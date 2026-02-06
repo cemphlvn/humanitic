@@ -1,0 +1,32 @@
+# Humanitic Ecosystem Instance Configuration
+
+ecosystem:
+  name: humanitic
+  version: 1.0.0
+  type: instance
+  mode: humanitic
+
+upstream:
+  plugin:
+    name: meta-agentic-loop
+    repo: "github.com/cemphlvn/meta-agentic-loop"
+    path: "./plugin"
+    sync: submodule
+
+humanitic:
+  enabled: true
+  license: "Humanitic Open License v1.0"
+  contribution_tracking: true
+  vector_rewards: true
+  mutual_support: true
+  founder_credits: true
+
+governance:
+  meta_principles:
+    - forever_open: true
+    - founder_credit: true
+    - mutual_support: true
+  changeable_policies:
+    - reward_distribution
+    - contribution_degree_calculation
+    - membership_requirements
