@@ -1,0 +1,42 @@
+# System Truths — Machinistic Intelligence Meta-Learning
+# Accumulated observations about system behavior, resources, and patterns
+# Format: Each entry is a truth discovered through operation
+
+---
+truths:
+
+  - id: ST-001
+    discovered: 2026-02-08
+    category: token_usage
+    observation: |
+      Multi-orchestrator architecture with curiosity_spark + CuriosityCoordinator
+      adds ~500 tokens to prompt but produces significantly better structured output.
+    implication: Pre-computed stick guidance trades tokens for quality.
+
+  - id: ST-002
+    discovered: 2026-02-08
+    category: architecture
+    observation: |
+      Coordinators (like CuriosityCoordinator) should run AFTER context gathering
+      but BEFORE generation. They need gathered facts to coordinate effectively.
+    implication: Pipeline order matters. Sticks → Context → Coordinators → Generation.
+
+  - id: ST-003
+    discovered: 2026-02-08
+    category: policy_suggestion
+    observation: |
+      Logging system truths as meta-learning is useful for:
+      1. Tracking what works across sessions
+      2. Building institutional memory for the codebase
+      3. Informing future architectural decisions
+    implication: This is a useful policy we can help suggest to the user.
+
+---
+# Append new truths below this line
+
+  - id: ST-004
+    discovered: 2026-02-08
+    category: token_usage
+    observation: |
+      Generation with full stick pipeline (6 sticks + 1 coordinator) produced 28-line song in ~50s
+    implication: Token investment in pre-computation pays off in output quality
