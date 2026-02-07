@@ -33,36 +33,8 @@ All contributions in `/public/` are licensed under [license TBD] with:
 ## Contributing
 
 ```bash
-# 1. Tag your contribution (timestamps + hashes)
+# Tag your contribution
 ./scripts/tag-contribution.sh public/yourname/project "description"
-
-# 2. Sign on Arweave (permanent provenance)
-./scripts/sign-arweave.sh contrib-1234567890
 ```
 
-## On-Chain Signing
-
-Contributions are signed to **Arweave** for permanent provenance:
-
-| Field | Description |
-|-------|-------------|
-| `hash` | SHA256 of contribution contents |
-| `timestamp` | ISO-8601 when tagged |
-| `signature` | `ar://{tx_id}` — permanent Arweave link |
-
-### Setup Arweave
-
-```bash
-npm install -g arkb
-# Get wallet from https://arweave.app/wallet
-# Fund with AR tokens
-mkdir -p ~/.arweave
-mv wallet.json ~/.arweave/
-```
-
-### Verify Contribution
-
-```bash
-# View on Arweave
-open https://arweave.net/{tx_id}
-```
+This timestamps and signs the contribution to your vector.
