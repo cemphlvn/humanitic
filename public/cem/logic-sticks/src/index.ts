@@ -22,3 +22,6 @@ export * from './docs.js';
 
 // Re-export composition utilities
 export * from './composition.js';
+
+// Re-export agentic stats (federated meta-learning)
+export * from './agentic-stats/index.js';
