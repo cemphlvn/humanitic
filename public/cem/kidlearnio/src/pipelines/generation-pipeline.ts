@@ -14,6 +14,7 @@ import { generateLyrics } from '@/agents/lyrics-agent';
 import { generateStyle, validateStylePrompt } from '@/agents/style-agent';
 import { processSticks, withCoordinatorOutputs } from '@/lib/stick-processor';
 import { createCuriosityCoordinator } from '@/agents/curiosity-coordinator';
+import { logPipelineRun } from '@/lib/agentic-logger';
 
 /**
  * Progress callback type for real-time updates.
@@ -199,6 +200,17 @@ export async function runPipeline(
 
     const durationMs = Date.now() - startTime;
 
+    // Log to agentic stats (Truth Technician Level 2)
+    logPipelineRun({
+      topic: input.topic,
+      language,
+      technique: finalTechnique,
+      ageRange: input.ageRange,
+      durationMs,
+      success: true,
+      tokensEstimate: 2500, // Approximate tokens per generation
+    });
+
     return {
       success: true,
       lyrics,
@@ -223,6 +235,17 @@ export async function runPipeline(
         error: errorMessage,
       })
     );
+
+    // Log failure to agentic stats
+    logPipelineRun({
+      topic: input.topic,
+      language: input.language ?? 'en',
+      technique: input.technique,
+      ageRange: input.ageRange,
+      durationMs: Date.now() - startTime,
+      success: false,
+      error: errorMessage,
+    });
 
     return {
       success: false,
