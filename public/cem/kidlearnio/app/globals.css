@@ -1,0 +1,378 @@
+/* KidLearnio — Global Styles */
+
+:root {
+  /* Curiosity Spark — Primary */
+  --spark-primary: #6c63ff;
+  --spark-primary-light: #9d97ff;
+  --spark-primary-dark: #4b44b3;
+
+  /* Learning Growth — Secondary */
+  --growth-secondary: #00d9a5;
+  --growth-secondary-light: #4fffcb;
+  --growth-secondary-dark: #00b389;
+
+  /* Wonder — Accent */
+  --wonder-accent: #ff6b9d;
+  --wonder-accent-light: #ff9bbf;
+  --wonder-accent-dark: #e64a7d;
+
+  /* Knowledge — Neutral */
+  --knowledge-dark: #2d3436;
+  --knowledge-medium: #636e72;
+  --knowledge-light: #b2bec3;
+  --knowledge-surface: #f8f9fa;
+  --knowledge-background: #ffffff;
+
+  /* Semantic */
+  --success: #00c853;
+  --warning: #ffb300;
+  --error: #ff5252;
+  --info: #2196f3;
+
+  /* Fonts */
+  --font-display: var(--font-fredoka), 'Nunito', sans-serif;
+  --font-body: var(--font-inter), 'Nunito Sans', sans-serif;
+
+  /* Spacing */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-8: 3rem;
+
+  /* MDB overrides */
+  --mdb-primary: var(--spark-primary);
+  --mdb-secondary: var(--growth-secondary);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  font-family: var(--font-body);
+  background: var(--knowledge-background);
+  color: var(--knowledge-dark);
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--font-display);
+  font-weight: 600;
+}
+
+/* Main container */
+.app-container {
+  min-height: 100vh;
+  background: linear-gradient(
+    180deg,
+    var(--knowledge-background) 0%,
+    var(--knowledge-surface) 100%
+  );
+}
+
+/* Header */
+.app-header {
+  background: white;
+  border-bottom: 1px solid var(--knowledge-light);
+  padding: var(--space-4) var(--space-6);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.app-title {
+  color: var(--spark-primary);
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.app-title i {
+  color: var(--wonder-accent);
+}
+
+/* Form card */
+.generator-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: var(--space-6);
+  margin-bottom: var(--space-5);
+}
+
+/* Input styling */
+.topic-input {
+  font-size: 1.1rem;
+  padding: var(--space-4);
+  border: 2px solid var(--knowledge-light);
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.topic-input:focus {
+  border-color: var(--spark-primary);
+  box-shadow: 0 0 0 3px var(--spark-primary-light);
+  outline: none;
+}
+
+/* Age slider */
+.age-slider-container {
+  padding: var(--space-4) 0;
+}
+
+.age-label {
+  font-weight: 600;
+  color: var(--knowledge-dark);
+  margin-bottom: var(--space-2);
+}
+
+.age-display {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--spark-primary);
+  font-weight: 700;
+}
+
+/* Technique buttons */
+.technique-buttons {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.technique-btn {
+  flex: 1;
+  min-width: 150px;
+  padding: var(--space-4);
+  border: 2px solid var(--knowledge-light);
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+}
+
+.technique-btn:hover {
+  border-color: var(--spark-primary-light);
+  transform: translateY(-2px);
+}
+
+.technique-btn.active {
+  border-color: var(--spark-primary);
+  background: linear-gradient(
+    135deg,
+    var(--spark-primary-light) 0%,
+    white 100%
+  );
+}
+
+.technique-btn h4 {
+  font-size: 1rem;
+  margin-bottom: var(--space-1);
+  color: var(--knowledge-dark);
+}
+
+.technique-btn p {
+  font-size: 0.85rem;
+  color: var(--knowledge-medium);
+  margin: 0;
+}
+
+/* Generate button */
+.generate-btn {
+  background: linear-gradient(
+    135deg,
+    var(--spark-primary) 0%,
+    var(--spark-primary-dark) 100%
+  );
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: var(--space-4) var(--space-6);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  width: 100%;
+}
+
+.generate-btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(108, 99, 255, 0.3);
+}
+
+.generate-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Pipeline progress */
+.pipeline-progress {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  background: var(--knowledge-surface);
+  border-radius: 12px;
+  margin-top: var(--space-4);
+}
+
+.pipeline-stage {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+.pipeline-stage.active {
+  background: var(--spark-primary);
+  color: white;
+  animation: pulse 1.5s infinite;
+}
+
+.pipeline-stage.complete {
+  background: var(--growth-secondary);
+  color: white;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+/* Output cards */
+.output-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  padding: var(--space-5);
+  margin-bottom: var(--space-4);
+}
+
+.output-card h3 {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+  color: var(--knowledge-dark);
+}
+
+.output-card h3 i {
+  color: var(--wonder-accent);
+}
+
+.lyrics-display {
+  font-family: var(--font-body);
+  white-space: pre-wrap;
+  line-height: 1.6;
+  padding: var(--space-4);
+  background: var(--knowledge-surface);
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.style-display {
+  font-family: monospace;
+  padding: var(--space-4);
+  background: var(--knowledge-dark);
+  color: var(--growth-secondary-light);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+/* Copy button */
+.copy-btn {
+  background: transparent;
+  border: 1px solid var(--knowledge-light);
+  border-radius: 8px;
+  padding: var(--space-2) var(--space-3);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.85rem;
+  color: var(--knowledge-medium);
+  transition: all 0.2s ease;
+}
+
+.copy-btn:hover {
+  border-color: var(--spark-primary);
+  color: var(--spark-primary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .app-header {
+    padding: var(--space-3) var(--space-4);
+  }
+
+  .generator-card {
+    padding: var(--space-4);
+    border-radius: 12px;
+  }
+
+  .technique-buttons {
+    flex-direction: column;
+  }
+
+  .technique-btn {
+    min-width: 100%;
+  }
+}
+
+/* Loading notes animation */
+.loading-notes {
+  display: flex;
+  gap: var(--space-2);
+  justify-content: center;
+}
+
+.loading-note {
+  width: 12px;
+  height: 12px;
+  background: var(--spark-primary);
+  border-radius: 50%;
+  animation: bounce-note 0.6s infinite ease-in-out;
+}
+
+.loading-note:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.loading-note:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+@keyframes bounce-note {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}

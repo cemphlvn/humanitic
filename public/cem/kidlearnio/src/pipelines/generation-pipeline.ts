@@ -1,0 +1,260 @@
+import { v4 as uuidv4 } from 'uuid';
+import type {
+  GenerationInput,
+  GenerationOutput,
+  PipelineState,
+  PipelineStage,
+  GatheredContext,
+  Technique,
+} from '@/types';
+import { loadAgentDocuments } from '@/lib/document-loader';
+import { gatherContext } from '@/agents/context-gatherer';
+import { decideOnTechnique, runOrchestrator } from '@/agents/orchestrator';
+import { generateLyrics } from '@/agents/lyrics-agent';
+import { generateStyle, validateStylePrompt } from '@/agents/style-agent';
+
+/**
+ * Progress callback type for real-time updates.
+ */
+export type ProgressCallback = (state: PipelineState) => void | Promise<void>;
+
+/**
+ * Create initial pipeline state.
+ */
+function createInitialState(input: GenerationInput): PipelineState {
+  const now = new Date().toISOString();
+  return {
+    stage: 'IDLE',
+    topic: input.topic,
+    ageRange: input.ageRange,
+    technique: input.technique,
+    startedAt: now,
+    updatedAt: now,
+  };
+}
+
+/**
+ * Update pipeline state with new stage.
+ */
+function updateState(
+  state: PipelineState,
+  updates: Partial<PipelineState>
+): PipelineState {
+  return {
+    ...state,
+    ...updates,
+    updatedAt: new Date().toISOString(),
+  };
+}
+
+/**
+ * Run the complete generation pipeline.
+ */
+export async function runPipeline(
+  input: GenerationInput,
+  onProgress?: ProgressCallback
+): Promise<GenerationOutput> {
+  const sessionId = uuidv4();
+  const startTime = Date.now();
+
+  let state = createInitialState(input);
+
+  const emitProgress = async (newState: PipelineState) => {
+    state = newState;
+    if (onProgress) {
+      await onProgress(state);
+    }
+  };
+
+  try {
+    // Load agent documents
+    const docs = await loadAgentDocuments();
+
+    // Stage 1: Gathering Context
+    await emitProgress(updateState(state, { stage: 'GATHERING_CONTEXT' }));
+    const context = await gatherContext(input.topic, input.ageRange);
+
+    // Stage 2: Decide on Technique (if not specified or to confirm)
+    await emitProgress(
+      updateState(state, {
+        stage: 'APPLYING_TECHNIQUE',
+        context,
+      })
+    );
+
+    const decision = await decideOnTechnique(
+      docs,
+      input.topic,
+      input.ageRange
+    );
+
+    // Use user's preference or agent's decision
+    const finalTechnique: Technique =
+      input.technique !== decision.technique
+        ? input.technique // User override
+        : decision.technique;
+
+    // Stage 3: Generate Lyrics
+    let lyrics: string | undefined;
+    if (input.outputType === 'lyrics' || input.outputType === 'both') {
+      await emitProgress(
+        updateState(state, {
+          stage: 'GENERATING_LYRICS',
+          technique: finalTechnique,
+        })
+      );
+
+      lyrics = await generateLyrics(
+        docs,
+        context,
+        finalTechnique,
+        input.ageRange,
+        decision.curiosityTechnique
+      );
+    }
+
+    // Stage 4: Generate Style
+    let style: string | undefined;
+    if (input.outputType === 'style' || input.outputType === 'both') {
+      await emitProgress(
+        updateState(state, {
+          stage: 'GENERATING_STYLE',
+          lyrics,
+        })
+      );
+
+      style = await generateStyle(
+        docs,
+        input.topic,
+        finalTechnique,
+        input.ageRange
+      );
+
+      // Validate style
+      const validation = validateStylePrompt(style);
+      if (!validation.valid) {
+        console.warn('Style validation issues:', validation.issues);
+      }
+    }
+
+    // Stage 5: Store to Memory (placeholder - Cognee integration)
+    await emitProgress(
+      updateState(state, {
+        stage: 'STORING_MEMORY',
+        lyrics,
+        style,
+      })
+    );
+
+    // TODO: Implement Cognee memory storage
+    const memoryId = sessionId; // Placeholder
+
+    // Stage 6: Complete
+    await emitProgress(
+      updateState(state, {
+        stage: 'COMPLETE',
+        memoryId,
+      })
+    );
+
+    const durationMs = Date.now() - startTime;
+
+    return {
+      success: true,
+      lyrics,
+      style,
+      metadata: {
+        topic: input.topic,
+        ageRange: input.ageRange,
+        technique: finalTechnique,
+        sessionId,
+        timestamp: new Date().toISOString(),
+        durationMs,
+      },
+    };
+  } catch (error) {
+    const errorMessage =
+      error instanceof Error ? error.message : 'Unknown error';
+
+    await emitProgress(
+      updateState(state, {
+        stage: 'ERROR',
+        error: errorMessage,
+      })
+    );
+
+    return {
+      success: false,
+      metadata: {
+        topic: input.topic,
+        ageRange: input.ageRange,
+        technique: input.technique,
+        sessionId,
+        timestamp: new Date().toISOString(),
+        durationMs: Date.now() - startTime,
+      },
+      error: errorMessage,
+    };
+  }
+}
+
+/**
+ * Run pipeline with full orchestration (single-shot mode).
+ * Uses the orchestrator to run everything in one Claude call.
+ */
+export async function runPipelineSingleShot(
+  input: GenerationInput
+): Promise<GenerationOutput> {
+  const sessionId = uuidv4();
+  const startTime = Date.now();
+
+  try {
+    const docs = await loadAgentDocuments();
+    const result = await runOrchestrator(docs, input);
+
+    return {
+      success: true,
+      lyrics: result.lyrics,
+      style: result.style,
+      metadata: {
+        topic: input.topic,
+        ageRange: input.ageRange,
+        technique: result.technique,
+        sessionId,
+        timestamp: new Date().toISOString(),
+        durationMs: Date.now() - startTime,
+      },
+    };
+  } catch (error) {
+    return {
+      success: false,
+      metadata: {
+        topic: input.topic,
+        ageRange: input.ageRange,
+        technique: input.technique,
+        sessionId,
+        timestamp: new Date().toISOString(),
+        durationMs: Date.now() - startTime,
+      },
+      error: error instanceof Error ? error.message : 'Unknown error',
+    };
+  }
+}
+
+/**
+ * Get human-readable stage description.
+ */
+export function getStageDescription(stage: PipelineStage): string {
+  const descriptions: Record<PipelineStage, string> = {
+    IDLE: 'Ready to start',
+    GATHERING_CONTEXT: 'Gathering educational context...',
+    APPLYING_TECHNIQUE: 'Applying learning technique...',
+    GENERATING_LYRICS: 'Writing song lyrics...',
+    GENERATING_STYLE: 'Crafting music style...',
+    STORING_MEMORY: 'Saving to memory...',
+    COMPLETE: 'Generation complete!',
+    ERROR: 'An error occurred',
+  };
+
+  return descriptions[stage];
+}

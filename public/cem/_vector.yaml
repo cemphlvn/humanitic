@@ -20,3 +20,10 @@ contributions: []
   timestamp: 2026-02-07T21:03:11Z
   hash: 166b40707fb08082fa7a25fdf591f289bc575fe3f55f261fd26a3856888e6cc2
   signature: pending  # TODO: on-chain signing
+
+- id: contrib-1770500605
+  project: public/cem/kidlearnio
+  description: "Agentic Suno prompt writer for K-12 curiosity-driven education"
+  timestamp: 2026-02-07T21:43:25Z
+  hash: 6c87e050079cafd4015c39e80496249d070b67e1be23be184ae79232c258ecfb
+  signature: pending  # TODO: on-chain signing
