@@ -1,0 +1,18 @@
+# Personal Vector — cem
+# Private workspace configuration
+
+user: cem
+created: 2025-02-08T00:00:00Z
+
+# Curiosity vectors (private development)
+curiosities: []
+
+# Culture propagation settings
+culture:
+  inheritance: 0.8  # 80% passes to child agents
+  retention: 0.2    # 20% retained personally
+
+# Preferences
+preferences:
+  default_model: sonnet
+  verbose: false

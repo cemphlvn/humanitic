@@ -1,0 +1,22 @@
+# Contribution Vector — cem
+# Tokenized contributions with timestamps
+
+contributor: cem
+created: 2025-02-08T00:00:00Z
+chain: pending  # Will be signed on-chain
+
+contributions: []
+# Each contribution will be appended:
+# - id: contrib-{timestamp}
+#   project: path/to/project
+#   description: what was contributed
+#   timestamp: ISO-8601
+#   hash: sha256 of contribution
+#   signature: on-chain signature (pending)
+
+- id: contrib-1770498191
+  project: public/cem
+  description: "Initial public namespace creation"
+  timestamp: 2026-02-07T21:03:11Z
+  hash: 166b40707fb08082fa7a25fdf591f289bc575fe3f55f261fd26a3856888e6cc2
+  signature: pending  # TODO: on-chain signing
