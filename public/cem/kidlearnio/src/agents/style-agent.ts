@@ -1,11 +1,12 @@
-import type { AgentDocuments, AgeRange, Technique } from '@/types';
+import type { AgentDocuments, AgentDocumentsWithBrain, AgeRange, Technique } from '@/types';
 import { createMessage, MODELS, TOKEN_LIMITS } from '@/lib/anthropic';
 import { getDocumentExcerpt } from '@/lib/document-loader';
 
 /**
  * Build the style agent system prompt.
+ * Accepts either AgentDocuments or AgentDocumentsWithBrain.
  */
-export function buildStyleAgentPrompt(docs: AgentDocuments): string {
+export function buildStyleAgentPrompt(docs: AgentDocuments | AgentDocumentsWithBrain): string {
   return `You are the STYLE AGENT of KidLearnio.
 Your job is to craft Suno AI style prompts for educational children's songs.
 
@@ -73,9 +74,10 @@ Return ONLY the style prompt, nothing else. Single line, 4-7 descriptors, comma-
 
 /**
  * Generate a Suno style prompt.
+ * Accepts either AgentDocuments or AgentDocumentsWithBrain.
  */
 export async function generateStyle(
-  docs: AgentDocuments,
+  docs: AgentDocuments | AgentDocumentsWithBrain,
   topic: string,
   technique: Technique,
   ageRange: AgeRange,

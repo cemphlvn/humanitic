@@ -4,10 +4,10 @@ import type {
   GenerationOutput,
   PipelineState,
   PipelineStage,
-  GatheredContext,
   Technique,
+  SupportedLanguage,
 } from '@/types';
-import { loadAgentDocuments } from '@/lib/document-loader';
+import { loadAgentDocumentsWithBrain } from '@/lib/document-loader';
 import { gatherContext } from '@/agents/context-gatherer';
 import { decideOnTechnique, runOrchestrator } from '@/agents/orchestrator';
 import { generateLyrics } from '@/agents/lyrics-agent';
@@ -67,8 +67,10 @@ export async function runPipeline(
   };
 
   try {
-    // Load agent documents
-    const docs = await loadAgentDocuments();
+    // ENFORCEMENT: Load agent documents WITH language brain
+    // Language brain MUST be loaded before lyrics generation (Brains Before Mouths)
+    const language: SupportedLanguage = input.language ?? 'en';
+    const docsWithBrain = await loadAgentDocumentsWithBrain(language);
 
     // Stage 1: Gathering Context
     await emitProgress(updateState(state, { stage: 'GATHERING_CONTEXT' }));
@@ -83,7 +85,7 @@ export async function runPipeline(
     );
 
     const decision = await decideOnTechnique(
-      docs,
+      docsWithBrain,
       input.topic,
       input.ageRange
     );
@@ -94,7 +96,7 @@ export async function runPipeline(
         ? input.technique // User override
         : decision.technique;
 
-    // Stage 3: Generate Lyrics
+    // Stage 3: Generate Lyrics (with language brain enforcement)
     let lyrics: string | undefined;
     if (input.outputType === 'lyrics' || input.outputType === 'both') {
       await emitProgress(
@@ -104,8 +106,9 @@ export async function runPipeline(
         })
       );
 
+      // ENFORCEMENT: generateLyrics requires docsWithBrain (includes language brain)
       lyrics = await generateLyrics(
-        docs,
+        docsWithBrain,
         context,
         finalTechnique,
         input.ageRange,
@@ -124,7 +127,7 @@ export async function runPipeline(
       );
 
       style = await generateStyle(
-        docs,
+        docsWithBrain,
         input.topic,
         finalTechnique,
         input.ageRange
@@ -167,6 +170,7 @@ export async function runPipeline(
         topic: input.topic,
         ageRange: input.ageRange,
         technique: finalTechnique,
+        language,
         sessionId,
         timestamp: new Date().toISOString(),
         durationMs,
@@ -189,6 +193,7 @@ export async function runPipeline(
         topic: input.topic,
         ageRange: input.ageRange,
         technique: input.technique,
+        language: input.language ?? 'en',
         sessionId,
         timestamp: new Date().toISOString(),
         durationMs: Date.now() - startTime,
@@ -207,10 +212,11 @@ export async function runPipelineSingleShot(
 ): Promise<GenerationOutput> {
   const sessionId = uuidv4();
   const startTime = Date.now();
+  const language: SupportedLanguage = input.language ?? 'en';
 
   try {
-    const docs = await loadAgentDocuments();
-    const result = await runOrchestrator(docs, input);
+    const docsWithBrain = await loadAgentDocumentsWithBrain(language);
+    const result = await runOrchestrator(docsWithBrain, input);
 
     return {
       success: true,
@@ -220,6 +226,7 @@ export async function runPipelineSingleShot(
         topic: input.topic,
         ageRange: input.ageRange,
         technique: result.technique,
+        language,
         sessionId,
         timestamp: new Date().toISOString(),
         durationMs: Date.now() - startTime,
@@ -232,6 +239,7 @@ export async function runPipelineSingleShot(
         topic: input.topic,
         ageRange: input.ageRange,
         technique: input.technique,
+        language,
         sessionId,
         timestamp: new Date().toISOString(),
         durationMs: Date.now() - startTime,

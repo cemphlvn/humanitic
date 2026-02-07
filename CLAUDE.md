@@ -102,6 +102,10 @@ humanitic/
 │       ├── skills/            # cockpit, start, shift, etc.
 │       ├── agents/            # Agent methodology
 │       └── governance/        # Meta-principles
+├── public/
+│   └── cem/                   # Contributor instances
+│       ├── kidlearnio/        # Educational song generator (consumes logic-sticks)
+│       └── logic-sticks/      # Shared reasoning substrate (co-built)
 ├── prompt-writer/             # Agentic Suno Prompt Writer (Next.js)
 ├── librarian/                 # Self-organizing knowledge system
 ├── meta/                      # Meta-awareness layer
@@ -119,6 +123,37 @@ vector_tracking: true          # Contributions tracked via _vector.yaml
 founder_rewards: true          # Curiosity founders rewarded by contribution
 credit_chains: true            # Companies credit original vectors
 mutual_support: true           # Ecosystem members help freely
+co_build_freely: true          # Everything designed to be co-built openly
+```
+
+---
+
+## CO-BUILDING ARCHITECTURE
+
+```yaml
+principle: |
+  Everything in Humanitic is designed to be co-built freely.
+  Instances consume shared substrates. Usage evolves both.
+
+shared_substrates:
+  logic-sticks:
+    path: /public/cem/logic-sticks/
+    purpose: Fundamental thought patterns in conceptual space
+    nature: Vectors weaving reasoning in harmony
+    status: Developing through kidlearnio instantiation
+
+consumer_instances:
+  kidlearnio:
+    path: /public/cem/kidlearnio/
+    consumes: [logic-sticks]
+    contributes: Refines sticks through educational use
+    status: Active
+
+co_evolution:
+  - Consumer instances use substrate
+  - Usage reveals needed improvements
+  - Improvements benefit all consumers
+  - New instances join, contribute, benefit
 ```
 
 ---

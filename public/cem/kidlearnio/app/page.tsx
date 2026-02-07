@@ -5,7 +5,7 @@ import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { GeneratorForm } from '@/components/GeneratorForm';
 import { OutputDisplay } from '@/components/OutputDisplay';
 import { PipelineProgress } from '@/components/PipelineProgress';
-import type { GenerationOutput, PipelineStage, Technique } from '@/types';
+import type { GenerationOutput, PipelineStage, Technique, SupportedLanguage } from '@/types';
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -18,6 +18,7 @@ export default function HomePage() {
       topic: string;
       ageRange: [number, number];
       technique: Technique;
+      language: SupportedLanguage;
     }) => {
       setIsLoading(true);
       setError(null);
@@ -49,6 +50,7 @@ export default function HomePage() {
             topic: formData.topic,
             ageRange: formData.ageRange,
             technique: formData.technique,
+            language: formData.language,
             outputType: 'both',
           }),
         });

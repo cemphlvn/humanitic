@@ -145,6 +145,58 @@ h6 {
   font-weight: 700;
 }
 
+/* Language buttons — Brains Before Mouths */
+.language-buttons {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.language-btn {
+  padding: var(--space-3) var(--space-4);
+  border: 2px solid var(--knowledge-light);
+  border-radius: 12px;
+  background: white;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+  min-width: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.language-btn:hover {
+  border-color: var(--wonder-accent-light);
+  transform: translateY(-2px);
+}
+
+.language-btn.active {
+  border-color: var(--wonder-accent);
+  background: linear-gradient(
+    135deg,
+    var(--wonder-accent-light) 0%,
+    white 100%
+  );
+}
+
+.language-code {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--knowledge-dark);
+}
+
+.language-name {
+  font-size: 0.75rem;
+  color: var(--knowledge-medium);
+}
+
+.language-btn.active .language-code {
+  color: var(--wonder-accent-dark);
+}
+
 /* Technique buttons */
 .technique-buttons {
   display: flex;

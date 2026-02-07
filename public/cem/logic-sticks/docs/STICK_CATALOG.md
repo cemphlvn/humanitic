@@ -1,52 +1,19 @@
-# Logic Sticks — KidLearnio Consumer View
+# Logic Sticks Catalog
 
-> **Consuming shared reasoning patterns from logic-sticks substrate**
-> "Sticks" that hold logic together across sessions
-
-```yaml
-consumer: kidlearnio
-substrate: /public/cem/logic-sticks/
-relationship: Consume and co-build
-principle: |
-  KidLearnio uses sticks from the shared substrate.
-  Usage drives improvement. Improvement benefits all.
-```
+> **Atomic reasoning patterns for agent composition**
+> Each stick is a vector in conceptual space
 
 ---
 
-## Shared Substrate Reference
+## Foundation Sticks
 
-**Full catalog:** `../logic-sticks/docs/STICK_CATALOG.md`
-**Vector model:** `../logic-sticks/docs/VECTOR_MODEL.md`
-
----
-
-## What Are Logic Sticks?
-
-```yaml
-definition: |
-  Atomic units of reasoning that can be composed into larger behaviors.
-  Named "sticks" because they:
-  - Can be picked up and used anywhere
-  - Connect pieces together
-  - Are simple but strong
-  - Build structures when combined
-
-purpose:
-  - Ensure consistent reasoning across agents
-  - Enable behavior modification without code changes
-  - Create composable intelligence patterns
-```
-
----
-
-## Core Logic Sticks
-
-### 1. Age Adapter Stick
+### 1. Age Adapter
 
 ```yaml
 name: age_adapter
 purpose: Adjust any content for target age range
+vector: [development, accessibility, appropriateness]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN age_range [min, max]
@@ -71,16 +38,18 @@ logic: |
 
   RETURN adjusted_parameters
 
-usage:
-  - Every agent applies this before generating content
-  - Ensures age-appropriate output across system
+composition:
+  composes_with: [vocabulary_gate, connection_bridge]
+  composed_by: [structure_scaffold]
 ```
 
-### 2. Curiosity Spark Stick
+### 2. Curiosity Spark
 
 ```yaml
 name: curiosity_spark
 purpose: Transform any statement into a curiosity trigger
+vector: [engagement, wonder, question]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN fact: string
@@ -98,16 +67,18 @@ logic: |
 
   RETURN curiosity_trigger
 
-example:
-  input: "Water evaporates when heated"
-  output: "I wonder where puddles disappear to on sunny days..."
+composition:
+  composes_with: [age_adapter]
+  composed_by: [structure_scaffold]
 ```
 
-### 3. Memorability Booster Stick
+### 3. Memorability Booster
 
 ```yaml
 name: memorability_booster
 purpose: Make any phrase more memorable
+vector: [retention, rhythm, recall]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN phrase: string
@@ -123,17 +94,18 @@ logic: |
 
   RETURN boosted_phrase
 
-example:
-  input: "Plants use sunlight to make food"
-  techniques_applied: [rhythm, rhyme]
-  output: "Plants use the light of the sun / To make their food, every one!"
+composition:
+  composes_with: [rhyme_finder]
+  composed_by: [structure_scaffold]
 ```
 
-### 4. Connection Bridge Stick
+### 4. Connection Bridge
 
 ```yaml
 name: connection_bridge
 purpose: Create bridge from known concept to unknown
+vector: [analogy, scaffolding, transfer]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN:
@@ -152,18 +124,18 @@ logic: |
 
   RETURN bridge_statement
 
-example:
-  known: "heart"
-  unknown: "pump"
-  shared: "pushes liquid"
-  output: "Your heart is like a pump because it pushes blood around!"
+composition:
+  composes_with: [age_adapter]
+  composed_by: [structure_scaffold]
 ```
 
-### 5. Structure Scaffold Stick
+### 5. Structure Scaffold
 
 ```yaml
 name: structure_scaffold
-purpose: Apply consistent song structure based on technique
+purpose: Apply consistent structure based on technique
+vector: [organization, consistency, flow]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN technique: "memorization" | "connection"
@@ -186,15 +158,17 @@ logic: |
       bridge_purpose: "real world connection"
     }
 
-usage:
-  - Lyrics Agent applies this to ensure correct structure
+composition:
+  composes: [age_adapter, curiosity_spark, memorability_booster, connection_bridge]
 ```
 
-### 6. Vocabulary Gate Stick
+### 6. Vocabulary Gate
 
 ```yaml
 name: vocabulary_gate
 purpose: Check and replace words above age level
+vector: [accessibility, clarity, simplification]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN:
@@ -215,17 +189,17 @@ logic: |
 
   RETURN gated_text
 
-example:
-  input: "Photosynthesis converts carbon dioxide"
-  age: 8
-  output: "Photo-SIN-thesis (making food with light) changes the air we breathe out"
+composition:
+  composes_with: [age_adapter, connection_bridge]
 ```
 
-### 7. Rhyme Finder Stick
+### 7. Rhyme Finder
 
 ```yaml
 name: rhyme_finder
 purpose: Find age-appropriate rhymes for any word
+vector: [phonetics, vocabulary, melody]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN:
@@ -245,17 +219,17 @@ logic: |
 
   RETURN top_5_rhymes
 
-example:
-  word: "sun"
-  age: 7
-  output: ["fun", "run", "one", "done", "begun"]
+composition:
+  composes_with: [vocabulary_gate, memorability_booster]
 ```
 
-### 8. Language Router Stick
+### 8. Language Router
 
 ```yaml
 name: language_router
 purpose: Route concept through correct language brain BEFORE generation
+vector: [cognition, localization, native_voice]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN:
@@ -272,56 +246,32 @@ logic: |
   LOAD:
     brain_document: docs/languages/LYRICS_{LANG}.md
 
-  EXTRACT_FROM_BRAIN:
-    cognitive_semantics:
-      - How speakers of this language THINK
-      - Agent focus vs topic focus
-      - Evidentiality markers
-      - Spatial/temporal framing
-
-    linguistic_features:
-      - Word order (SOV, SVO, etc.)
-      - Morphological patterns (agglutination, isolation)
-      - Phonetic constraints (tones, stress, syllables)
-
-    word_arts:
-      - Native idioms (NOT translated idioms)
-      - Proverbs in original form
-      - Language-specific wordplay
-      - Native rhyme patterns
-
   APPLY_IN_ORDER:
-    1. cognitive_semantics  # Set mental model
-    2. grammatical_features # Structure output
-    3. morphological_rules  # Form words correctly
-    4. phonetic_patterns    # Ensure singability
-    5. word_arts            # Add native flavor
-    6. rhyme_meter          # Polish with native patterns
+    1. cognitive_semantics
+    2. grammatical_features
+    3. morphological_rules
+    4. phonetic_patterns
+    5. word_arts
+    6. rhyme_meter
 
-  VALIDATE:
-    - Zero translated idioms
-    - Natural word order
-    - Correct morphology
-    - Native rhythm/meter
+  RETURN lyrics_in_native_voice
 
-  OUTPUT:
-    lyrics: string (in target language, NATIVE voice)
-
-example:
-  input_concept: "Water evaporates when heated"
-
-  english_output: "Up, up, up! The water flies high!"
-  turkish_output: "Yukarı, yukarı! Su uçar, buhar olur!"
-  chinese_output: "蒸发啦！（往上飘）水滴旅行转圈圈！"
-
-  note: Each uses NATIVE patterns, not translations
+composition:
+  precedes: ALL other sticks (mandatory first position)
+  domain: Language-specific content generation
 ```
 
-### 9. Suno Style Composer Stick
+---
+
+## Domain Sticks (Suno-Specific)
+
+### 9. Suno Style Composer
 
 ```yaml
 name: suno_style_composer
 purpose: Build valid Suno style prompt from components
+vector: [style, musicality, age_appropriate]
+consumers: [kidlearnio]
 
 logic: |
   GIVEN:
@@ -339,62 +289,37 @@ logic: |
       ages_8_10: "100-120 BPM, energetic"
       ages_11_14: "100-130 BPM, dynamic"
 
-    vocals:
-      all: "clear enunciation, child-friendly range"
-      add_for_memorization: "sing-along, call and response"
-      add_for_connection: "expressive, narrative quality"
-
-    instruments:
-      ages_5_7: "acoustic guitar, ukulele, piano, claps"
-      ages_8_10: "piano, guitar, light drums, bells"
-      ages_11_14: "full band, synths, varied percussion"
-
   COMPOSE: "[genre], [mood], [tempo], [instruments], [vocals]"
-
   VALIDATE: 4-7 descriptors
 
   RETURN style_prompt
+
+composition:
+  composes_with: [age_adapter]
+  domain: Suno AI music generation
 ```
 
 ---
 
 ## Composition Rules
 
-### Stick Ordering
-
 ```yaml
-when_generating_lyrics:
+ordering:
   0. language_router       # MUST BE FIRST — load language brain
   1. age_adapter           # Determine constraints
   2. curiosity_spark       # Create opening hook
   3. structure_scaffold    # Get section blueprint
   4. connection_bridge     # If technique is connection
   5. memorability_booster  # Enhance key phrases
-  6. vocabulary_gate       # Final vocabulary check (language-specific)
-  7. rhyme_finder          # Polish rhyme scheme (native patterns)
+  6. vocabulary_gate       # Final vocabulary check
+  7. rhyme_finder          # Polish rhyme scheme
 
-when_generating_style:
-  1. age_adapter           # Determine constraints
-  2. suno_style_composer   # Build prompt
-
-ENFORCEMENT:
-  - language_router MUST execute before ANY lyric generation
-  - If language_router not executed, lyrics generation MUST FAIL
-  - This is architectural enforcement, not optional
-```
-
-### Stick Conflicts
-
-```yaml
-resolution_priority:
-  1. Safety (never compromise on age-appropriateness)
-  2. Educational accuracy
-  3. Memorability
-  4. Style preferences
-
-example_conflict:
-  situation: rhyme_finder suggests word outside vocabulary_gate
-  resolution: vocabulary_gate wins, find different rhyme
+conflicts:
+  resolution_priority:
+    1. Safety (never compromise age-appropriateness)
+    2. Educational accuracy
+    3. Memorability
+    4. Style preferences
 ```
 
 ---
@@ -402,17 +327,18 @@ example_conflict:
 ## Adding New Sticks
 
 ```yaml
-template:
-  name: unique_identifier
-  purpose: single_sentence_description
-  logic: |
-    GIVEN inputs
-    PROCESS with clear steps
-    RETURN outputs
-  example:
-    input: ...
-    output: ...
-  integration_point: where_in_pipeline_this_applies
+process:
+  1. Identify gap in reasoning capability
+  2. Define vector (conceptual direction)
+  3. Specify logic (GIVEN → PROCESS → RETURN)
+  4. Declare composition relationships
+  5. Add to catalog
+  6. Consumer tests and refines
+
+contribution:
+  - Fork/PR to humanitic/public/cem/logic-sticks
+  - Or: File issue describing needed stick
+  - Or: Consumer instance evolves stick through use
 ```
 
 ---
@@ -421,6 +347,7 @@ template:
 
 ```yaml
 version: 1.0.0
-type: agent-knowledge-document
-purpose: Define reusable reasoning patterns for agent consistency
+type: shared-substrate
+purpose: Atomic reasoning patterns for agent composition
+status: Co-building with kidlearnio
 ```

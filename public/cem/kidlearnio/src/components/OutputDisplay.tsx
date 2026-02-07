@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from 'react';
 import type { GenerationMetadata } from '@/types';
+import { LANGUAGE_NAMES } from '@/types';
 
 interface OutputDisplayProps {
   lyrics?: string;
@@ -38,6 +39,10 @@ export function OutputDisplay({ lyrics, style, metadata }: OutputDisplayProps) {
         <span className="badge bg-primary">
           <i className="fas fa-book-open me-1" />
           {metadata.topic}
+        </span>
+        <span className="badge" style={{ background: 'var(--wonder-accent)', color: 'white' }}>
+          <i className="fas fa-globe me-1" />
+          {LANGUAGE_NAMES[metadata.language]}
         </span>
         <span className="badge bg-secondary">
           <i className="fas fa-child me-1" />

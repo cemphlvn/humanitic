@@ -1,6 +1,53 @@
 import { z } from 'zod';
 
 // ============================================================================
+// LANGUAGE SCHEMAS — Brains Before Mouths
+// ============================================================================
+
+export const SupportedLanguageSchema = z.enum(['en', 'tr', 'zh']);
+export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
+
+export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
+  en: 'English',
+  tr: 'Türkçe',
+  zh: '中文',
+};
+
+export const LANGUAGE_BRAIN_PATHS: Record<SupportedLanguage, string> = {
+  en: 'docs/languages/LYRICS_EN.md',
+  tr: 'docs/languages/LYRICS_TR.md',
+  zh: 'docs/languages/LYRICS_ZH.md',
+};
+
+/**
+ * Language Brain — cognitive patterns for target language
+ * Loaded from LYRICS_{LANG}.md before any generation
+ */
+export interface LanguageBrain {
+  code: SupportedLanguage;
+  name: string;
+
+  // Cognitive patterns (how speakers THINK)
+  cognitiveSemantics: {
+    agentFocus: 'high' | 'medium' | 'low';
+    topicProminent: boolean;
+    evidentiality: boolean;
+    spatialFraming: 'absolute' | 'relative' | 'intrinsic';
+  };
+
+  // Linguistic features
+  features: {
+    wordOrder: 'SOV' | 'SVO' | 'VSO' | 'flexible';
+    agglutinative: boolean;
+    tonal: boolean;
+    stressPattern: 'fixed' | 'mobile' | 'pitch';
+  };
+
+  // Raw document content
+  rawDocument: string;
+}
+
+// ============================================================================
 // INPUT SCHEMAS
 // ============================================================================
 
@@ -19,6 +66,7 @@ export const GenerationInputSchema = z.object({
   topic: z.string().min(1, 'Topic is required').max(200, 'Topic too long'),
   ageRange: AgeRangeSchema,
   technique: TechniqueSchema,
+  language: SupportedLanguageSchema.default('en'),
   outputType: OutputTypeSchema.default('both'),
   customInstructions: z.string().max(500).optional(),
 });
@@ -85,6 +133,7 @@ export const GenerationMetadataSchema = z.object({
   topic: z.string(),
   ageRange: AgeRangeSchema,
   technique: TechniqueSchema,
+  language: SupportedLanguageSchema,
   sessionId: z.string(),
   timestamp: z.string(),
   durationMs: z.number(),
@@ -132,6 +181,11 @@ export interface AgentDocuments {
   pipeline: string;
   logicSticks: string;
   sunoGuide: string;
+  languageArchitecture: string;
+}
+
+export interface AgentDocumentsWithBrain extends AgentDocuments {
+  languageBrain: LanguageBrain;
 }
 
 // ============================================================================

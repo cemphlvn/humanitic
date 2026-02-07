@@ -1,21 +1,65 @@
-import type { AgentDocuments, GatheredContext, AgeRange, Technique } from '@/types';
+import type {
+  AgentDocumentsWithBrain,
+  GatheredContext,
+  AgeRange,
+  Technique,
+} from '@/types';
 import { createMessage, MODELS, TOKEN_LIMITS } from '@/lib/anthropic';
 import { getDocumentExcerpt } from '@/lib/document-loader';
 
 /**
- * Build the lyrics agent system prompt.
+ * Build the lyrics agent system prompt WITH language brain.
+ * ENFORCEMENT: Language brain MUST be loaded before this function is called.
  */
-export function buildLyricsAgentPrompt(docs: AgentDocuments): string {
+export function buildLyricsAgentPrompt(docs: AgentDocumentsWithBrain): string {
+  const brain = docs.languageBrain;
+
+  // ENFORCEMENT: Fail fast if no brain
+  if (!brain || !brain.rawDocument) {
+    throw new Error(
+      'ENFORCEMENT FAILURE: Language brain not loaded. ' +
+      'Cannot generate lyrics without loading language brain first. ' +
+      'Use loadAgentDocumentsWithBrain() instead of loadAgentDocuments().'
+    );
+  }
+
   return `You are the LYRICS AGENT of KidLearnio.
 Your job is to write educational song lyrics that spark curiosity and teach effectively.
+
+═══════════════════════════════════════════════════════════════════════════════
+CRITICAL: BRAINS BEFORE MOUTHS — Language-Native Generation
+═══════════════════════════════════════════════════════════════════════════════
+
+You are generating lyrics in: ${brain.name} (${brain.code})
+
+COGNITIVE PATTERNS FOR THIS LANGUAGE:
+- Agent Focus: ${brain.cognitiveSemantics.agentFocus}
+- Topic-Prominent: ${brain.cognitiveSemantics.topicProminent}
+- Evidentiality Markers: ${brain.cognitiveSemantics.evidentiality}
+- Word Order: ${brain.features.wordOrder}
+- Agglutinative: ${brain.features.agglutinative}
+- Tonal: ${brain.features.tonal}
+
+LANGUAGE-SPECIFIC GUIDE:
+${getDocumentExcerpt(brain.rawDocument, 4000)}
+
+ENFORCEMENT RULES:
+1. NEVER generate in English first then translate
+2. THINK in ${brain.name} — use native cognitive patterns
+3. USE native idioms, proverbs, wordplay (NOT translated)
+4. APPLY language-specific rhyme patterns
+5. RESPECT morphological rules (e.g., vowel harmony for Turkish)
+6. MATCH native rhythm patterns (syllable count for Turkish/Chinese, stress for English)
+
+═══════════════════════════════════════════════════════════════════════════════
 
 CORE DOCUMENTS:
 
 ---CURIOSITY TECHNIQUES---
-${getDocumentExcerpt(docs.curiosity, 3000)}
+${getDocumentExcerpt(docs.curiosity, 2500)}
 
 ---PEDAGOGICAL APPROACH---
-${getDocumentExcerpt(docs.pedagogy, 3000)}
+${getDocumentExcerpt(docs.pedagogy, 2500)}
 
 YOUR RULES:
 
@@ -58,19 +102,24 @@ Return ONLY the lyrics with structure markers. No additional commentary.`;
 
 /**
  * Generate lyrics for an educational song.
+ * ENFORCEMENT: docs MUST contain languageBrain (use loadAgentDocumentsWithBrain).
  */
 export async function generateLyrics(
-  docs: AgentDocuments,
+  docs: AgentDocumentsWithBrain,
   context: GatheredContext,
   technique: Technique,
   ageRange: AgeRange,
   curiosityTechnique: string
 ): Promise<string> {
+  // ENFORCEMENT: buildLyricsAgentPrompt will throw if brain not loaded
   const systemPrompt = buildLyricsAgentPrompt(docs);
 
-  const userMessage = `
-Generate educational song lyrics using the following context:
+  const brain = docs.languageBrain;
 
+  const userMessage = `
+Generate educational song lyrics in ${brain.name} (${brain.code}) using the following context:
+
+LANGUAGE: ${brain.name}
 TECHNIQUE: ${technique.toUpperCase()}
 CURIOSITY APPROACH: ${curiosityTechnique}
 AGE RANGE: ${ageRange[0]}-${ageRange[1]} years old
@@ -84,7 +133,25 @@ GATHERED CONTEXT:
 - Complexity: ${context.ageAdaptations.complexity}
 - Metaphor Sources: ${context.ageAdaptations.metaphorSources.join(', ')}
 
-Write the complete lyrics now. Follow the ${technique === 'memorization' ? 'memorization structure' : '6-layer connection structure'}.`;
+CRITICAL REMINDERS FOR ${brain.name.toUpperCase()}:
+${brain.code === 'tr' ? `
+- Use SOV word order (yüklem sonda)
+- Apply vowel harmony (ünlü uyumu)
+- Use native deyimler and atasözleri
+- Maintain hece ölçüsü (syllable meter)
+` : brain.code === 'zh' ? `
+- Use topic-prominent structure
+- Include 四字格 (four-character phrases)
+- Use 叠词 (reduplication) for rhythm
+- Apply native 成语 and 谚语
+` : `
+- Use active voice with clear agent
+- Apply stress-timed rhythm
+- Use native idioms and wordplay
+- Match word stress to melody
+`}
+
+Write the complete lyrics now in ${brain.name}. Follow the ${technique === 'memorization' ? 'memorization structure' : '6-layer connection structure'}.`;
 
   const lyrics = await createMessage(systemPrompt, userMessage, {
     model: MODELS.LYRICS_AGENT,
@@ -97,17 +164,19 @@ Write the complete lyrics now. Follow the ${technique === 'memorization' ? 'memo
 
 /**
  * Refine lyrics based on feedback.
+ * ENFORCEMENT: docs MUST contain languageBrain.
  */
 export async function refineLyrics(
-  docs: AgentDocuments,
+  docs: AgentDocumentsWithBrain,
   originalLyrics: string,
   feedback: string,
   ageRange: AgeRange
 ): Promise<string> {
   const systemPrompt = buildLyricsAgentPrompt(docs);
+  const brain = docs.languageBrain;
 
   const userMessage = `
-Here are lyrics that need refinement:
+Here are ${brain.name} lyrics that need refinement:
 
 ---ORIGINAL LYRICS---
 ${originalLyrics}
@@ -116,9 +185,13 @@ ${originalLyrics}
 FEEDBACK:
 ${feedback}
 
+LANGUAGE: ${brain.name}
 AGE RANGE: ${ageRange[0]}-${ageRange[1]}
 
-Rewrite the lyrics addressing the feedback while maintaining the educational content and song structure.`;
+Rewrite the lyrics in ${brain.name}, addressing the feedback while:
+- Maintaining educational content and song structure
+- Using native ${brain.name} patterns (NOT translated patterns)
+- Keeping idioms and wordplay in native form`;
 
   const refined = await createMessage(systemPrompt, userMessage, {
     model: MODELS.LYRICS_AGENT,

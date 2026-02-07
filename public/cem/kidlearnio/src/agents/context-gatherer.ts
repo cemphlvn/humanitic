@@ -1,4 +1,4 @@
-import type { AgentDocuments, GatheredContext, AgeRange } from '@/types';
+import type { GatheredContext, AgeRange } from '@/types';
 import { GatheredContextSchema } from '@/types';
 import { createMessage, MODELS, TOKEN_LIMITS } from '@/lib/anthropic';
 

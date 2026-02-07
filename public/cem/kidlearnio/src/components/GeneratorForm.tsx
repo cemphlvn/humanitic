@@ -2,13 +2,15 @@
 
 import { useState, useCallback } from 'react';
 import { MDBInput, MDBRange } from 'mdb-react-ui-kit';
-import type { Technique } from '@/types';
+import type { Technique, SupportedLanguage } from '@/types';
+import { LANGUAGE_NAMES } from '@/types';
 
 interface GeneratorFormProps {
   onGenerate: (data: {
     topic: string;
     ageRange: [number, number];
     technique: Technique;
+    language: SupportedLanguage;
   }) => void;
   isLoading: boolean;
 }
@@ -18,6 +20,7 @@ export function GeneratorForm({ onGenerate, isLoading }: GeneratorFormProps) {
   const [ageMin, setAgeMin] = useState(8);
   const [ageMax, setAgeMax] = useState(10);
   const [technique, setTechnique] = useState<Technique>('connection');
+  const [language, setLanguage] = useState<SupportedLanguage>('en');
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -28,9 +31,10 @@ export function GeneratorForm({ onGenerate, isLoading }: GeneratorFormProps) {
         topic: topic.trim(),
         ageRange: [ageMin, ageMax],
         technique,
+        language,
       });
     },
-    [topic, ageMin, ageMax, technique, onGenerate]
+    [topic, ageMin, ageMax, technique, language, onGenerate]
   );
 
   return (
@@ -93,6 +97,33 @@ export function GeneratorForm({ onGenerate, isLoading }: GeneratorFormProps) {
             : ageMin <= 10
               ? 'Growing minds — can handle some complexity'
               : 'Older kids — abstract thinking OK'}
+        </small>
+      </div>
+
+      {/* Language Selection */}
+      <div className="mb-4">
+        <label className="form-label fw-bold">
+          <i className="fas fa-globe me-2" style={{ color: 'var(--wonder-accent)' }} />
+          Language (Brains Before Mouths)
+        </label>
+        <div className="language-buttons">
+          {(Object.entries(LANGUAGE_NAMES) as [SupportedLanguage, string][]).map(
+            ([code, name]) => (
+              <button
+                key={code}
+                type="button"
+                className={`language-btn ${language === code ? 'active' : ''}`}
+                onClick={() => setLanguage(code)}
+                disabled={isLoading}
+              >
+                <span className="language-code">{code.toUpperCase()}</span>
+                <span className="language-name">{name}</span>
+              </button>
+            )
+          )}
+        </div>
+        <small className="text-muted d-block mt-1">
+          Lyrics generated natively — not translated
         </small>
       </div>
 

@@ -1,4 +1,11 @@
-import type { AgentDocuments, GenerationInput, GatheredContext, AgeRange, Technique } from '@/types';
+import type {
+  AgentDocuments,
+  AgentDocumentsWithBrain,
+  GenerationInput,
+  GatheredContext,
+  AgeRange,
+  Technique,
+} from '@/types';
 import { createMessage, MODELS, TOKEN_LIMITS } from '@/lib/anthropic';
 import { getDocumentExcerpt } from '@/lib/document-loader';
 
@@ -73,9 +80,10 @@ NEVER FORGET: You are the orchestrator. Continue forward. 不进则退.`;
 
 /**
  * Determine the best technique for a topic and age range.
+ * Accepts either AgentDocuments or AgentDocumentsWithBrain.
  */
 export async function decideOnTechnique(
-  docs: AgentDocuments,
+  _docs: AgentDocuments | AgentDocumentsWithBrain,
   topic: string,
   ageRange: AgeRange
 ): Promise<{
