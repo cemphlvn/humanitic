@@ -13,15 +13,28 @@ import {
   structureScaffold,
   songOrder,
   songChoreography,
+  curiositySpark,
   validateCompositionOrder,
   type AgeAdapterOutput,
   type LanguageRouterOutput,
   type StructureScaffoldOutput,
   type SongOrderOutput,
   type SongChoreographyOutput,
+  type CuriositySparkOutput,
 } from '@humanitic/logic-sticks';
 
 import type { AgeRange, Technique, SupportedLanguage } from '@/types';
+
+/**
+ * Coordinator outputs from multi-orchestrator architecture
+ */
+export interface CoordinatorOutputs {
+  curiosity?: {
+    coordinatorGuidance: string;
+    primaryHookType: string;
+  };
+  // Future coordinators: pedagogy, structure, language
+}
 
 /**
  * Complete pre-processing result from all applicable sticks
@@ -32,6 +45,10 @@ export interface StickProcessorResult {
   structure: StructureScaffoldOutput;
   songOrder: SongOrderOutput;
   choreography: SongChoreographyOutput;
+  curiosity: CuriositySparkOutput;
+
+  // Coordinator outputs (multi-orchestrator)
+  coordinators: CoordinatorOutputs;
 
   // Computed from sticks
   promptEnhancements: {
@@ -40,6 +57,7 @@ export interface StickProcessorResult {
     languageGuidance: string;
     singabilityGuidance: string;
     choreographyGuidance: string;
+    curiosityGuidance: string;
   };
 }
 
@@ -49,14 +67,16 @@ export interface StickProcessorResult {
  * COMPOSITION ORDER (from logic-sticks):
  * 1. language_router (MUST BE FIRST)
  * 2. age_adapter
- * 3. structure_scaffold
- * 4. song_order (enforces brevity/singability)
- * 5. song_choreography (movement patterns)
+ * 3. curiosity_spark (transforms facts into wonder)
+ * 4. structure_scaffold
+ * 5. song_order (enforces brevity/singability)
+ * 6. song_choreography (movement patterns)
  */
 export function processSticks(
   language: SupportedLanguage,
   ageRange: AgeRange,
-  technique: Technique
+  technique: Technique,
+  topic?: string
 ): StickProcessorResult {
   // 1. Language Router — FIRST (determines cognitive patterns)
   const languageRouting = languageRouter.apply({ targetLanguage: language });
@@ -64,13 +84,16 @@ export function processSticks(
   // 2. Age Adapter — adjusts content for target age
   const ageAdaptation = ageAdapter.apply({ ageRange });
 
-  // 3. Structure Scaffold — provides song structure for technique
+  // 3. Curiosity Spark — transforms facts into wonder triggers
+  const curiosity = curiositySpark.apply({ ageRange, topic: topic || '' });
+
+  // 4. Structure Scaffold — provides song structure for technique
   const structure = structureScaffold.apply({ technique });
 
-  // 4. Song Order — enforces brevity and singability
+  // 5. Song Order — enforces brevity and singability
   const songOrderResult = songOrder.apply({ ageRange, technique });
 
-  // 5. Song Choreography — movement patterns for kinesthetic learning
+  // 6. Song Choreography — movement patterns for kinesthetic learning
   const choreography = songChoreography.apply({ ageRange, technique });
 
   // Compute prompt enhancements from stick outputs
@@ -79,7 +102,8 @@ export function processSticks(
     languageRouting,
     structure,
     songOrderResult,
-    choreography
+    choreography,
+    curiosity
   );
 
   return {
@@ -88,7 +112,23 @@ export function processSticks(
     structure,
     songOrder: songOrderResult,
     choreography,
+    curiosity,
+    coordinators: {}, // Populated later by coordinators in pipeline
     promptEnhancements,
+  };
+}
+
+/**
+ * Merge coordinator outputs into stick results.
+ * Called by pipeline after coordinators run.
+ */
+export function withCoordinatorOutputs(
+  result: StickProcessorResult,
+  coordinators: CoordinatorOutputs
+): StickProcessorResult {
+  return {
+    ...result,
+    coordinators,
   };
 }
 
@@ -100,7 +140,8 @@ function computePromptEnhancements(
   lang: LanguageRouterOutput,
   struct: StructureScaffoldOutput,
   order: SongOrderOutput,
-  choreo: SongChoreographyOutput
+  choreo: SongChoreographyOutput,
+  curio: CuriositySparkOutput
 ): StickProcessorResult['promptEnhancements'] {
   // Vocabulary guidance from age adapter
   const vocabularyGuidance = `
@@ -137,12 +178,16 @@ LANGUAGE PATTERNS (from language_router stick):
   // Choreography guidance from song_choreography stick
   const choreographyGuidance = choreo.choreographyGuidance;
 
+  // Curiosity guidance from curiosity_spark stick
+  const curiosityGuidance = curio.curiosityGuidance;
+
   return {
     vocabularyGuidance,
     structureGuidance,
     languageGuidance,
     singabilityGuidance,
     choreographyGuidance,
+    curiosityGuidance,
   };
 }
 
@@ -168,9 +213,11 @@ export function getRecommendedSticks(outputType: 'lyrics' | 'style' | 'both'): s
   return [
     'language_router',
     'age_adapter',
+    'curiosity_spark',
     'structure_scaffold',
+    'song_order',
+    'song_choreography',
     // Future sticks:
-    // 'curiosity_spark',
     // 'memorability_booster',
     // 'vocabulary_gate',
     // 'rhyme_finder',

@@ -12,7 +12,8 @@ import { gatherContext } from '@/agents/context-gatherer';
 import { decideOnTechnique, runOrchestrator } from '@/agents/orchestrator';
 import { generateLyrics } from '@/agents/lyrics-agent';
 import { generateStyle, validateStylePrompt } from '@/agents/style-agent';
-import { processSticks } from '@/lib/stick-processor';
+import { processSticks, withCoordinatorOutputs } from '@/lib/stick-processor';
+import { createCuriosityCoordinator } from '@/agents/curiosity-coordinator';
 
 /**
  * Progress callback type for real-time updates.
@@ -75,16 +76,40 @@ export async function runPipeline(
 
     // LOGIC STICKS: Pre-compute deterministic transformations
     // This happens BEFORE Claude calls — sticks handle predictable, Claude handles creative
-    const stickResults = processSticks(language, input.ageRange, input.technique);
+    const stickResults = processSticks(language, input.ageRange, input.technique, input.topic);
     console.log('[Pipeline] Logic sticks applied:', {
       vocabulary: stickResults.ageAdaptation.vocabularyLevel,
       structure: stickResults.structure.sections.length + ' sections',
       language: stickResults.languageRouting.language,
+      curiosityTriggers: stickResults.curiosity.recommendedTriggers.join(', '),
     });
 
     // Stage 1: Gathering Context
     await emitProgress(updateState(state, { stage: 'GATHERING_CONTEXT' }));
     const context = await gatherContext(input.topic, input.ageRange);
+
+    // MULTI-ORCHESTRATOR: Curiosity Coordinator
+    // Each domain has its own coordinator managing its sticks
+    const curiosityCoordinator = createCuriosityCoordinator(input.ageRange, language);
+    const curiosityCoordination = curiosityCoordinator.coordinate({
+      topic: input.topic,
+      ageRange: input.ageRange,
+      language,
+      coreConcepts: context.coreConcepts,
+      keyFacts: context.keyFacts,
+    });
+    console.log('[Pipeline] Curiosity coordinated:', {
+      hookType: curiosityCoordination.primaryHook.type,
+      triggerCount: curiosityCoordination.triggers.length,
+    });
+
+    // Merge coordinator outputs into stick results
+    const stickResultsWithCoordinators = withCoordinatorOutputs(stickResults, {
+      curiosity: {
+        coordinatorGuidance: curiosityCoordination.coordinatorGuidance,
+        primaryHookType: curiosityCoordination.primaryHook.type,
+      },
+    });
 
     // Stage 2: Decide on Technique (if not specified or to confirm)
     await emitProgress(
@@ -117,14 +142,14 @@ export async function runPipeline(
       );
 
       // ENFORCEMENT: generateLyrics requires docsWithBrain (includes language brain)
-      // Pass stickResults for pre-computed guidance
+      // Pass stickResults with coordinator outputs for pre-computed guidance
       lyrics = await generateLyrics(
         docsWithBrain,
         context,
         finalTechnique,
         input.ageRange,
         decision.curiosityTechnique,
-        stickResults
+        stickResultsWithCoordinators
       );
     }
 

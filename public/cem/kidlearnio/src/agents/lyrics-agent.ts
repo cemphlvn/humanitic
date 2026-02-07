@@ -27,6 +27,13 @@ export function buildLyricsAgentPrompt(
     );
   }
 
+  // Build coordinator guidance section if coordinators produced output
+  const coordinatorGuidance = stickResults?.coordinators?.curiosity?.coordinatorGuidance
+    ? `
+${stickResults.coordinators.curiosity.coordinatorGuidance}
+`
+    : '';
+
   // Build stick guidance section if sticks were processed
   const stickGuidance = stickResults
     ? `
@@ -40,10 +47,12 @@ ${stickResults.promptEnhancements.structureGuidance}
 
 ${stickResults.promptEnhancements.languageGuidance}
 
+${stickResults.promptEnhancements.curiosityGuidance}
+
 ${stickResults.promptEnhancements.singabilityGuidance}
 
 ${stickResults.promptEnhancements.choreographyGuidance}
-
+${coordinatorGuidance}
 STICK ENFORCEMENT: Follow these pre-computed rules EXACTLY. These constraints
 come from domain experts (musicians, educators, dance teachers) and represent
 accumulated pedagogical wisdom. A song that violates these rules will not work.

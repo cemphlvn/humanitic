@@ -11,6 +11,7 @@ import { languageRouter } from './language-router.js';
 import { structureScaffold } from './structure-scaffold.js';
 import { songOrder } from './song-order.js';
 import { songChoreography } from './song-choreography.js';
+import { curiositySpark } from './curiosity-spark.js';
 
 /**
  * Registry of all available sticks
@@ -21,8 +22,8 @@ export const STICK_REGISTRY: Record<string, LogicStick<unknown, unknown>> = {
   structure_scaffold: structureScaffold as LogicStick<unknown, unknown>,
   song_order: songOrder as LogicStick<unknown, unknown>,
   song_choreography: songChoreography as LogicStick<unknown, unknown>,
+  curiosity_spark: curiositySpark as LogicStick<unknown, unknown>,
   // Future sticks:
-  // curiosity_spark: curiositySpark,
   // memorability_booster: memorabilityBooster,
   // vocabulary_gate: vocabularyGate,
   // rhyme_finder: rhymeFinder,
