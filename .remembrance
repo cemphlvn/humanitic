@@ -17,4 +17,33 @@ confidence: 1.0
 
 ---
 
+## 2026-02-08 — Data-Leading Skill Failure
+
+```yaml
+timestamp: 2026-02-08T00:00:00Z
+agent: orchestrator
+context: kidlearnio API integration
+error: "404 model not found: claude-sonnet-4-5-20250514"
+truth: |
+  NEVER fabricate external identifiers (model names, API versions, package versions).
+  ALWAYS verify via web search BEFORE using in code.
+  Pattern: If data comes from external system → search first, code second.
+failure_type: data-leading-skill
+fix_applied: |
+  - Searched "Anthropic API model ID format 2026"
+  - Found: claude-sonnet-4-5-20250929, claude-haiku-4-5-20251001
+  - Updated src/lib/anthropic.ts
+reflection: |
+  The failure was assuming model name patterns instead of verifying.
+  Common sense check: "If I search with made-up names, I get 404."
+  This is not a code bug — it's a reasoning process bug.
+  Data-leading = external data must lead internal code, not vice versa.
+confidence: 1.0
+sources:
+  - https://platform.claude.com/docs/en/about-claude/models/overview
+  - https://docs.litellm.ai/docs/providers/anthropic
+```
+
+---
+
 *Forward, always forward.*

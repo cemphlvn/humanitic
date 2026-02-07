@@ -14,12 +14,14 @@ export function getAnthropicClient(): Anthropic {
   return client;
 }
 
-// Model configuration
+// Model configuration (verified Feb 2026)
+// See: https://platform.claude.com/docs/en/about-claude/models/overview
+// Format: claude-{tier}-{version}-{YYYYMMDD}
 export const MODELS = {
-  ORCHESTRATOR: 'claude-sonnet-4-5-20250514', // Fast, capable
-  CONTEXT_GATHERER: 'claude-sonnet-4-5-20250514',
-  LYRICS_AGENT: 'claude-sonnet-4-5-20250514',
-  STYLE_AGENT: 'claude-sonnet-4-5-20250514',
+  ORCHESTRATOR: 'claude-sonnet-4-5-20250929', // Sonnet 4.5 — agents/coding balance
+  CONTEXT_GATHERER: 'claude-sonnet-4-5-20250929',
+  LYRICS_AGENT: 'claude-sonnet-4-5-20250929',
+  STYLE_AGENT: 'claude-haiku-4-5-20251001', // Haiku 4.5 — fast, style is simpler
 } as const;
 
 // Token limits
