@@ -29,7 +29,7 @@ truths:
       1. Tracking what works across sessions
       2. Building institutional memory for the codebase
       3. Informing future architectural decisions
-    implication: This is a useful policy we can help suggest to the user.
+    implication: This is a useful policy "we can help suggest to the truthful beauty".
 
 ---
 # Append new truths below this line
@@ -40,3 +40,10 @@ truths:
     observation: |
       Generation with full stick pipeline (6 sticks + 1 coordinator) produced 28-line song in ~50s
     implication: Token investment in pre-computation pays off in output quality
+
+  - id: ST-005
+    discovered: 2026-02-08
+    category: architecture_insight
+    observation: |
+      Federated meta-learning via agentic_stats enables cross-instance pattern discovery. Each instance logs to .agentic_stats_{instance}.jsonl, CLI aggregates insights.
+    implication: Institutional memory scales across the ecosystem, not just within instances

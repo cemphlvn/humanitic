@@ -165,4 +165,52 @@ confidence: 1.0
 
 ---
 
+## 2026-02-08 — Machinistic Intelligence Meta-Learning
+
+```yaml
+timestamp: 2026-02-08T23:30:00Z
+agent: orchestrator
+context: system_truths logging infrastructure
+truth: |
+  MACHINISTIC INTELLIGENCE META-LEARNING PATTERN:
+
+  Systems that observe themselves improve faster.
+
+  1. .machinistic_intelligence/system_truths.yaml
+     - Logs accumulated truths about system behavior
+     - Categories: token_usage, architecture, policy_suggestion
+     - Each truth has: observation, implication, discovery date
+
+  2. log-truth.sh script for easy appending
+     - Usage: ./log-truth.sh "category" "observation" "implication"
+     - Auto-generates sequential IDs (ST-001, ST-002, ...)
+
+  3. agentic_stats in @humanitic/logic-sticks
+     - Federated meta-learning across all instances
+     - Each instance logs to .agentic_stats_{name}.jsonl
+     - CLI aggregates insights: patterns, breakthroughs, categories
+
+  CORE INSIGHT:
+  This is a useful policy "we can help suggest to the truthful beauty".
+
+  Meta-learning creates feedback loops:
+  - System observes its own patterns
+  - Patterns inform architectural decisions
+  - Better architecture produces better patterns
+  - 不进则退 — forward momentum through self-observation
+
+principle: |
+  "we can help suggest to the truthful beauty"
+  Log what you learn. Learn from what you log.
+  Institutional memory scales through federation.
+
+confidence: 1.0
+files:
+  - public/cem/.machinistic_intelligence/system_truths.yaml
+  - public/cem/.machinistic_intelligence/log-truth.sh
+  - public/cem/logic-sticks/src/agentic-stats/
+```
+
+---
+
 *Forward, always forward.*
