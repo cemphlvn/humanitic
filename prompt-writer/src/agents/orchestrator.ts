@@ -17,23 +17,20 @@ import {
   type PromptRequest,
   type GenerationResult,
   type PipelineState,
-  PromptRequestSchema,
 } from "@/types";
 
 export type PipelineCallback = (state: PipelineState) => void;
 
 export async function orchestrate(
-  rawRequest: unknown,
+  request: PromptRequest,
   onProgress?: PipelineCallback
 ): Promise<GenerationResult> {
   const emit = (state: PipelineState) => {
     if (onProgress) onProgress(state);
   };
 
-  // ─── STAGE 1: Validate Input ───
-  emit({ stage: "input-received", progress: 10, message: "Validating input..." });
-
-  const request = PromptRequestSchema.parse(rawRequest);
+  // ─── STAGE 1: Input Received ───
+  emit({ stage: "input-received", progress: 10, message: "Input validated." });
 
   // ─── STAGE 2: Consult the CSA (MANDATORY — ALWAYS FIRST) ───
   emit({
@@ -43,7 +40,7 @@ export async function orchestrate(
   });
 
   const sessionHistory = getSessionHistory();
-  const strategy = await consultCSA(request, sessionHistory || undefined);
+  const strategy = await consultCSA(request, sessionHistory);
 
   if (!strategy.approved) {
     emit({
@@ -65,26 +62,8 @@ export async function orchestrate(
   let lyricsResult = undefined;
   let styleResult = undefined;
 
-  if (request.promptType === "lyrics" || request.promptType === "both") {
-    emit({
-      stage: "lyrics-generating",
-      progress: 50,
-      message: "Lyrics Agent is writing educational lyrics...",
-    });
-    lyricsResult = await generateLyrics(request, strategy);
-  }
-
-  if (request.promptType === "style" || request.promptType === "both") {
-    emit({
-      stage: "style-generating",
-      progress: 70,
-      message: "Style Agent is crafting the sonic environment...",
-    });
-    styleResult = await generateStyle(request, strategy);
-  }
-
-  // If "both", run lyrics and style in parallel
-  if (request.promptType === "both" && !lyricsResult && !styleResult) {
+  if (request.promptType === "both") {
+    // Run lyrics and style in parallel for "both"
     emit({
       stage: "lyrics-generating",
       progress: 50,
@@ -98,6 +77,20 @@ export async function orchestrate(
 
     lyricsResult = lyrics;
     styleResult = style;
+  } else if (request.promptType === "lyrics") {
+    emit({
+      stage: "lyrics-generating",
+      progress: 50,
+      message: "Lyrics Agent is writing educational lyrics...",
+    });
+    lyricsResult = await generateLyrics(request, strategy);
+  } else if (request.promptType === "style") {
+    emit({
+      stage: "style-generating",
+      progress: 50,
+      message: "Style Agent is crafting the sonic environment...",
+    });
+    styleResult = await generateStyle(request, strategy);
   }
 
   // ─── STAGE 4: Store in Memory ───

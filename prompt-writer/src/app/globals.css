@@ -279,19 +279,6 @@ body {
   gap: 8px;
 }
 
-/* ─── Copy Button ─── */
-.copy-btn {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  opacity: 0.6;
-  transition: opacity 0.2s;
-}
-
-.copy-btn:hover {
-  opacity: 1;
-}
-
 /* ─── Responsive ─── */
 @media (max-width: 768px) {
   .pipeline-stepper {

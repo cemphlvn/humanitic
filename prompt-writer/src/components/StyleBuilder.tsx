@@ -150,6 +150,7 @@ export default function StyleBuilder() {
     parts.push(genre);
     if (subGenre) parts.push(subGenre.toLowerCase());
     parts.push(...moods.map((m) => m.toLowerCase()));
+    if (energy !== "medium") parts.push(`${energy} energy`);
     parts.push(`${tempo} BPM`);
     parts.push(musicalKey);
     parts.push(...instruments.map((i) => i.toLowerCase()));
@@ -159,15 +160,28 @@ export default function StyleBuilder() {
     }
     parts.push(...production.map((p) => p.toLowerCase()));
     return parts.join(", ");
-  }, [genre, subGenre, moods, tempo, musicalKey, instruments, vocalGender, vocalStyle, vocalRange, production]);
+  }, [genre, subGenre, moods, energy, tempo, musicalKey, instruments, vocalGender, vocalStyle, vocalRange, production]);
 
   const charCount = styleString.length;
   const charClass = charCount <= 200 ? "ok" : charCount <= 500 ? "warn" : "over";
 
   const handleCopy = async () => {
-    await navigator.clipboard.writeText(styleString);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    try {
+      await navigator.clipboard.writeText(styleString);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      const textarea = document.createElement("textarea");
+      textarea.value = styleString;
+      textarea.style.position = "fixed";
+      textarea.style.opacity = "0";
+      document.body.appendChild(textarea);
+      textarea.select();
+      document.execCommand("copy");
+      document.body.removeChild(textarea);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
   };
 
   return (

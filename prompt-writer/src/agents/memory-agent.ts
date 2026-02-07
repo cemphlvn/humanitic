@@ -60,9 +60,12 @@ export function storeSession(
     if (!store.topicGraph.has(topic)) {
       store.topicGraph.set(topic, new Set());
     }
-    for (const other of connections) {
-      if (other !== topic) {
-        store.topicGraph.get(topic)!.add(other);
+    const topicSet = store.topicGraph.get(topic);
+    if (topicSet) {
+      for (const other of connections) {
+        if (other !== topic) {
+          topicSet.add(other);
+        }
       }
     }
   }

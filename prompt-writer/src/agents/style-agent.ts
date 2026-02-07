@@ -3,8 +3,10 @@ import {
   type PromptRequest,
   type CSAStrategy,
   type StyleOutput,
+  type MemorizationTechnique,
   StyleOutputSchema,
 } from "@/types";
+import { parseLLMJson, sanitizeInput } from "./cognitive-strategy-agent";
 
 const STYLE_SYSTEM_PROMPT = `You are the Style Agent of the Suno Prompt Writer system. You generate Style of Music prompts for Suno AI that set the perfect sonic environment for educational songs.
 
@@ -60,13 +62,16 @@ export async function generateStyle(
 ): Promise<StyleOutput> {
   const client = new Anthropic();
 
+  const subject = sanitizeInput(request.subject);
+  const context = sanitizeInput(request.additionalContext || "None");
+
   const userMessage = `
 GENERATE SUNO STYLE PROMPT for this educational request:
 
-SUBJECT: ${request.subject}
+SUBJECT: ${subject}
 AGE GROUP: ${request.ageGroup}
 LEARNING APPROACH: ${request.learningApproach}
-ADDITIONAL CONTEXT: ${request.additionalContext || "None"}
+ADDITIONAL CONTEXT: ${context}
 
 CSA STYLE RECOMMENDATION:
 - Genre: ${strategy.styleRecommendation.genre}
@@ -99,21 +104,14 @@ Generate the style prompt now as a JSON object.`;
     throw new Error("Style Agent returned no text response");
   }
 
-  let rawText = textContent.text.trim();
-  if (rawText.startsWith("```")) {
-    rawText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
-  }
-
-  const parsed = JSON.parse(rawText);
-  const validated = StyleOutputSchema.parse(parsed);
-
-  return validated;
+  const parsed = parseLLMJson(textContent.text);
+  return StyleOutputSchema.parse(parsed);
 }
 
-function getMemorizationStylePairing(technique?: string): string {
+function getMemorizationStylePairing(technique?: MemorizationTechnique): string {
   if (!technique) return "Not a memorization approach — no pairing needed.";
 
-  const pairings: Record<string, string> = {
+  const pairings: Record<MemorizationTechnique, string> = {
     "acronym-songs": "Best with: Pop, hip-hop (strong hooks). Needs a catchy, repeatable chorus melody.",
     "rhyme-chains": "Best with: Rap, spoken word (rhythm-focused). Needs clear rhythmic backbone.",
     "counting-songs": "Best with: EDM, march (strict beat). Needs an unwavering rhythmic grid.",
@@ -122,5 +120,5 @@ function getMemorizationStylePairing(technique?: string): string {
     "call-and-response": "Best with: Gospel, funk, classroom chant. Needs clear call-response structure in the beat.",
   };
 
-  return pairings[technique] || "No specific pairing guidance.";
+  return pairings[technique];
 }

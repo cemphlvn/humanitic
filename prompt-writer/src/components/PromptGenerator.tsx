@@ -53,8 +53,14 @@ export default function PromptGenerator() {
       });
 
       if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || "Generation failed");
+        let errorMessage = "Generation failed";
+        try {
+          const errData = await response.json();
+          errorMessage = errData.error || errorMessage;
+        } catch {
+          errorMessage = `Server error (${response.status})`;
+        }
+        throw new Error(errorMessage);
       }
 
       const data: GenerationResult = await response.json();

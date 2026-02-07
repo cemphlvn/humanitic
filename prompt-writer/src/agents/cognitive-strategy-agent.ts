@@ -7,19 +7,22 @@ import {
   CSAStrategySchema,
 } from "@/types";
 
-const DOCS_DIR = join(process.cwd(), "..", "docs");
-
 function loadDocument(filename: string): string {
-  try {
-    return readFileSync(join(DOCS_DIR, filename), "utf-8");
-  } catch {
-    // Fallback to prompt-writer/docs
+  const candidates = [
+    join(process.cwd(), "docs", filename),
+    join(process.cwd(), "..", "docs", filename),
+  ];
+
+  for (const filepath of candidates) {
     try {
-      return readFileSync(join(process.cwd(), "docs", filename), "utf-8");
+      return readFileSync(filepath, "utf-8");
     } catch {
-      return `[Document ${filename} not found]`;
+      // try next candidate
     }
   }
+
+  console.warn(`[CSA] Document not found: ${filename}`);
+  return `[Document ${filename} not found]`;
 }
 
 function loadAllDocuments(): string {
@@ -41,6 +44,21 @@ ${curiositySparking}
 === MEMORIZATION TECHNIQUES ===
 ${memorization}
 `;
+}
+
+function sanitizeInput(text: string): string {
+  return text.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, "");
+}
+
+function parseLLMJson(raw: string): unknown {
+  let text = raw.trim();
+  // Strip code fences
+  if (text.startsWith("```")) {
+    text = text.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
+  }
+  // Strip trailing commas before } or ]
+  text = text.replace(/,\s*([}\]])/g, "$1");
+  return JSON.parse(text);
 }
 
 const CSA_SYSTEM_PROMPT = `You are the Cognitive Strategy Agent (CSA) — the gatekeeper of the Suno Prompt Writer system.
@@ -85,12 +103,15 @@ export async function consultCSA(
   const client = new Anthropic();
   const documents = loadAllDocuments();
 
+  const subject = sanitizeInput(request.subject);
+  const context = sanitizeInput(request.additionalContext || "None provided");
+
   const userMessage = `
 EDUCATIONAL REQUEST:
-- Subject: ${request.subject}
+- Subject: ${subject}
 - Age Group: ${request.ageGroup}
 - Learning Approach: ${request.learningApproach}
-- Additional Context: ${request.additionalContext || "None provided"}
+- Additional Context: ${context}
 
 ${sessionHistory ? `SESSION HISTORY:\n${sessionHistory}` : "No previous session history."}
 
@@ -119,14 +140,8 @@ Output your strategy as a JSON object.`;
     throw new Error("CSA returned no text response");
   }
 
-  let rawText = textContent.text.trim();
-  // Strip code fences if present
-  if (rawText.startsWith("```")) {
-    rawText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
-  }
-
-  const parsed = JSON.parse(rawText);
-  const validated = CSAStrategySchema.parse(parsed);
-
-  return validated;
+  const parsed = parseLLMJson(textContent.text);
+  return CSAStrategySchema.parse(parsed);
 }
+
+export { parseLLMJson, sanitizeInput };

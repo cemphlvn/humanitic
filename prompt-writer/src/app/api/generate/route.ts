@@ -3,14 +3,21 @@ import { orchestrate } from "@/agents/orchestrator";
 import { PromptRequestSchema } from "@/types";
 import { ZodError } from "zod";
 
+export const maxDuration = 60;
+
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    let body: unknown;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON in request body" },
+        { status: 400 }
+      );
+    }
 
-    // Validate input
     const validatedRequest = PromptRequestSchema.parse(body);
-
-    // Run the full orchestration pipeline
     const result = await orchestrate(validatedRequest);
 
     return NextResponse.json(result, { status: 200 });
@@ -29,7 +36,6 @@ export async function POST(request: NextRequest) {
     }
 
     if (error instanceof Error) {
-      // CSA redirect
       if (error.message.startsWith("CSA redirect:")) {
         return NextResponse.json(
           { error: error.message, type: "csa_redirect" },
@@ -38,7 +44,7 @@ export async function POST(request: NextRequest) {
       }
 
       return NextResponse.json(
-        { error: error.message },
+        { error: "Generation failed. Please try again." },
         { status: 500 }
       );
     }

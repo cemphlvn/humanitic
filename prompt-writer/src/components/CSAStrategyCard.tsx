@@ -1,12 +1,12 @@
 "use client";
 
-import type { CSAStrategy } from "@/types";
+import type { CSAStrategy, ThoughtPipeline, LogicStick, CuriosityTechnique } from "@/types";
 
 interface CSAStrategyCardProps {
   strategy: CSAStrategy;
 }
 
-const PIPELINE_LABELS: Record<string, string> = {
+const PIPELINE_LABELS: Record<ThoughtPipeline, string> = {
   "wonder-question-discovery": "Wonder → Question → Discovery",
   "pattern-rhythm-recall": "Pattern → Rhythm → Recall",
   "story-character-lesson": "Story → Character → Lesson",
@@ -14,7 +14,7 @@ const PIPELINE_LABELS: Record<string, string> = {
   "play-explore-build": "Play → Explore → Build",
 };
 
-const STICK_LABELS: Record<string, string> = {
+const STICK_LABELS: Record<LogicStick, string> = {
   ladder: "The Ladder",
   mirror: "The Mirror",
   zoom: "The Zoom",
@@ -23,7 +23,7 @@ const STICK_LABELS: Record<string, string> = {
   web: "The Web",
 };
 
-const CURIOSITY_LABELS: Record<string, string> = {
+const CURIOSITY_LABELS: Record<CuriosityTechnique, string> = {
   "impossible-fact": "The Impossible Fact",
   "unanswered-question": "The Unanswered Question",
   "personal-stake": "The Personal Stake",
@@ -51,13 +51,13 @@ export default function CSAStrategyCard({ strategy }: CSAStrategyCardProps) {
           <div className="col-6">
             <small className="text-muted d-block">Pipeline</small>
             <strong className="d-block" style={{ fontSize: "0.85rem" }}>
-              {PIPELINE_LABELS[strategy.pipeline] || strategy.pipeline}
+              {PIPELINE_LABELS[strategy.pipeline]}
             </strong>
           </div>
           <div className="col-6">
             <small className="text-muted d-block">Logic Stick</small>
             <strong className="d-block" style={{ fontSize: "0.85rem" }}>
-              {STICK_LABELS[strategy.logicStick] || strategy.logicStick}
+              {STICK_LABELS[strategy.logicStick]}
             </strong>
           </div>
         </div>
@@ -74,7 +74,7 @@ export default function CSAStrategyCard({ strategy }: CSAStrategyCardProps) {
                 fontSize: "0.75rem",
               }}
             >
-              {CURIOSITY_LABELS[t] || t}
+              {CURIOSITY_LABELS[t]}
             </span>
           ))}
         </div>

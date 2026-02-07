@@ -3,8 +3,11 @@ import {
   type PromptRequest,
   type CSAStrategy,
   type LyricsOutput,
+  type ThoughtPipeline,
+  type LogicStick,
   LyricsOutputSchema,
 } from "@/types";
+import { parseLLMJson, sanitizeInput } from "./cognitive-strategy-agent";
 
 const LYRICS_SYSTEM_PROMPT = `You are the Lyrics Agent of the Suno Prompt Writer system. You generate structured song lyrics for Suno AI that teach educational concepts to children through music.
 
@@ -44,13 +47,16 @@ export async function generateLyrics(
 ): Promise<LyricsOutput> {
   const client = new Anthropic();
 
+  const subject = sanitizeInput(request.subject);
+  const context = sanitizeInput(request.additionalContext || "None");
+
   const userMessage = `
 GENERATE SUNO LYRICS for this educational request:
 
-SUBJECT: ${request.subject}
+SUBJECT: ${subject}
 AGE GROUP: ${request.ageGroup}
 LEARNING APPROACH: ${request.learningApproach}
-ADDITIONAL CONTEXT: ${request.additionalContext || "None"}
+ADDITIONAL CONTEXT: ${context}
 
 CSA-APPROVED STRATEGY:
 - Thought Pipeline: ${strategy.pipeline}
@@ -85,19 +91,12 @@ Generate the lyrics now as a JSON object.`;
     throw new Error("Lyrics Agent returned no text response");
   }
 
-  let rawText = textContent.text.trim();
-  if (rawText.startsWith("```")) {
-    rawText = rawText.replace(/^```(?:json)?\n?/, "").replace(/\n?```$/, "");
-  }
-
-  const parsed = JSON.parse(rawText);
-  const validated = LyricsOutputSchema.parse(parsed);
-
-  return validated;
+  const parsed = parseLLMJson(textContent.text);
+  return LyricsOutputSchema.parse(parsed);
 }
 
-function getPipelineMapping(pipeline: string): string {
-  const mappings: Record<string, string> = {
+function getPipelineMapping(pipeline: ThoughtPipeline): string {
+  const mappings: Record<ThoughtPipeline, string> = {
     "wonder-question-discovery": `[Intro] → WONDER moment
 [Verse 1] → Astonishing fact / observation
 [Pre-Chorus] → Natural question that arises
@@ -141,11 +140,11 @@ function getPipelineMapping(pipeline: string): string {
 [Bridge] → Surprise twist / unexpected connection
 [Final Chorus] → Singing together — shared knowledge`,
   };
-  return mappings[pipeline] || mappings["wonder-question-discovery"];
+  return mappings[pipeline];
 }
 
-function getLogicStickPattern(stick: string): string {
-  const patterns: Record<string, string> = {
+function getLogicStickPattern(stick: LogicStick): string {
+  const patterns: Record<LogicStick, string> = {
     ladder: "A → B → C → D: Each step builds on the previous. Sequential, cause-and-effect.",
     mirror: "A ↔ B: Two things compared side by side. Same structure, different content. Chorus reveals connection.",
     zoom: "Macro → Micro → Macro: Zoom in to the smallest detail, then zoom back out with new understanding.",
@@ -153,5 +152,5 @@ function getLogicStickPattern(stick: string): string {
     "rhythm-lock": "Pattern → Repetition → Variation → Lock: Rhythmic pattern that becomes automatic through repetition.",
     web: "Center → Spoke 1 → Spoke 2 → Spoke 3 → Center+: Central concept with multiple connections radiating out.",
   };
-  return patterns[stick] || patterns["ladder"];
+  return patterns[stick];
 }
