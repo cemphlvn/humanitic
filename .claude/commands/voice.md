@@ -1,0 +1,1 @@
+../../plugin/.claude/skills/voice.md
