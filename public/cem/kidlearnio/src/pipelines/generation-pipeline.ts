@@ -12,6 +12,7 @@ import { gatherContext } from '@/agents/context-gatherer';
 import { decideOnTechnique, runOrchestrator } from '@/agents/orchestrator';
 import { generateLyrics } from '@/agents/lyrics-agent';
 import { generateStyle, validateStylePrompt } from '@/agents/style-agent';
+import { processSticks } from '@/lib/stick-processor';
 
 /**
  * Progress callback type for real-time updates.
@@ -72,6 +73,15 @@ export async function runPipeline(
     const language: SupportedLanguage = input.language ?? 'en';
     const docsWithBrain = await loadAgentDocumentsWithBrain(language);
 
+    // LOGIC STICKS: Pre-compute deterministic transformations
+    // This happens BEFORE Claude calls — sticks handle predictable, Claude handles creative
+    const stickResults = processSticks(language, input.ageRange, input.technique);
+    console.log('[Pipeline] Logic sticks applied:', {
+      vocabulary: stickResults.ageAdaptation.vocabularyLevel,
+      structure: stickResults.structure.sections.length + ' sections',
+      language: stickResults.languageRouting.language,
+    });
+
     // Stage 1: Gathering Context
     await emitProgress(updateState(state, { stage: 'GATHERING_CONTEXT' }));
     const context = await gatherContext(input.topic, input.ageRange);
@@ -107,12 +117,14 @@ export async function runPipeline(
       );
 
       // ENFORCEMENT: generateLyrics requires docsWithBrain (includes language brain)
+      // Pass stickResults for pre-computed guidance
       lyrics = await generateLyrics(
         docsWithBrain,
         context,
         finalTechnique,
         input.ageRange,
-        decision.curiosityTechnique
+        decision.curiosityTechnique,
+        stickResults
       );
     }
 

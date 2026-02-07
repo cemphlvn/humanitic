@@ -6,12 +6,16 @@ import type {
 } from '@/types';
 import { createMessage, MODELS, TOKEN_LIMITS } from '@/lib/anthropic';
 import { getDocumentExcerpt } from '@/lib/document-loader';
+import type { StickProcessorResult } from '@/lib/stick-processor';
 
 /**
- * Build the lyrics agent system prompt WITH language brain.
+ * Build the lyrics agent system prompt WITH language brain and stick outputs.
  * ENFORCEMENT: Language brain MUST be loaded before this function is called.
  */
-export function buildLyricsAgentPrompt(docs: AgentDocumentsWithBrain): string {
+export function buildLyricsAgentPrompt(
+  docs: AgentDocumentsWithBrain,
+  stickResults?: StickProcessorResult
+): string {
   const brain = docs.languageBrain;
 
   // ENFORCEMENT: Fail fast if no brain
@@ -22,6 +26,25 @@ export function buildLyricsAgentPrompt(docs: AgentDocumentsWithBrain): string {
       'Use loadAgentDocumentsWithBrain() instead of loadAgentDocuments().'
     );
   }
+
+  // Build stick guidance section if sticks were processed
+  const stickGuidance = stickResults
+    ? `
+═══════════════════════════════════════════════════════════════════════════════
+LOGIC STICKS PRE-COMPUTED GUIDANCE (from @humanitic/logic-sticks)
+═══════════════════════════════════════════════════════════════════════════════
+
+${stickResults.promptEnhancements.vocabularyGuidance}
+
+${stickResults.promptEnhancements.structureGuidance}
+
+${stickResults.promptEnhancements.languageGuidance}
+
+STICK ENFORCEMENT: Follow these pre-computed rules exactly. They are derived
+from the logic-sticks substrate and represent accumulated pedagogical wisdom.
+═══════════════════════════════════════════════════════════════════════════════
+`
+    : '';
 
   return `You are the LYRICS AGENT of KidLearnio.
 Your job is to write educational song lyrics that spark curiosity and teach effectively.
@@ -52,7 +75,7 @@ ENFORCEMENT RULES:
 6. MATCH native rhythm patterns (syllable count for Turkish/Chinese, stress for English)
 
 ═══════════════════════════════════════════════════════════════════════════════
-
+${stickGuidance}
 CORE DOCUMENTS:
 
 ---CURIOSITY TECHNIQUES---
@@ -109,10 +132,11 @@ export async function generateLyrics(
   context: GatheredContext,
   technique: Technique,
   ageRange: AgeRange,
-  curiosityTechnique: string
+  curiosityTechnique: string,
+  stickResults?: StickProcessorResult
 ): Promise<string> {
   // ENFORCEMENT: buildLyricsAgentPrompt will throw if brain not loaded
-  const systemPrompt = buildLyricsAgentPrompt(docs);
+  const systemPrompt = buildLyricsAgentPrompt(docs, stickResults);
 
   const brain = docs.languageBrain;
 
