@@ -1,0 +1,21 @@
+# Humanitic Ecosystem — pnpm Workspace Configuration
+#
+# This enables the co-building pattern:
+# - Instances in public/cem/ can import from each other
+# - Changes are reflected immediately (no publish cycle)
+# - Contributors retain rights (inbound=outbound)
+# - Attribution flows through git naturally
+#
+# From 2050: This pattern has stood the test of time because
+# it removes friction while preserving attribution and rights.
+
+packages:
+  # Shared substrates (consumed by instances)
+  - 'public/cem/logic-sticks'
+
+  # Consumer instances (apps that use substrates)
+  - 'public/cem/kidlearnio'
+
+  # Future instances will be added here
+  # - 'public/cem/your-instance'
+  # - 'public/{contributor}/their-instance'

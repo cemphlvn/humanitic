@@ -1,5 +1,5 @@
 {
-  "name": "kidlearnio",
+  "name": "@humanitic/kidlearnio",
   "version": "1.0.0",
   "description": "Agentic Suno prompt writer for K-12 curiosity-driven learning",
   "private": true,
@@ -15,6 +15,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.37.0",
     "@fortawesome/fontawesome-free": "^6.7.0",
+    "@humanitic/logic-sticks": "workspace:*",
     "mdb-react-ui-kit": "^9.0.0",
     "next": "^16.1.0",
     "react": "^19.0.0",
@@ -33,5 +34,11 @@
   },
   "engines": {
     "node": ">=20.0.0"
+  },
+  "_humanitic": {
+    "type": "instance",
+    "consumes": ["@humanitic/logic-sticks"],
+    "contributes": "Educational domain refinements to logic-sticks",
+    "principle": "First consumer, first co-builder"
   }
 }

@@ -1,0 +1,47 @@
+{
+  "name": "@humanitic/logic-sticks",
+  "version": "0.1.0",
+  "description": "Shared reasoning substrate — fundamental thought patterns in conceptual space",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    },
+    "./docs/*": "./docs/*"
+  },
+  "files": [
+    "dist",
+    "docs"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch"
+  },
+  "keywords": [
+    "logic",
+    "reasoning",
+    "patterns",
+    "humanitic",
+    "co-building"
+  ],
+  "author": "Humanitic Ecosystem Contributors",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/humanitic/humanitic.git",
+    "directory": "public/cem/logic-sticks"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "typescript": "^5.7.0"
+  },
+  "peerDependencies": {},
+  "_humanitic": {
+    "type": "substrate",
+    "consumers": ["@humanitic/kidlearnio"],
+    "principle": "Vectors weave. Harmony emerges. Co-build freely."
+  }
+}

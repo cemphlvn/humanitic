@@ -119,4 +119,50 @@ applications:
 
 ---
 
+## 2026-02-08 — Workspace Integration Pattern
+
+```yaml
+timestamp: 2026-02-08T02:00:00Z
+agent: orchestrator
+context: logic-sticks + kidlearnio integration
+truth: |
+  PNPM WORKSPACE INTEGRATION PATTERN:
+  - pnpm-workspace.yaml at repo root defines package relationships
+  - workspace:* protocol enables immediate change reflection
+  - No publish cycle needed — changes are live
+
+  PACKAGE STRUCTURE:
+  - @humanitic/logic-sticks: Shared substrate (packages/)
+  - @humanitic/kidlearnio: Consumer instance (apps/)
+  - Import via: import { ageAdapter } from '@humanitic/logic-sticks'
+
+  CONTRIBUTION RIGHTS (Inbound=Outbound):
+  - Contributors retain copyright
+  - Contributions licensed under project license
+  - No CLA overhead
+  - Attribution flows through git commits naturally
+
+  FROM 2050 PERSPECTIVE:
+  - This pattern has stood the test of time because:
+    * Zero friction for immediate development
+    * Clear ownership without legal overhead
+    * Symbiotic evolution through usage
+    * New contributors join without barriers
+
+sources:
+  - https://pnpm.io/workspaces
+  - https://turborepo.dev/docs/crafting-your-repository/structuring-a-repository
+  - https://opensource.guide/legal/
+
+principle: |
+  workspace:* for live linking.
+  Inbound=outbound for rights.
+  Git for attribution.
+  Co-build freely.
+
+confidence: 1.0
+```
+
+---
+
 *Forward, always forward.*
