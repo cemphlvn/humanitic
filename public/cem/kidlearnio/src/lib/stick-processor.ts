@@ -11,10 +11,14 @@ import {
   ageAdapter,
   languageRouter,
   structureScaffold,
+  songOrder,
+  songChoreography,
   validateCompositionOrder,
   type AgeAdapterOutput,
   type LanguageRouterOutput,
   type StructureScaffoldOutput,
+  type SongOrderOutput,
+  type SongChoreographyOutput,
 } from '@humanitic/logic-sticks';
 
 import type { AgeRange, Technique, SupportedLanguage } from '@/types';
@@ -26,12 +30,16 @@ export interface StickProcessorResult {
   ageAdaptation: AgeAdapterOutput;
   languageRouting: LanguageRouterOutput;
   structure: StructureScaffoldOutput;
+  songOrder: SongOrderOutput;
+  choreography: SongChoreographyOutput;
 
   // Computed from sticks
   promptEnhancements: {
     vocabularyGuidance: string;
     structureGuidance: string;
     languageGuidance: string;
+    singabilityGuidance: string;
+    choreographyGuidance: string;
   };
 }
 
@@ -42,6 +50,8 @@ export interface StickProcessorResult {
  * 1. language_router (MUST BE FIRST)
  * 2. age_adapter
  * 3. structure_scaffold
+ * 4. song_order (enforces brevity/singability)
+ * 5. song_choreography (movement patterns)
  */
 export function processSticks(
   language: SupportedLanguage,
@@ -57,17 +67,27 @@ export function processSticks(
   // 3. Structure Scaffold — provides song structure for technique
   const structure = structureScaffold.apply({ technique });
 
+  // 4. Song Order — enforces brevity and singability
+  const songOrderResult = songOrder.apply({ ageRange, technique });
+
+  // 5. Song Choreography — movement patterns for kinesthetic learning
+  const choreography = songChoreography.apply({ ageRange, technique });
+
   // Compute prompt enhancements from stick outputs
   const promptEnhancements = computePromptEnhancements(
     ageAdaptation,
     languageRouting,
-    structure
+    structure,
+    songOrderResult,
+    choreography
   );
 
   return {
     ageAdaptation,
     languageRouting,
     structure,
+    songOrder: songOrderResult,
+    choreography,
     promptEnhancements,
   };
 }
@@ -78,7 +98,9 @@ export function processSticks(
 function computePromptEnhancements(
   age: AgeAdapterOutput,
   lang: LanguageRouterOutput,
-  struct: StructureScaffoldOutput
+  struct: StructureScaffoldOutput,
+  order: SongOrderOutput,
+  choreo: SongChoreographyOutput
 ): StickProcessorResult['promptEnhancements'] {
   // Vocabulary guidance from age adapter
   const vocabularyGuidance = `
@@ -109,10 +131,18 @@ LANGUAGE PATTERNS (from language_router stick):
 - Rhythm: ${lang.linguisticFeatures.stressPattern}
 - Tonal: ${lang.linguisticFeatures.tonal ? 'yes' : 'no'}`.trim();
 
+  // Singability guidance from song_order stick
+  const singabilityGuidance = order.singabilityGuidance;
+
+  // Choreography guidance from song_choreography stick
+  const choreographyGuidance = choreo.choreographyGuidance;
+
   return {
     vocabularyGuidance,
     structureGuidance,
     languageGuidance,
+    singabilityGuidance,
+    choreographyGuidance,
   };
 }
 

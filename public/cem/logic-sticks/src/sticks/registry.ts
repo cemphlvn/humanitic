@@ -9,6 +9,8 @@ import type { LogicStick } from '../types.js';
 import { ageAdapter } from './age-adapter.js';
 import { languageRouter } from './language-router.js';
 import { structureScaffold } from './structure-scaffold.js';
+import { songOrder } from './song-order.js';
+import { songChoreography } from './song-choreography.js';
 
 /**
  * Registry of all available sticks
@@ -17,13 +19,13 @@ export const STICK_REGISTRY: Record<string, LogicStick<unknown, unknown>> = {
   age_adapter: ageAdapter as LogicStick<unknown, unknown>,
   language_router: languageRouter as LogicStick<unknown, unknown>,
   structure_scaffold: structureScaffold as LogicStick<unknown, unknown>,
-  // Future sticks will be added here:
+  song_order: songOrder as LogicStick<unknown, unknown>,
+  song_choreography: songChoreography as LogicStick<unknown, unknown>,
+  // Future sticks:
   // curiosity_spark: curiositySpark,
   // memorability_booster: memorabilityBooster,
-  // connection_bridge: connectionBridge,
   // vocabulary_gate: vocabularyGate,
   // rhyme_finder: rhymeFinder,
-  // suno_style_composer: sunoStyleComposer,
 };
 
 /**

@@ -40,8 +40,15 @@ ${stickResults.promptEnhancements.structureGuidance}
 
 ${stickResults.promptEnhancements.languageGuidance}
 
-STICK ENFORCEMENT: Follow these pre-computed rules exactly. They are derived
-from the logic-sticks substrate and represent accumulated pedagogical wisdom.
+${stickResults.promptEnhancements.singabilityGuidance}
+
+${stickResults.promptEnhancements.choreographyGuidance}
+
+STICK ENFORCEMENT: Follow these pre-computed rules EXACTLY. These constraints
+come from domain experts (musicians, educators, dance teachers) and represent
+accumulated pedagogical wisdom. A song that violates these rules will not work.
+
+CRITICAL: Output a SONG, not a poem. Keep lines short. Keep it singable.
 ═══════════════════════════════════════════════════════════════════════════════
 `
     : '';
