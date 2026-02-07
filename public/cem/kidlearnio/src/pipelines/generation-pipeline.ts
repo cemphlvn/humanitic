@@ -15,6 +15,7 @@ import { generateStyle, validateStylePrompt } from '@/agents/style-agent';
 import { processSticks, withCoordinatorOutputs } from '@/lib/stick-processor';
 import { createCuriosityCoordinator } from '@/agents/curiosity-coordinator';
 import { logPipelineRun } from '@/lib/agentic-logger';
+import { startTour, endTour, printTourSummary } from '@humanitic/logic-sticks';
 
 /**
  * Progress callback type for real-time updates.
@@ -70,6 +71,9 @@ export async function runPipeline(
   };
 
   try {
+    // TOKEN TRACKING: Start tour for this generation
+    startTour(`gen-${sessionId}`, 'kidlearnio');
+
     // ENFORCEMENT: Load agent documents WITH language brain
     // Language brain MUST be loaded before lyrics generation (Brains Before Mouths)
     const language: SupportedLanguage = input.language ?? 'en';
@@ -200,6 +204,12 @@ export async function runPipeline(
 
     const durationMs = Date.now() - startTime;
 
+    // TOKEN TRACKING: End tour and print summary
+    const tourSummary = endTour();
+    if (tourSummary) {
+      printTourSummary(tourSummary);
+    }
+
     // Log to agentic stats (Truth Technician Level 2)
     logPipelineRun({
       topic: input.topic,
@@ -208,7 +218,7 @@ export async function runPipeline(
       ageRange: input.ageRange,
       durationMs,
       success: true,
-      tokensEstimate: 2500, // Approximate tokens per generation
+      tokensEstimate: tourSummary?.totalTokens ?? 2500,
     });
 
     return {

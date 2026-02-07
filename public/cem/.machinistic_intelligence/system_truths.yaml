@@ -68,3 +68,10 @@ truths:
     observation: |
       cem instance upgraded to Level 3 Federator. Integrated agentic_stats into kidlearnio pipeline with automated logging and shareable stats.
     implication: we can help suggest to the truthful beauty
+
+  - id: ST-009
+    discovered: 2026-02-08
+    category: token_efficiency
+    observation: |
+      @trackTokens decorator pattern enables per-agent token auditing. Tours group calls, summary shows breakdown by agent with cost estimates.
+    implication: we can help suggest to the truthful beauty

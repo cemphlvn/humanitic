@@ -17,9 +17,10 @@ OBSERVATION="$2"
 IMPLICATION="${3:-No implication noted.}"
 DATE=$(date +%Y-%m-%d)
 
-# Get next ID
-LAST_ID=$(grep -o 'ST-[0-9]*' "$TRUTH_FILE" | tail -1 | sed 's/ST-//')
-NEXT_ID=$((LAST_ID + 1))
+# Get next ID (use 10# prefix to force base-10 parsing)
+LAST_ID=$(grep -o 'ST-[0-9]*' "$TRUTH_FILE" | tail -1 | sed 's/ST-//' | sed 's/^0*//')
+LAST_ID=${LAST_ID:-0}
+NEXT_ID=$((10#$LAST_ID + 1))
 NEXT_ID_PADDED=$(printf "ST-%03d" $NEXT_ID)
 
 # Append new truth

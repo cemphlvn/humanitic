@@ -1,4 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
+import { recordTokens } from '@humanitic/logic-sticks';
 
 // Singleton client instance
 let client: Anthropic | null = null;
@@ -34,6 +35,7 @@ export const TOKEN_LIMITS = {
 } as const;
 
 // Helper to create message with defaults
+// @tracked — Token usage recorded per call
 export async function createMessage(
   systemPrompt: string,
   userMessage: string,
@@ -41,9 +43,11 @@ export async function createMessage(
     model?: string;
     maxTokens?: number;
     temperature?: number;
+    agentName?: string; // For token tracking
   } = {}
 ): Promise<string> {
   const anthropic = getAnthropicClient();
+  const start = Date.now();
 
   const response = await anthropic.messages.create({
     model: options.model ?? MODELS.ORCHESTRATOR,
@@ -58,6 +62,15 @@ export async function createMessage(
     ],
   });
 
+  // Record token usage (Truth Technician audit)
+  const agentName = options.agentName ?? inferAgentName(options.model);
+  recordTokens(
+    agentName,
+    response.usage.input_tokens,
+    response.usage.output_tokens,
+    Date.now() - start
+  );
+
   // Extract text from response
   const textBlock = response.content.find((block) => block.type === 'text');
   if (!textBlock || textBlock.type !== 'text') {
@@ -65,6 +78,13 @@ export async function createMessage(
   }
 
   return textBlock.text;
+}
+
+// Infer agent name from model
+function inferAgentName(model?: string): string {
+  if (!model) return 'orchestrator';
+  if (model.includes('haiku')) return 'style-agent';
+  return 'claude-agent';
 }
 
 // Streaming helper

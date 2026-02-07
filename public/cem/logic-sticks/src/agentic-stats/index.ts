@@ -28,3 +28,13 @@ export {
   createAgenticLogger,
   aggregateInsights,
 } from './logger.js';
+
+export {
+  startTour,
+  endTour,
+  recordTokens,
+  getCurrentStats,
+  trackTokens,
+  withTokenTracking,
+  printTourSummary,
+} from './token-tracker.js';
