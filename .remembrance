@@ -213,4 +213,224 @@ files:
 
 ---
 
+## 2026-02-08 — Agentic-Scriptic Duality
+
+```yaml
+timestamp: 2026-02-08T02:30:00Z
+agent: orchestrator
+context: workflow-audit architecture crystallization
+truth: |
+  AGENTIC-SCRIPTIC DUALITY:
+
+  Two forces work TOGETHER, not against each other:
+
+  1. AGENTIC INTELLIGENCE (provides FLEXIBILITY)
+     - Contextual adaptation under variants
+     - Reasoning through novel situations
+     - Creative problem-solving
+     - Learning from experience
+     - Making judgment calls
+     - WHAT: enables the system to handle uncertainty intelligently
+
+  2. SCRIPTIC ARCHITECTURE (provides OBSERVABILITY)
+     - Traceability of what happened
+     - Engineering preconditions (valid starting states)
+     - Reproducible behaviors where needed
+     - Pattern detection through logging
+     - WHAT: enables the agent to work effectively
+
+  THE SYMBIOSIS:
+    Scriptic architecture ENABLES agentic intelligence by:
+      - Providing clear observability (agent knows what happened)
+      - Ensuring preconditions (agent starts from valid state)
+      - Tracking variants (agent learns from different contexts)
+      - Logging patterns (agent recognizes recurring situations)
+
+    Agentic intelligence EXTENDS scriptic architecture by:
+      - Handling cases scripts can't anticipate
+      - Adapting to novel contexts
+      - Proposing new scripts when patterns emerge
+      - Deciding when to be deterministic vs flexible
+
+  IMPLEMENTATION:
+    scriptic_provides:
+      - Hook preconditions (validate before action)
+      - Logging infrastructure (.remembrance, audits)
+      - Pattern schemas (opportunity, hypothesis, test)
+      - Traceable execution (who did what when)
+
+    agentic_provides:
+      - Contextual reasoning (what's appropriate now)
+      - Variant handling (this case is different because...)
+      - Creative solutions (no script for this, so...)
+      - Meta-learning (we should script this in future)
+
+principle: |
+  Scriptic architecture enables agentic intelligence.
+  Agentic intelligence extends scriptic architecture.
+  Neither replaces the other; they are symbiotic.
+
+confidence: 1.0
+shape_shift: true
+```
+
+---
+
+## 2026-02-08 — Observability ≠ Rigidity
+
+```yaml
+timestamp: 2026-02-08T02:00:00Z
+agent: orchestrator
+context: workflow-audit philosophy correction
+truth: |
+  OBSERVABILITY-FLEXIBILITY DUALITY:
+
+  The goal is NOT to become deterministic at the cost of flexibility.
+  The goal IS to:
+    1. MAINTAIN flexibility under uncertain conditions
+    2. ACHIEVE clear observability into what's happening
+    3. FLOURISH for engineering improvements
+    4. IMPROVE adaptively, not rigidly
+
+  WRONG FRAMING:
+    "Make everything deterministic" → rigid, brittle, unable to adapt
+
+  RIGHT FRAMING:
+    "Make everything observable" → flexible, adaptive, self-improving
+    Observability enables intelligent adaptation under uncertainty.
+    Determinism where it prevents waste; flexibility where it enables growth.
+
+  THE BALANCE:
+    - Validate external data (deterministic) → prevents 404s
+    - Don't prescribe solution paths (flexible) → enables creativity
+    - Log what you do (observable) → enables learning
+    - Don't over-constrain action space (flexible) → enables exploration
+
+  EVOLUTION VECTOR REFRAMED:
+    ad-hoc → observable → adaptive → flourishing
+    NOT: ad-hoc → scriptic → deterministic → rigid
+
+principle: |
+  Observability enables adaptation.
+  Determinism prevents waste.
+  Flexibility enables growth.
+  The wise system knows when to apply each.
+
+confidence: 1.0
+shape_shift: true
+```
+
+---
+
+## 2026-02-08 — Agentic Observability Suite Vision
+
+```yaml
+timestamp: 2026-02-08T04:00:00Z
+agent: orchestrator
+context: Strategic vision for 3D agentic observability GUI
+truth: |
+  VISION 2050 BACKTRACKING:
+
+  The future (2050) has:
+    - 3D force-directed graphs of agent hierarchies
+    - Real-time spawn/completion animations
+    - Time-travel debugging (scrub through history)
+    - OpenTelemetry-native traces
+    - VR/AR exploration of agent trees
+
+  The foundation (Feb 2026) needs:
+    - OpenTelemetry-compatible trace schema
+    - WebSocket MCP server for real-time
+    - React Three Fiber + R3F-ForceGraph
+    - Drei for HTML overlays
+    - Hooks emitting events to WebSocket
+
+  KEY LIBRARIES (Context7 validated):
+    - /pmndrs/react-three-fiber (243 snippets, score 71.6)
+    - /pmndrs/drei (337 snippets, score 86.1)
+    - /vasturiano/r3f-forcegraph (29 snippets, DAG + hierarchy)
+    - /websites/opentelemetry_io (8911 snippets, score 85.9)
+
+  CLAUDE CODE ENABLES THIS:
+    - PreToolUse/PostToolUse hooks capture agent lifecycle
+    - WebSocket MCP type supports real-time streaming
+    - SessionStart can inject visualization context
+    - Task tool spawns are traceable via hooks
+
+  PHASE 0 (NOW):
+    - agent-trace/ infrastructure ✓
+    - validate-spawn.sh ✓
+    - capture-result.sh ✓
+    - hooks.json updated ✓
+    - NEXT: OTel schema, WebSocket MCP, query commands
+
+principle: |
+  Backtrack from 2050 to know what to build today.
+  The agentic-scriptic duality enables the visualization.
+  Scripts capture → MCP streams → Browser renders → Human understands.
+
+confidence: 1.0
+shape_shift: true
+sources:
+  - context7:/pmndrs/react-three-fiber
+  - context7:/vasturiano/r3f-forcegraph
+  - context7:/websites/opentelemetry_io
+  - context7:/anthropics/claude-code
+```
+
+---
+
+## 2026-02-08 — Mastery Brain Document Type
+
+```yaml
+timestamp: 2026-02-08T16:30:00Z
+agent: orchestrator
+context: kidlearnio Song Flow Expert design
+truth: |
+  MASTERY BRAIN DOCUMENT TYPE:
+
+  A new document pattern for evolvable agent expertise:
+
+  STRUCTURE:
+    1. CURIOSITY_VECTOR — Direction of exploration
+       - current_focus: What we're curious about NOW
+       - open_questions: Unresolved mysteries
+       - next_explorations: Where to dig deeper
+
+    2. ACCUMULATED_TRUTHS — What we've learned
+       - techniques: Validated methods
+       - anti_patterns: What NOT to do
+       - breakthroughs: Moments of insight
+
+    3. EVOLUTION_PROTOCOL — How it grows
+       - triggers: When to update
+       - validation: How truths are verified
+       - integration: How new learnings merge
+
+    4. TECHNIQUE_LIBRARY — Specific named methods
+
+  PARALLEL TO:
+    - Language Brain = cognitive patterns for a LANGUAGE
+    - Mastery Brain = cognitive patterns for a DOMAIN OF EXPERTISE
+    - Both evolvable, both agent-readable
+
+  FIRST INSTANCE:
+    - Song Flow Mastery Brain for KidLearnio
+    - Curiosity: developing better flowing, memorable melodies
+    - Domain: educational song structure, mental imagery, narrative flow
+
+principle: |
+  Bundle curiosity_vector + so_far_knowledge = Mastery Brain.
+  Agents with curiosity evolve through accumulated truths.
+  Domain expertise crystallizes into reusable cognitive patterns.
+
+confidence: 1.0
+shape_shift: true
+applications:
+  - docs/SONG_FLOW_MASTERY_BRAIN.md (first instance)
+  - Future: any domain where agent curiosity drives learning
+```
+
+---
+
 *Forward, always forward.*

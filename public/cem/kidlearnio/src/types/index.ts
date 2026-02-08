@@ -84,6 +84,7 @@ export const PipelineStageSchema = z.enum([
   'IDLE',
   'GATHERING_CONTEXT',
   'APPLYING_TECHNIQUE',
+  'GENERATING_FLOW_GUIDANCE', // Song Flow Expert stage
   'GENERATING_LYRICS',
   'GENERATING_STYLE',
   'STORING_MEMORY',

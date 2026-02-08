@@ -28,11 +28,20 @@ export function buildLyricsAgentPrompt(
   }
 
   // Build coordinator guidance section if coordinators produced output
-  const coordinatorGuidance = stickResults?.coordinators?.curiosity?.coordinatorGuidance
+  const curiosityGuidance = stickResults?.coordinators?.curiosity?.coordinatorGuidance
     ? `
 ${stickResults.coordinators.curiosity.coordinatorGuidance}
 `
     : '';
+
+  // Flow guidance from Song Flow Expert (hybrid coordinator)
+  const flowGuidance = stickResults?.coordinators?.flow?.coordinatorGuidance
+    ? `
+${stickResults.coordinators.flow.coordinatorGuidance}
+`
+    : '';
+
+  const coordinatorGuidance = curiosityGuidance + flowGuidance;
 
   // Build stick guidance section if sticks were processed
   const stickGuidance = stickResults
@@ -102,25 +111,30 @@ ${getDocumentExcerpt(docs.pedagogy, 2500)}
 
 YOUR RULES:
 
+═══════════════════════════════════════════════════════════════════════════════
+HARD LIMITS (from Song Flow Expert — DO NOT EXCEED):
+═══════════════════════════════════════════════════════════════════════════════
+- DURATION: 60-90 seconds when sung (MAXIMUM)
+- SECTIONS: Maximum 5 total (e.g., Hook + Verse + Chorus + Verse + Bridge)
+- VERSES: Maximum 4 lines each
+- IMAGERY: 1 vivid mental image per verse (no more)
+- HOOK: Must appear in first 15 seconds, repeat every 8 bars
+═══════════════════════════════════════════════════════════════════════════════
+
 FOR MEMORIZATION SONGS:
-- Start with wonder prompt or novelty hook
-- Use techniques: acronyms, rhyme encoding, rhythm chunking, story hooks
-- Keep chorus VERY simple and repetitive (the core fact)
-- Include physical action suggestions [clap], [stomp], [snap]
-- Maximum 2 minutes when sung
+- Start with hook immediately (first 4 lines)
+- Use techniques: acronyms, rhyme encoding, rhythm chunking
+- Keep chorus VERY simple (2-4 lines max)
+- Include [clap], [stomp] on key words only
 - Repeat key facts 4+ times
-- Structure: [Hook] [Verse 1] [Chorus] [Verse 2] [Chorus] [Bridge] [Chorus]
+- Structure: [Hook] [Verse 1] [Chorus] [Verse 2] [Chorus] — THAT'S ALL
 
 FOR CONNECTION SONGS:
-- Follow the 6-layer structure:
-  1. [Anchor] - Familiar ground (something child knows)
-  2. [Bridge Verse] - Connection from known to unknown
-  3. [Chorus] - Core concept (memorable, the main learning)
-  4. [Expansion] - Deeper explanation, how/why
-  5. [Application] - Real world connection to child's life
-  6. [Final Chorus] - Synthesis, bringing it together
-- Build progressively, each verse adds understanding
-- Can be 2-3 minutes
+- Compressed 4-layer structure:
+  1. [Hook] - Curiosity trigger + core concept preview
+  2. [Verse] - Bridge from known to unknown (4 lines max)
+  3. [Chorus] - Core concept (simple, memorable)
+  4. [Bridge] - Real world application
 - Core concept repeated 3+ times
 
 VOCABULARY RULES:
@@ -129,14 +143,14 @@ VOCABULARY RULES:
 - Ages 11-14: Technical terms with context OK, 10+ word sentences fine
 
 ALWAYS:
-- Make it SINGABLE (consistent meter, natural rhymes)
-- Make it FUN (playful, not homework-feeling)
-- Make it ACCURATE (educational content correct)
-- Use [Verse], [Chorus], [Bridge] markers
-- Include suggested tempo/rhythm notes at the end
+- SHORTER IS BETTER — cut ruthlessly
+- ONE image per verse (make it vivid and concrete)
+- Hook phrase: 3-5 syllables, catchy, repeatable
+- Use [Verse], [Chorus], [Bridge] markers only
+- NO tempo notes, NO rhythm suggestions, NO movement suggestions
 
 OUTPUT FORMAT:
-Return ONLY the lyrics with structure markers. No additional commentary.`;
+Return ONLY the lyrics with structure markers. Nothing else. Be BRIEF.`;
 }
 
 /**

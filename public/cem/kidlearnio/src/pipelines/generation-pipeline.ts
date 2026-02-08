@@ -12,6 +12,7 @@ import { gatherContext } from '@/agents/context-gatherer';
 import { decideOnTechnique, runOrchestrator } from '@/agents/orchestrator';
 import { generateLyrics } from '@/agents/lyrics-agent';
 import { generateStyle, validateStylePrompt } from '@/agents/style-agent';
+import { coordinateFlowGuidance } from '@/agents/song-flow-expert';
 import { processSticks, withCoordinatorOutputs } from '@/lib/stick-processor';
 import { createCuriosityCoordinator } from '@/agents/curiosity-coordinator';
 import { logPipelineRun } from '@/lib/agentic-logger';
@@ -136,7 +137,36 @@ export async function runPipeline(
         ? input.technique // User override
         : decision.technique;
 
-    // Stage 3: Generate Lyrics (with language brain enforcement)
+    // Stage 2.5: Generate Flow Guidance (Song Flow Expert - HYBRID)
+    // Scriptic: loads constraints, Agentic: tailors suggestions
+    await emitProgress(
+      updateState(state, {
+        stage: 'GENERATING_FLOW_GUIDANCE',
+        technique: finalTechnique,
+      })
+    );
+
+    const flowGuidance = await coordinateFlowGuidance(
+      input.topic,
+      input.ageRange,
+      finalTechnique,
+      language,
+      context
+    );
+    console.log('[Pipeline] Flow guidance generated:', {
+      hookCandidates: flowGuidance.suggestions.hookPhraseCandidates.length,
+      targetDuration: flowGuidance.constraints.duration.targetSeconds + 's',
+    });
+
+    // Merge flow guidance into coordinator outputs
+    const stickResultsWithAllCoordinators = withCoordinatorOutputs(stickResultsWithCoordinators, {
+      flow: {
+        coordinatorGuidance: flowGuidance.coordinatorGuidance,
+        constraints: flowGuidance.constraints,
+      },
+    });
+
+    // Stage 3: Generate Lyrics (with language brain + flow guidance enforcement)
     let lyrics: string | undefined;
     if (input.outputType === 'lyrics' || input.outputType === 'both') {
       await emitProgress(
@@ -147,14 +177,14 @@ export async function runPipeline(
       );
 
       // ENFORCEMENT: generateLyrics requires docsWithBrain (includes language brain)
-      // Pass stickResults with coordinator outputs for pre-computed guidance
+      // Pass stickResults with ALL coordinator outputs (curiosity + flow)
       lyrics = await generateLyrics(
         docsWithBrain,
         context,
         finalTechnique,
         input.ageRange,
         decision.curiosityTechnique,
-        stickResultsWithCoordinators
+        stickResultsWithAllCoordinators
       );
     }
 
@@ -327,6 +357,7 @@ export function getStageDescription(stage: PipelineStage): string {
     IDLE: 'Ready to start',
     GATHERING_CONTEXT: 'Gathering educational context...',
     APPLYING_TECHNIQUE: 'Applying learning technique...',
+    GENERATING_FLOW_GUIDANCE: 'Crafting song flow...',
     GENERATING_LYRICS: 'Writing song lyrics...',
     GENERATING_STYLE: 'Crafting music style...',
     STORING_MEMORY: 'Saving to memory...',

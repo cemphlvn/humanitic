@@ -33,7 +33,14 @@ export interface CoordinatorOutputs {
     coordinatorGuidance: string;
     primaryHookType: string;
   };
-  // Future coordinators: pedagogy, structure, language
+  flow?: {
+    coordinatorGuidance: string;
+    constraints: {
+      duration: { targetSeconds: number; maxSeconds: number };
+      structure: { maxSections: number; hookFrequency: number; verseMaxLines: number };
+    };
+  };
+  // Future coordinators: pedagogy, language
 }
 
 /**
@@ -121,14 +128,18 @@ export function processSticks(
 /**
  * Merge coordinator outputs into stick results.
  * Called by pipeline after coordinators run.
+ * Merges new coordinators with existing ones (additive).
  */
 export function withCoordinatorOutputs(
   result: StickProcessorResult,
-  coordinators: CoordinatorOutputs
+  newCoordinators: Partial<CoordinatorOutputs>
 ): StickProcessorResult {
   return {
     ...result,
-    coordinators,
+    coordinators: {
+      ...result.coordinators,
+      ...newCoordinators,
+    },
   };
 }
 

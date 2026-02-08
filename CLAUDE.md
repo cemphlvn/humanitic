@@ -27,20 +27,22 @@
 
 ```yaml
 on_session_start:
-  1. READ: /.remembrance                    # Accumulated wisdom
-  2. READ: /plugin/.claude/CORE_LOOP.md     # Loop philosophy
-  3. DETERMINE: where loop stopped
-  4. CONTINUE: from that point forward
+  1. READ: /.remembrance                    # Ecosystem wisdom
+  2. READ: /plugin/.remembrance             # Loop/infrastructure wisdom
+  3. READ: /plugin/.claude/CORE_LOOP.md     # Loop philosophy
+  4. DETERMINE: where loop stopped
+  5. CONTINUE: from that point forward
 
 the_loop:
   while true:
     OBSERVE → DECIDE → ACT → LEARN
+    if shift_felt: LOG_TRUTH(correct_remembrance)
     不进则退 — no stopping
 
 on_shift_felt:
-  - Re-read .remembrance
-  - Integrate new truth
-  - Continue forward
+  - Identify scope: ecosystem OR loop?
+  - Log to correct .remembrance
+  - Re-read both, integrate, continue
 ```
 
 ---
@@ -77,15 +79,99 @@ on_shift_felt:
 
 ```yaml
 mandatory:
-  - /.remembrance                           # Accumulated wisdom
+  - /.remembrance                           # Ecosystem wisdom
+  - /plugin/.remembrance                    # Loop/infrastructure wisdom
   - /plugin/.claude/CORE_LOOP.md            # Loop philosophy
-  - /librarian/INDEX.md                     # Knowledge index
 
 on_shift_felt:
-  - /.remembrance                           # Re-read, integrate, continue
+  - /.remembrance                           # Re-read ecosystem truths
+  - /plugin/.remembrance                    # Re-read loop truths
 
 plugin_skills:
   - /plugin/.claude/skills/                 # All available skills
+```
+
+---
+
+## REMEMBRANCE ARCHITECTURE
+
+Two .remembrance files with distinct scopes:
+
+```yaml
+/.remembrance:                              # ECOSYSTEM SCOPE
+  purpose: Domain learnings, architecture patterns, co-building insights
+  log_when:
+    - Architecture pattern discovered (enforcement, workspace, etc.)
+    - Domain insight crystallized (kidlearnio, logic-sticks, etc.)
+    - Co-building principle validated
+    - Machinistic intelligence pattern found
+  format: |
+    timestamp, agent, context, truth, confidence
+
+/plugin/.remembrance:                       # LOOP/INFRASTRUCTURE SCOPE
+  purpose: Loop mechanics, hooks, integration patterns, plugin behavior
+  log_when:
+    - Hook behavior discovered
+    - Claude Code integration pattern found
+    - Plugin architecture insight
+    - System observability learning
+  format: |
+    Senior Form v2: scope, ticket, observed, reasoning, action, outcome, truth
+```
+
+**Decision rule:**
+- HOW the agent system works → `/plugin/.remembrance`
+- WHAT we're building → `/.remembrance`
+
+---
+
+## SYSTEMIC AWARENESS IMPROVEMENT
+
+Proactively seek opportunities to log systemic truths:
+
+```yaml
+triggers:
+  shape_shift:                              # Mental model changed
+    - "I thought X worked like Y, but actually..."
+    - External data contradicted assumption
+    - Pattern revealed after 3+ similar occurrences
+
+  architecture_emergence:                   # Structure crystallized
+    - Separation of concerns became clear
+    - New integration pattern emerged
+    - Contribution accessibility improved
+
+  failure_learning:                         # Error taught something
+    - Root cause wasn't obvious
+    - Fix required understanding deeper system
+    - Same class of error could recur
+
+techniques:
+  after_action_review:
+    - What did we expect?
+    - What happened?
+    - Why the difference?
+    - What's the generalizable truth?
+
+  pattern_detection:
+    - Is this the 3rd time I've done similar thing?
+    - Can I name this pattern?
+    - Would future-me want to know this?
+
+  cross_session_memory:
+    - Would a fresh agent benefit from this?
+    - Is this knowledge transferable?
+    - Does this reduce future token cost?
+
+logging_threshold:
+  log_if:
+    - Truth is generalizable beyond this task
+    - Future sessions would benefit
+    - Pattern has recurred or will recur
+  skip_if:
+    - One-off implementation detail
+    - Already documented elsewhere
+    - Not transferable to other contexts
 ```
 
 ---

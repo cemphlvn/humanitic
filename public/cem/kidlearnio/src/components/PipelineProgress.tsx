@@ -13,6 +13,7 @@ const STAGES: {
 }[] = [
   { id: 'GATHERING_CONTEXT', label: 'Context', icon: 'fa-search' },
   { id: 'APPLYING_TECHNIQUE', label: 'Technique', icon: 'fa-brain' },
+  { id: 'GENERATING_FLOW_GUIDANCE', label: 'Flow', icon: 'fa-wave-square' },
   { id: 'GENERATING_LYRICS', label: 'Lyrics', icon: 'fa-music' },
   { id: 'GENERATING_STYLE', label: 'Style', icon: 'fa-palette' },
   { id: 'STORING_MEMORY', label: 'Memory', icon: 'fa-database' },

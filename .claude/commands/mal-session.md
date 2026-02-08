@@ -1,0 +1,1 @@
+../../plugin/.claude/commands/mal-session.md

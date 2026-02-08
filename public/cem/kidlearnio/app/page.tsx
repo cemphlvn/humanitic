@@ -30,6 +30,7 @@ export default function HomePage() {
         const stages: PipelineStage[] = [
           'GATHERING_CONTEXT',
           'APPLYING_TECHNIQUE',
+          'GENERATING_FLOW_GUIDANCE',
           'GENERATING_LYRICS',
           'GENERATING_STYLE',
           'STORING_MEMORY',

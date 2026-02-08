@@ -30,7 +30,8 @@ export const TOKEN_LIMITS = {
   MAX_INPUT: 100000,
   MAX_OUTPUT: 4096,
   CONTEXT_GATHERER_OUTPUT: 2048,
-  LYRICS_OUTPUT: 2048,
+  LYRICS_OUTPUT: 1024, // Reduced for 60-90s songs (Song Flow Expert constraint)
+  FLOW_EXPERT_OUTPUT: 1024,
   STYLE_OUTPUT: 512,
 } as const;
 
