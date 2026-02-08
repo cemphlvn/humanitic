@@ -23,6 +23,7 @@ export const MODELS = {
   CONTEXT_GATHERER: 'claude-sonnet-4-5-20250929',
   LYRICS_AGENT: 'claude-sonnet-4-5-20250929',
   STYLE_AGENT: 'claude-haiku-4-5-20251001', // Haiku 4.5 — fast, style is simpler
+  MICRO_FIXER: 'claude-haiku-4-5-20251001', // Haiku 4.5 — cheap single-line fixes
 } as const;
 
 // Token limits

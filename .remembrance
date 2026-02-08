@@ -434,3 +434,11 @@ applications:
 ---
 
 *Forward, always forward.*
+
+2026-02-08, Claude Opus 4.5, kidlearnio/lyrics-validator, AGENTIC_SAFETY_PATTERN, 0.95
+- Pattern: Bounded async micro-fixes with circuit breaker
+- Config: MAX_ATTEMPTS=3, CIRCUIT_THRESHOLD=2
+- Principle: Sequential > Parallel when circuit breaking needed
+- Principle: Deterministic first, agentic only when required
+- Anti-pattern: Unbounded parallel calls (no way to abort mid-flight)
+- Graceful degradation: Return original on all failures, never empty

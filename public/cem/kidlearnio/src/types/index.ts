@@ -138,6 +138,7 @@ export const GenerationMetadataSchema = z.object({
   sessionId: z.string(),
   timestamp: z.string(),
   durationMs: z.number(),
+  traceId: z.string().optional(), // Link to dashboard trace
 });
 
 export type GenerationMetadata = z.infer<typeof GenerationMetadataSchema>;

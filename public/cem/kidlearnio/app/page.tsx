@@ -1,20 +1,21 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useMemo } from 'react';
 import { MDBContainer, MDBRow, MDBCol } from 'mdb-react-ui-kit';
 import { GeneratorForm } from '@/components/GeneratorForm';
 import { OutputDisplay } from '@/components/OutputDisplay';
-import { PipelineProgress } from '@/components/PipelineProgress';
-import type { GenerationOutput, PipelineStage, Technique, SupportedLanguage } from '@/types';
+import { AgentActivityPanel } from '@/components/AgentActivityPanel';
+import type { GenerationOutput, Technique, SupportedLanguage } from '@/types';
 
 export default function HomePage() {
   const [isLoading, setIsLoading] = useState(false);
-  const [currentStage, setCurrentStage] = useState<PipelineStage>('IDLE');
   const [output, setOutput] = useState<GenerationOutput | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [requestBody, setRequestBody] = useState<Record<string, unknown> | null>(null);
 
+  // Handle generation start - triggers SSE stream
   const handleGenerate = useCallback(
-    async (formData: {
+    (formData: {
       topic: string;
       ageRange: [number, number];
       technique: Technique;
@@ -23,58 +24,33 @@ export default function HomePage() {
       setIsLoading(true);
       setError(null);
       setOutput(null);
-      setCurrentStage('GATHERING_CONTEXT');
 
-      try {
-        // Simulate stage progression for UX
-        const stages: PipelineStage[] = [
-          'GATHERING_CONTEXT',
-          'APPLYING_TECHNIQUE',
-          'GENERATING_FLOW_GUIDANCE',
-          'GENERATING_LYRICS',
-          'GENERATING_STYLE',
-          'STORING_MEMORY',
-        ];
-
-        let stageIndex = 0;
-        const stageInterval = setInterval(() => {
-          if (stageIndex < stages.length) {
-            setCurrentStage(stages[stageIndex] as PipelineStage);
-            stageIndex++;
-          }
-        }, 2000);
-
-        const response = await fetch('/api/generate', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            topic: formData.topic,
-            ageRange: formData.ageRange,
-            technique: formData.technique,
-            language: formData.language,
-            outputType: 'both',
-          }),
-        });
-
-        clearInterval(stageInterval);
-
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.error ?? 'Generation failed');
-        }
-
-        const result: GenerationOutput = await response.json();
-        setOutput(result);
-        setCurrentStage('COMPLETE');
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Unknown error');
-        setCurrentStage('ERROR');
-      } finally {
-        setIsLoading(false);
-      }
+      // Set request body to trigger SSE connection
+      setRequestBody({
+        topic: formData.topic,
+        ageRange: formData.ageRange,
+        technique: formData.technique,
+        language: formData.language,
+        outputType: 'both',
+      });
     },
     []
   );
+
+  // Handle result from SSE stream
+  const handleResult = useCallback((result: unknown) => {
+    setOutput(result as GenerationOutput);
+    setIsLoading(false);
+  }, []);
+
+  // Handle error from SSE stream
+  const handleError = useCallback((errorMsg: string) => {
+    setError(errorMsg);
+    setIsLoading(false);
+  }, []);
+
+  // Memoize request body to prevent unnecessary re-renders
+  const stableRequestBody = useMemo(() => requestBody, [requestBody]);
 
   return (
     <div className="app-container">
@@ -94,9 +70,13 @@ export default function HomePage() {
               <h2 className="mb-4">Create Educational Song</h2>
               <GeneratorForm onGenerate={handleGenerate} isLoading={isLoading} />
 
-              {isLoading && (
-                <PipelineProgress currentStage={currentStage} />
-              )}
+              {/* Real-time Agent Activity Panel */}
+              <AgentActivityPanel
+                isActive={isLoading}
+                requestBody={stableRequestBody ?? undefined}
+                onResult={handleResult}
+                onError={handleError}
+              />
 
               {error && (
                 <div className="alert alert-danger mt-4" role="alert">

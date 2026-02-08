@@ -17,11 +17,24 @@ import { processSticks, withCoordinatorOutputs } from '@/lib/stick-processor';
 import { createCuriosityCoordinator } from '@/agents/curiosity-coordinator';
 import { logPipelineRun } from '@/lib/agentic-logger';
 import { startTour, endTour, printTourSummary } from '@humanitic/logic-sticks';
+import { validateAndFix } from '@/lib/lyrics-validator';
+import {
+  startTrace,
+  endTrace,
+  withObservation,
+  storeTrace,
+  type TraceEvent,
+} from '@/lib/tracing';
 
 /**
  * Progress callback type for real-time updates.
  */
 export type ProgressCallback = (state: PipelineState) => void | Promise<void>;
+
+/**
+ * Trace event callback for real-time observability.
+ */
+export type TraceEventCallback = (event: TraceEvent) => void;
 
 /**
  * Create initial pipeline state.
@@ -53,14 +66,16 @@ function updateState(
 }
 
 /**
- * Run the complete generation pipeline.
+ * Run the complete generation pipeline with full tracing.
  */
 export async function runPipeline(
   input: GenerationInput,
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback,
+  onTraceEvent?: TraceEventCallback
 ): Promise<GenerationOutput> {
   const sessionId = uuidv4();
   const startTime = Date.now();
+  const language: SupportedLanguage = input.language ?? 'en';
 
   let state = createInitialState(input);
 
@@ -71,43 +86,107 @@ export async function runPipeline(
     }
   };
 
+  // ═══════════════════════════════════════════════════════════════════════════
+  // START TRACE — Root observation for entire pipeline
+  // ═══════════════════════════════════════════════════════════════════════════
+  startTrace({
+    name: 'song-generation',
+    input: {
+      topic: input.topic,
+      language,
+      ageRange: input.ageRange,
+      technique: input.technique,
+    },
+    sessionId,
+    onEvent: onTraceEvent,
+  });
+
   try {
     // TOKEN TRACKING: Start tour for this generation
     startTour(`gen-${sessionId}`, 'kidlearnio');
 
-    // ENFORCEMENT: Load agent documents WITH language brain
-    // Language brain MUST be loaded before lyrics generation (Brains Before Mouths)
-    const language: SupportedLanguage = input.language ?? 'en';
-    const docsWithBrain = await loadAgentDocumentsWithBrain(language);
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE: Load Documents (Tool)
+    // ═══════════════════════════════════════════════════════════════════════════
+    const docsWithBrain = await withObservation(
+      'load-documents',
+      {
+        type: 'tool',
+        input: { language },
+        metadata: { stage: 'setup' },
+      },
+      async () => {
+        return loadAgentDocumentsWithBrain(language);
+      }
+    );
 
-    // LOGIC STICKS: Pre-compute deterministic transformations
-    // This happens BEFORE Claude calls — sticks handle predictable, Claude handles creative
-    const stickResults = processSticks(language, input.ageRange, input.technique, input.topic);
-    console.log('[Pipeline] Logic sticks applied:', {
-      vocabulary: stickResults.ageAdaptation.vocabularyLevel,
-      structure: stickResults.structure.sections.length + ' sections',
-      language: stickResults.languageRouting.language,
-      curiosityTriggers: stickResults.curiosity.recommendedTriggers.join(', '),
-    });
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE: Process Sticks (Tool - Deterministic)
+    // ═══════════════════════════════════════════════════════════════════════════
+    const stickResults = await withObservation(
+      'logic-sticks',
+      {
+        type: 'tool',
+        input: { language, ageRange: input.ageRange, technique: input.technique, topic: input.topic },
+        metadata: { deterministic: true },
+      },
+      async () => {
+        return processSticks(language, input.ageRange, input.technique, input.topic);
+      }
+    );
 
-    // Stage 1: Gathering Context
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE 1: Gather Context (Agent)
+    // ═══════════════════════════════════════════════════════════════════════════
     await emitProgress(updateState(state, { stage: 'GATHERING_CONTEXT' }));
-    const context = await gatherContext(input.topic, input.ageRange);
 
-    // MULTI-ORCHESTRATOR: Curiosity Coordinator
-    // Each domain has its own coordinator managing its sticks
-    const curiosityCoordinator = createCuriosityCoordinator(input.ageRange, language);
-    const curiosityCoordination = curiosityCoordinator.coordinate({
-      topic: input.topic,
-      ageRange: input.ageRange,
-      language,
-      coreConcepts: context.coreConcepts,
-      keyFacts: context.keyFacts,
-    });
-    console.log('[Pipeline] Curiosity coordinated:', {
-      hookType: curiosityCoordination.primaryHook.type,
-      triggerCount: curiosityCoordination.triggers.length,
-    });
+    const context = await withObservation(
+      'context-gatherer',
+      {
+        type: 'agent',
+        input: { topic: input.topic, ageRange: input.ageRange },
+        metadata: { stage: 'GATHERING_CONTEXT' },
+      },
+      async (span) => {
+        const result = await gatherContext(input.topic, input.ageRange);
+        span.update({
+          metadata: {
+            conceptCount: result.coreConcepts.length,
+            factCount: result.keyFacts.length,
+          },
+        });
+        return result;
+      }
+    );
+
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE: Curiosity Coordinator (Coordinator - Scriptic)
+    // ═══════════════════════════════════════════════════════════════════════════
+    const curiosityCoordination = await withObservation(
+      'curiosity-coordinator',
+      {
+        type: 'coordinator',
+        input: { topic: input.topic, ageRange: input.ageRange, language },
+        metadata: { scriptic: true },
+      },
+      async (span) => {
+        const coordinator = createCuriosityCoordinator(input.ageRange, language);
+        const result = coordinator.coordinate({
+          topic: input.topic,
+          ageRange: input.ageRange,
+          language,
+          coreConcepts: context.coreConcepts,
+          keyFacts: context.keyFacts,
+        });
+        span.update({
+          metadata: {
+            hookType: result.primaryHook.type,
+            triggerCount: result.triggers.length,
+          },
+        });
+        return result;
+      }
+    );
 
     // Merge coordinator outputs into stick results
     const stickResultsWithCoordinators = withCoordinatorOutputs(stickResults, {
@@ -117,18 +196,28 @@ export async function runPipeline(
       },
     });
 
-    // Stage 2: Decide on Technique (if not specified or to confirm)
-    await emitProgress(
-      updateState(state, {
-        stage: 'APPLYING_TECHNIQUE',
-        context,
-      })
-    );
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE 2: Decide on Technique (Agent)
+    // ═══════════════════════════════════════════════════════════════════════════
+    await emitProgress(updateState(state, { stage: 'APPLYING_TECHNIQUE', context }));
 
-    const decision = await decideOnTechnique(
-      docsWithBrain,
-      input.topic,
-      input.ageRange
+    const decision = await withObservation(
+      'technique-decision',
+      {
+        type: 'agent',
+        input: { topic: input.topic, ageRange: input.ageRange },
+        metadata: { stage: 'APPLYING_TECHNIQUE' },
+      },
+      async (span) => {
+        const result = await decideOnTechnique(docsWithBrain, input.topic, input.ageRange);
+        span.update({
+          metadata: {
+            technique: result.technique,
+            curiosityTechnique: result.curiosityTechnique,
+          },
+        });
+        return result;
+      }
     );
 
     // Use user's preference or agent's decision
@@ -137,26 +226,35 @@ export async function runPipeline(
         ? input.technique // User override
         : decision.technique;
 
-    // Stage 2.5: Generate Flow Guidance (Song Flow Expert - HYBRID)
-    // Scriptic: loads constraints, Agentic: tailors suggestions
-    await emitProgress(
-      updateState(state, {
-        stage: 'GENERATING_FLOW_GUIDANCE',
-        technique: finalTechnique,
-      })
-    );
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE 2.5: Flow Guidance (Coordinator - Hybrid)
+    // ═══════════════════════════════════════════════════════════════════════════
+    await emitProgress(updateState(state, { stage: 'GENERATING_FLOW_GUIDANCE', technique: finalTechnique }));
 
-    const flowGuidance = await coordinateFlowGuidance(
-      input.topic,
-      input.ageRange,
-      finalTechnique,
-      language,
-      context
+    const flowGuidance = await withObservation(
+      'flow-expert',
+      {
+        type: 'coordinator',
+        input: { topic: input.topic, ageRange: input.ageRange, technique: finalTechnique, language },
+        metadata: { stage: 'GENERATING_FLOW_GUIDANCE', hybrid: true },
+      },
+      async (span) => {
+        const result = await coordinateFlowGuidance(
+          input.topic,
+          input.ageRange,
+          finalTechnique,
+          language,
+          context
+        );
+        span.update({
+          metadata: {
+            hookCandidates: result.suggestions.hookPhraseCandidates.length,
+            targetDuration: result.constraints.duration.targetSeconds,
+          },
+        });
+        return result;
+      }
     );
-    console.log('[Pipeline] Flow guidance generated:', {
-      hookCandidates: flowGuidance.suggestions.hookPhraseCandidates.length,
-      targetDuration: flowGuidance.constraints.duration.targetSeconds + 's',
-    });
 
     // Merge flow guidance into coordinator outputs
     const stickResultsWithAllCoordinators = withCoordinatorOutputs(stickResultsWithCoordinators, {
@@ -166,71 +264,107 @@ export async function runPipeline(
       },
     });
 
-    // Stage 3: Generate Lyrics (with language brain + flow guidance enforcement)
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE 3: Generate Lyrics (Agent)
+    // ═══════════════════════════════════════════════════════════════════════════
     let lyrics: string | undefined;
     if (input.outputType === 'lyrics' || input.outputType === 'both') {
-      await emitProgress(
-        updateState(state, {
-          stage: 'GENERATING_LYRICS',
-          technique: finalTechnique,
-        })
+      await emitProgress(updateState(state, { stage: 'GENERATING_LYRICS', technique: finalTechnique }));
+
+      lyrics = await withObservation(
+        'lyrics-agent',
+        {
+          type: 'agent',
+          input: {
+            technique: finalTechnique,
+            ageRange: input.ageRange,
+            curiosityTechnique: decision.curiosityTechnique,
+            language,
+          },
+          metadata: { stage: 'GENERATING_LYRICS' },
+        },
+        async () => {
+          return generateLyrics(
+            docsWithBrain,
+            context,
+            finalTechnique,
+            input.ageRange,
+            decision.curiosityTechnique,
+            stickResultsWithAllCoordinators
+          );
+        }
       );
 
-      // ENFORCEMENT: generateLyrics requires docsWithBrain (includes language brain)
-      // Pass stickResults with ALL coordinator outputs (curiosity + flow)
-      lyrics = await generateLyrics(
-        docsWithBrain,
-        context,
-        finalTechnique,
-        input.ageRange,
-        decision.curiosityTechnique,
-        stickResultsWithAllCoordinators
+      // ═══════════════════════════════════════════════════════════════════════════
+      // STAGE 3.5: Validate Lyrics (Evaluator - Deterministic + Micro-fixes)
+      // ═══════════════════════════════════════════════════════════════════════════
+      const validationResult = await withObservation(
+        'lyrics-validator',
+        {
+          type: 'evaluator',
+          input: { lyrics, language, topic: input.topic },
+          metadata: { deterministic: true, autoFix: true },
+        },
+        async (span) => {
+          const result = await validateAndFix(lyrics!, language, input.topic, true);
+          span.update({
+            metadata: {
+              isValid: result.validation.isValid,
+              issueCount: result.validation.issues.length,
+              wasFixed: result.wasFixed,
+              circuitOpen: result.circuitOpen,
+            },
+          });
+          return result;
+        }
       );
+
+      lyrics = validationResult.lyrics;
     }
 
-    // Stage 4: Generate Style
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE 4: Generate Style (Agent)
+    // ═══════════════════════════════════════════════════════════════════════════
     let style: string | undefined;
     if (input.outputType === 'style' || input.outputType === 'both') {
-      await emitProgress(
-        updateState(state, {
-          stage: 'GENERATING_STYLE',
-          lyrics,
-        })
-      );
+      await emitProgress(updateState(state, { stage: 'GENERATING_STYLE', lyrics }));
 
-      style = await generateStyle(
-        docsWithBrain,
-        input.topic,
-        finalTechnique,
-        input.ageRange
-      );
+      style = await withObservation(
+        'style-agent',
+        {
+          type: 'agent',
+          input: { topic: input.topic, technique: finalTechnique, ageRange: input.ageRange },
+          metadata: { stage: 'GENERATING_STYLE' },
+        },
+        async (span) => {
+          const result = await generateStyle(docsWithBrain, input.topic, finalTechnique, input.ageRange);
 
-      // Validate style
-      const validation = validateStylePrompt(style);
-      if (!validation.valid) {
-        console.warn('Style validation issues:', validation.issues);
-      }
+          // Validate style
+          const validation = validateStylePrompt(result);
+          span.update({
+            metadata: {
+              styleValid: validation.valid,
+              styleIssues: validation.issues,
+            },
+          });
+
+          return result;
+        }
+      );
     }
 
-    // Stage 5: Store to Memory (placeholder - Cognee integration)
-    await emitProgress(
-      updateState(state, {
-        stage: 'STORING_MEMORY',
-        lyrics,
-        style,
-      })
-    );
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE 5: Store to Memory
+    // ═══════════════════════════════════════════════════════════════════════════
+    await emitProgress(updateState(state, { stage: 'STORING_MEMORY', lyrics, style }));
 
     // TODO: Implement Cognee memory storage
-    const memoryId = sessionId; // Placeholder
+    const memoryId = sessionId;
 
-    // Stage 6: Complete
-    await emitProgress(
-      updateState(state, {
-        stage: 'COMPLETE',
-        memoryId,
-      })
-    );
+    // ═══════════════════════════════════════════════════════════════════════════
+    // STAGE 6: Complete
+    // ═══════════════════════════════════════════════════════════════════════════
+    await emitProgress(updateState(state, { stage: 'COMPLETE', memoryId }));
 
     const durationMs = Date.now() - startTime;
 
@@ -251,6 +385,16 @@ export async function runPipeline(
       tokensEstimate: tourSummary?.totalTokens ?? 2500,
     });
 
+    // ═══════════════════════════════════════════════════════════════════════════
+    // END TRACE — Store completed trace
+    // ═══════════════════════════════════════════════════════════════════════════
+    const completedTrace = endTrace({
+      success: true,
+      lyrics,
+      style,
+    });
+    storeTrace(completedTrace);
+
     return {
       success: true,
       lyrics,
@@ -263,23 +407,18 @@ export async function runPipeline(
         sessionId,
         timestamp: new Date().toISOString(),
         durationMs,
+        traceId: completedTrace.id, // Include trace ID for dashboard link
       },
     };
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : 'Unknown error';
+    const errorMessage = error instanceof Error ? error.message : 'Unknown error';
 
-    await emitProgress(
-      updateState(state, {
-        stage: 'ERROR',
-        error: errorMessage,
-      })
-    );
+    await emitProgress(updateState(state, { stage: 'ERROR', error: errorMessage }));
 
     // Log failure to agentic stats
     logPipelineRun({
       topic: input.topic,
-      language: input.language ?? 'en',
+      language,
       technique: input.technique,
       ageRange: input.ageRange,
       durationMs: Date.now() - startTime,
@@ -287,16 +426,24 @@ export async function runPipeline(
       error: errorMessage,
     });
 
+    // End trace with error
+    const failedTrace = endTrace({
+      success: false,
+      error: errorMessage,
+    });
+    storeTrace(failedTrace);
+
     return {
       success: false,
       metadata: {
         topic: input.topic,
         ageRange: input.ageRange,
         technique: input.technique,
-        language: input.language ?? 'en',
+        language,
         sessionId,
         timestamp: new Date().toISOString(),
         durationMs: Date.now() - startTime,
+        traceId: failedTrace.id,
       },
       error: errorMessage,
     };

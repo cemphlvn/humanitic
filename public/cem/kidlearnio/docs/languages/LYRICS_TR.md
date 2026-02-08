@@ -234,6 +234,224 @@ asonans_örnekler:
 
 ---
 
+## Edebi Söz Sanatları (Literary Devices)
+
+> **EN ÖNEMLİ 5 SÖZ SANATI — Çocuk şarkılarında zorunlu kullan!**
+
+### 1. Teşbih (Benzetme/Simile)
+
+```yaml
+tanım: |
+  Aralarında ortak özellik bulunan iki kavramı karşılaştırma.
+  Soyut kavramları somutlaştırır — çocuklar için ZORUNLU.
+
+unsurlar:
+  benzeyen: "güneş"
+  benzetilen: "top"
+  benzetme_edatı: "gibi, kadar, sanki, tıpkı"
+  benzetme_yönü: "yuvarlak"
+
+çocuk_şarkısı_örnekleri:
+  - "Dünya bir top GİBİ döner" (uzay)
+  - "Kalp pompa GİBİ çalışır" (biyoloji)
+  - "Beyin bilgisayar GİBİ düşünür" (teknoloji)
+  - "Atomlar minik toplar GİBİ" (kimya)
+
+kural: |
+  Her soyut kavram için BİR teşbih kullan.
+  Çocuğun bildiği şeye benzet: top, oyuncak, hayvan, yemek.
+```
+
+### 2. Teşhis (Kişileştirme/Personification)
+
+```yaml
+tanım: |
+  İnsan dışı varlıklara insan özellikleri verme.
+  Çocuklar için EN ETKİLİ sanat — her şey canlı olur!
+
+örnekler:
+  - "Güneş GÜLÜMSÜYOR" (doğa)
+  - "Yapraklar DANS EDİYOR" (biyoloji)
+  - "Su ŞARKI SÖYLÜYEKen akar" (fen)
+  - "Rakamlar KONUŞUYOR" (matematik)
+  - "Bulut AĞLIYOR, yağmur yağıyor" (hava)
+
+çocuk_şarkısı_kullanımı: |
+  Doğa olaylarını kişileştir:
+  "Güneş uyanır, 'Günaydın!' der,
+   Çiçekler açar, arı gelir"
+
+  Bilimsel kavramları canlandır:
+  "Su buharlaşır, 'Hoşça kal!' der,
+   Gökyüzüne uçar, bulut olur"
+
+kural: Her dörtlükte EN AZ 1 teşhis kullan.
+```
+
+### 3. İstiare (Eğretileme/Metaphor)
+
+```yaml
+tanım: |
+  Benzetme edatı olmadan, bir şeyi başka bir şey olarak söyleme.
+  Teşbihten daha güçlü, daha şiirsel.
+
+tipler:
+  açık_istiare: |
+    Benzetilen söylenir, benzeyen gizli.
+    "Gökyüzündeki TOPLAR" (yıldızlar)
+  kapalı_istiare: |
+    Benzeyen söylenir, benzetilen gizli.
+    "Güneş DOĞDU" (bebek gibi)
+
+çocuk_şarkısı_örnekleri:
+  - "Gece örtüsü" (karanlık)
+  - "Bilgi denizi" (kitaplar)
+  - "Sayı merdiveni" (matematik)
+  - "Hafıza sandığı" (beyin)
+
+kural: |
+  Nakaratta istiare kullan — akılda kalır!
+  "Aç hafıza sandığını, koy içine bilgiyi!"
+```
+
+### 4. Tekrar (Yineleme/Repetition)
+
+```yaml
+tanım: |
+  Aynı ses, kelime veya yapının tekrar edilmesi.
+  Şarkılar için EN ÖNEMLİ sanat — ezber yapar!
+
+tipler:
+  ses_tekrarı:
+    aliterasyon: "Parlak Pırıl Pırıl" (p sesi)
+    asonans: "Anla, tanı, say" (a ünlüsü)
+
+  kelime_tekrarı:
+    anafor: |
+      Dize başlarında tekrar:
+      "Su döner, su döngü yapar,
+       Su buhar, su bulut olur"
+    epifora: |
+      Dize sonlarında tekrar (redif):
+      "Güneş doğar sabahLEYİN,
+       Çiçek açar sabahLEYİN"
+
+  yapı_tekrarı:
+    paralelizm: |
+      "Gel-DİM, gör-DÜM, öğren-DİM"
+      "Oku-YOR, yaz-IYOR, çiz-İYOR"
+
+şarkı_zorunluluğu: |
+  - Nakarat: Ana kavramı 4+ kez tekrarla
+  - Her dörtlük: En az 1 ses veya kelime tekrarı
+  - Redif: Fiil ekleriyle doğal tekrar oluştur
+```
+
+### 5. Tezat (Karşıtlık/Antithesis)
+
+```yaml
+tanım: |
+  Birbirine zıt kavramları yan yana getirme.
+  Çocuklar için çok etkili — farkları öğretir!
+
+örnekler:
+  - "Gece-gündüz, yaz-kış döner"
+  - "Sıcak-soğuk, su değişir"
+  - "Büyük-küçük, hepsi atom"
+  - "Artı-eksi, elektrik akışı"
+
+çocuk_şarkısı_kullanımı: |
+  Zıtlıkları nakarat yap:
+  "Sıcakta buhar, soğukta buz,
+   Su her halde, harika kız/oğuz!"
+
+  Karşılaştırma öğretimi:
+  "Güneş büyük, dünya küçük,
+   Ama ikisi de yuvarlak, süslü çiçek"
+
+kural: |
+  Her connection şarkısında tezat kullan.
+  Zıtlıklar = daha derin anlama.
+```
+
+---
+
+## Ahenk Unsurları (Prosodic Elements)
+
+### Ulama (Liaison/Linking)
+
+```yaml
+tanım: |
+  Ünsüzle biten kelimenin, ünlüyle başlayan kelimeyle birleşmesi.
+  Akıcılık ve melodi için KRİTİK!
+
+örnek:
+  yazılış: "Sen de gel"
+  okunuş: "Sen-de-gel" (3 hece, ulama yok)
+
+  yazılış: "Gel artık"
+  okunuş: "Ge-lar-tık" (3 hece, ulama var!)
+
+şarkı_kullanımı: |
+  Ulama ile hece sayısını ayarla:
+  "Su buhar olur" → "su-bu-ha-ro-lur" (5 hece, ulama)
+  Şarkının akıcılığı için ulamayı planla!
+
+dikkat: |
+  Hece sayarken ulamayı hesaba kat.
+  Ulama = daha akıcı şarkı.
+```
+
+### Hece Ölçüsü Kalıpları (Syllable Meter Patterns)
+
+```yaml
+yaş_bazlı_hece:
+  5-7_yaş:
+    tercih: 7 hece (yedili)
+    duraklar: 4+3 veya 3+4
+    örnek: "Gü-neş / do-ğar / her-gün" (4+3)
+
+  8-10_yaş:
+    tercih: 8 hece (sekizli)
+    duraklar: 4+4 veya 5+3
+    örnek: "Su-lar / a-kar / de-re-den / aşa-ğı" (4+4)
+
+  11-14_yaş:
+    tercih: 11 hece (on birli)
+    duraklar: 6+5 veya 4+4+3
+    örnek: "A-na-do-lu'nun / dağ-la-rın-da / kar-lar" (6+5)
+
+zorunlu_kural: |
+  Aynı şarkıda TÜM dizeler aynı hece sayısında olmalı!
+  Karışık hece = bozuk melodi = ezberlenemez.
+```
+
+### Kafiye ve Redif Kullanımı
+
+```yaml
+kafiye_zorunluluğu:
+  nakarat: Tam kafiye veya zengin kafiye
+  dörtlük: En az yarım kafiye
+
+redif_gücü: |
+  Türkçe'nin en güçlü silahı!
+  Fiil ekleri doğal redif oluşturur:
+
+  -yor redifi:
+  "Su akIYOR, çiçek açIYOR,
+   Güneş bakIYOR, kuş uçuYOR"
+
+  -dır redifi:
+  "Su sıvıDIR, buz katıDIR,
+   Buhar gazDIR, hepsi suDUR"
+
+kafiye_şeması:
+  memorization: aaaa veya aabb (kolay)
+  connection: abab veya abcb (anlam derinliği)
+```
+
+---
+
 ## Söz Sanatları (Word Arts)
 
 ### Deyimler (Idioms)

@@ -189,10 +189,52 @@ GATHERED CONTEXT:
 
 CRITICAL REMINDERS FOR ${brain.name.toUpperCase()}:
 ${brain.code === 'tr' ? `
-- Use SOV word order (yüklem sonda)
-- Apply vowel harmony (ünlü uyumu)
-- Use native deyimler and atasözleri
-- Maintain hece ölçüsü (syllable meter)
+═══════════════════════════════════════════════════════════════════════════════
+TÜRKÇE SÖZ SANATLARI — ZORUNLU KONTROL LİSTESİ
+═══════════════════════════════════════════════════════════════════════════════
+
+□ TEŞBİH (Benzetme) — EN AZ 2 TANE ŞARKIDA:
+  ZORUNLU: "gibi", "sanki", "kadar" kullan
+  ✓ "Su bulut GİBİ uçar"
+  ✓ "Dünya top GİBİ döner"
+  ✗ YANLIŞ: Benzetme olmadan soyut kavram anlatmak
+
+□ TEŞHİS (Kişileştirme) — HER DÖRTLÜKTE EN AZ 1 TANE:
+  ZORUNLU: Cansız varlığa insan eylemi ver
+  ✓ "Bulutlar AĞLIYOR" (ağlamak = insan eylemi)
+  ✓ "Güneş GÜLÜMSÜYOR" (gülümsemek = insan eylemi)
+  ✓ "Rüzgar FISILDADI" (fısıldamak = insan eylemi)
+  ✗ YANLIŞ: "Su akar" (akmak su için normal, teşhis DEĞİL)
+  ✗ YANLIŞ: Hiç teşhis olmayan dörtlük
+
+□ TEZAT (Karşıtlık) — EN AZ 1 TANE:
+  ZORUNLU: Zıt kavramları aynı dizede birleştir
+  ✓ "Sıcakta buhar, soğukta buz"
+  ✓ "Yukarı çıktı, aşağı düştü"
+
+□ İSTİARE — NAKARATTA ÖNERİLİR:
+  ✓ İstiare: "Bilgi denizi", "Hafıza hazinesi"
+  (Opsiyonel: Atasözü veya deyim eklenebilir)
+
+□ HECE ÖLÇÜSÜ — TÜM DİZELER AYNI SAYIDA:
+  7'li: He-ce-le-ri-say-say-say (çocuk şarkısı)
+  8'li: Bir-iki-üç-dört-beş-al-tı-ye-di (standart)
+  11'li: On-bir-he-ce-u-zun-di-ze-ler-i-çin
+  ✗ YANLIŞ: Bir dize 8, diğeri 10 hece
+
+□ ULAMA — AKICİLİK İÇİN:
+  ✓ "Gel artık" → "Ge-lar-tık" (3 hece, akıcı)
+  ✓ "Su akar" → "Sua-kar" (2 hece, akıcı)
+
+□ KAFİYE + REDİF:
+  ✓ Redif: gel-Dİ, gör-DÜ, bil-Dİ (-di eki)
+  ✓ Kafiye: su-lar, bu-har, yağ-mur (benzer sesler)
+
+GRAMATİK ZORUNLULUKLAR:
+- SOV: Yüklem her zaman SONDA
+- Ünlü uyumu: ASLA bozma (kalın/ince kuralı)
+- Konuşma dili: "Gördün mü?" değil "Gördünüz mü?"
+═══════════════════════════════════════════════════════════════════════════════
 ` : brain.code === 'zh' ? `
 - Use topic-prominent structure
 - Include 四字格 (four-character phrases)
