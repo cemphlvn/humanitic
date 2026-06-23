@@ -1,0 +1,24 @@
+"""Run every suite. Usage:  PYTHONPATH=. python3 tests/run_all.py"""
+import sys
+import traceback
+import test_kernel
+import test_backtest
+import test_constitution
+
+
+def main():
+    suites = [test_kernel, test_backtest, test_constitution]
+    ok = 0
+    for s in suites:
+        try:
+            s.run()
+            ok += 1
+        except Exception:
+            print(f"FAIL {s.__name__}")
+            traceback.print_exc()
+    print(f"\n{ok}/{len(suites)} suites green")
+    return 0 if ok == len(suites) else 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

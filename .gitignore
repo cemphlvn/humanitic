@@ -1,0 +1,16 @@
+# ── Article 0.1 — .local is HARD-gitignored (eternity clause; do not remove) ──
+.local
+.local/
+*.local
+**/.local/
+
+# python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+
+# os
+.DS_Store
