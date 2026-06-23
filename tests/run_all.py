@@ -4,10 +4,11 @@ import traceback
 import test_kernel
 import test_backtest
 import test_constitution
+import test_index
 
 
 def main():
-    suites = [test_kernel, test_backtest, test_constitution]
+    suites = [test_kernel, test_backtest, test_constitution, test_index]
     ok = 0
     for s in suites:
         try:
