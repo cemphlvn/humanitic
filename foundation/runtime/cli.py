@@ -34,6 +34,7 @@ def main(argv=None):
     fp.add_argument("--bars", type=int, default=8000, help="history length (bars)")
     bp = sub.add_parser("book", help="build the portfolio-of-edges (discover->court->orthogonality->allocate->monitor)")
     bp.add_argument("--no-local", action="store_true", help="do not write .local")
+    bp.add_argument("--paper", action="store_true", help="also trade the book forward on the portfolio paper account")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -74,8 +75,12 @@ def main(argv=None):
         print(json.dumps(paper.run_fit(n=args.bars), indent=2))
         return 0
     if args.cmd == "book":
-        from foundation.portfolio import loop
-        print(json.dumps(loop.build_book(write_local=not args.no_local), indent=2))
+        if args.paper:
+            from foundation.runtime import paper
+            print(json.dumps(paper.run_portfolio(write_local=not args.no_local), indent=2))
+        else:
+            from foundation.portfolio import loop
+            print(json.dumps(loop.build_book(write_local=not args.no_local), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,

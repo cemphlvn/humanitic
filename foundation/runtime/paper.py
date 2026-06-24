@@ -69,6 +69,34 @@ def run_paper(write_local=True, refit=False):
 FIT_INTERVALS = (1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256)
 
 
+PORTFOLIO = os.path.join(".local", "paper", "portfolio.json")
+
+
+def run_portfolio(write_local=True):
+    """Trade the assembled BOOK forward on a persistent portfolio paper account: build the book, take the
+    allocator's weight vector, compound its combined return stream. The portfolio is a superposition of
+    many small uncorrelated edges, not one opinion. Win metrics ride on the combined stream."""
+    from foundation.portfolio import loop, allocator
+    book, w, summary = loop.assemble()
+    pr = allocator.portfolio_returns(book, w)                 # the combined per-bar P&L (w applied)
+    acct = (PaperAccount.from_dict(json.load(open(PORTFOLIO)))
+            if (write_local and os.path.exists(PORTFOLIO)) else PaperAccount())
+    s = acct.run(np.ones(len(pr)), pr)                        # compound the PORTFOLIO forward
+    if write_local:
+        os.makedirs(os.path.dirname(PORTFOLIO), exist_ok=True)
+        with open(PORTFOLIO, "w") as f:
+            json.dump(acct.to_dict(), f)
+        try:
+            os.chmod(PORTFOLIO, 0o600)
+        except OSError:
+            pass
+        s["account"] = PORTFOLIO
+    s["book"] = {"size": summary["book_size"], "edges": summary["edges"],
+                 "diversified_ir": summary["diversified_ir"], "weights": summary["weights"]}
+    s["caveat"] = "synthetic candidates (planted) — validates book->paper wiring; live discovery replaces it"
+    return s
+
+
 def run_fit(seed=0, n=8000, intervals=FIT_INTERVALS, lookback=2000):
     """Time-interval-infra-fit across MANY intervals over a LONG history. Rolling-lookback regimes keep
     it O(n) and memory-safe; the Deflated Sharpe's n_trials = #feasible intervals (more intervals = a

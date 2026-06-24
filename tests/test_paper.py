@@ -30,8 +30,13 @@ def run():
     assert rep["interval"] >= 1 and rep["n_steps"] > 0
     assert "interval_chosen" in rep and rep["interval_chosen"]["interval"] == rep["interval"]
 
-    print("test_paper: OK (ledger+interval round-trip; interval-fit best=%s; paper trades fitted interval=%s)"
-          % (res["best_fit"]["interval"], rep["interval"]))
+    # book -> paper: the PORTFOLIO (superposition of edges) trades forward on its own account
+    pf = paper.run_portfolio(write_local=False)
+    assert pf["mode"].startswith("PAPER") and pf["n_steps"] > 0
+    assert pf["book"]["size"] >= 2 and "win" in pf            # multiple edges, win metrics on the combined stream
+
+    print("test_paper: OK (ledger+interval; paper trades interval=%s; book->portfolio paper book_size=%d)"
+          % (rep["interval"], pf["book"]["size"]))
     return True
 
 

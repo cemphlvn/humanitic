@@ -32,7 +32,8 @@ def candidate(seed, n=1500):
     return pnl, sharpe
 
 
-def build_book(n_candidates=10, capacity=6, tau=0.5, seed0=1, write_local=True):
+def assemble(n_candidates=10, capacity=6, tau=0.5, seed0=1):
+    """Run the factory and return (book, weights, summary) — the assembled book + its weight vector."""
     book = EdgeBook(capacity=capacity)
     log = []
     for i in range(n_candidates):
@@ -50,14 +51,19 @@ def build_book(n_candidates=10, capacity=6, tau=0.5, seed0=1, write_local=True):
     rev = monitor.review(book)                                      # DECAY / REDUNDANCY sweep
     retired = monitor.apply(book, rev)
     w = allocator.weights(book, method="risk_parity")               # ALLOCATE -> weight vector
-    out = {"book_size": len(book), "capacity": capacity, "candidates": n_candidates,
-           "edges": book.ids(), "weights": [round(float(x), 4) for x in w],
-           "portfolio_sharpe": round(allocator.portfolio_sharpe(book, w), 4),
-           "diversified_ir": round(allocator.diversified_ir(book), 4),
-           "retired": list(retired), "log": log,
-           "caveat": "synthetic regime candidates (planted) — validates the portfolio machinery; "
-                     "live discovery edges replace candidate() unchanged"}
+    summary = {"book_size": len(book), "capacity": capacity, "candidates": n_candidates,
+               "edges": book.ids(), "weights": [round(float(x), 4) for x in w],
+               "portfolio_sharpe": round(allocator.portfolio_sharpe(book, w), 4),
+               "diversified_ir": round(allocator.diversified_ir(book), 4),
+               "retired": list(retired), "log": log,
+               "caveat": "synthetic regime candidates (planted) — validates the portfolio machinery; "
+                         "live discovery edges replace candidate() unchanged"}
+    return book, w, summary
+
+
+def build_book(n_candidates=10, capacity=6, tau=0.5, seed0=1, write_local=True):
+    book, _, summary = assemble(n_candidates, capacity, tau, seed0)
     if write_local:
         book.save(BOOK_PATH)
-        out["book"] = BOOK_PATH
-    return out
+        summary["book"] = BOOK_PATH
+    return summary
