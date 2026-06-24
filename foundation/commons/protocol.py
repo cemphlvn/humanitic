@@ -4,7 +4,8 @@ onchain, payments. One shape (name, kind, describe()) so partners compose. This 
 architecture's seam: the strategy substrate (regime -> strategy -> backtest) and the agent economy
 (earn -> pay -> trade) speak the same language and plug together (composable architecture).
 """
-PARTNER_KINDS = ("data", "inference", "broker", "onchain", "payments", "training", "simulator")
+PARTNER_KINDS = ("data", "inference", "broker", "onchain", "payments", "training", "simulator",
+                 "policy")
 
 
 def conforms(obj):

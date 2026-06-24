@@ -82,6 +82,15 @@ _SUPPORTED = [
      "capabilities": ["bimanual-manipulation", "domain-randomization", "trajectory-data",
                       "vla-baselines", "remote-nvidia"],
      "adapter": "(runtime)", "license": humanitik_license("RoboTwin Platform")},
+    {"id": "pi0", "kind": "policy", "name": "Pi0 (VLA)", "status": "planned",
+     "capabilities": ["vision-language-action", "embodied", "remote-nvidia"],
+     "adapter": "foundation.operator.vla.Pi0", "license": humanitik_license("Physical Intelligence / RLinf")},
+    {"id": "gr00t", "kind": "policy", "name": "GR00T (VLA)", "status": "planned",
+     "capabilities": ["vision-language-action", "embodied", "remote-nvidia"],
+     "adapter": "foundation.operator.vla.Gr00t", "license": humanitik_license("NVIDIA / RLinf")},
+    {"id": "openvla", "kind": "policy", "name": "OpenVLA", "status": "planned",
+     "capabilities": ["vision-language-action", "embodied", "remote-nvidia"],
+     "adapter": "foundation.operator.vla.OpenVLA", "license": humanitik_license("OpenVLA / RLinf")},
 ]
 
 
