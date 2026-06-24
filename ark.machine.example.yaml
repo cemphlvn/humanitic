@@ -1,0 +1,25 @@
+# ark.machine.yaml — DECLARE YOUR MACHINE. Copy/edit this file (or drop it in .local/machine.yaml,
+# which overrides the repo-level one). Deep-merged over the defaults; YAML or JSON both work.
+
+machine: cem-macbook
+
+secrets:
+  backend: keychain            # keychain | encrypted-file | env
+  # for encrypted-file (no-Keychain machines):
+  # path: .local/secrets.enc
+  # passphrase_env: ARK_ENC_PASS   # the scrypt passphrase (keep IT in the keychain)
+
+inference:
+  engine: stub                 # stub | mlx | ollama
+  url: http://127.0.0.1:8080/v1
+  model: <local-model-id>      # e.g. an mlx-community 4-bit Qwen3/Llama
+
+execution:
+  broker: paper                # paper | alpaca | ibkr | cdp
+  risk: conservative           # MAX_GROSS 0.25
+  live: false                  # fiat live capital needs the explicit approval token
+
+onchain:
+  network: base-sepolia        # testnet-first; mainnet needs the human-approved live gate
+  x402_budget_usdc: 5.0        # the agent's session spend cap
+  x402_max_single_usdc: 0.50   # per-payment cap (anti-drain)
