@@ -20,6 +20,7 @@ import test_critic
 import test_vsa_mlx
 import test_cross_seam
 import test_autonomous
+import test_partners
 
 
 def main():
@@ -27,7 +28,7 @@ def main():
               test_commons, test_spine, test_spine_props, test_court_props,
               test_privacy_props, test_index_props, test_health,
               test_news_probe, test_trigram_strategy, test_jepa, test_critic, test_vsa_mlx,
-              test_cross_seam, test_autonomous]
+              test_cross_seam, test_autonomous, test_partners]
     ok = 0
     for s in suites:
         try:

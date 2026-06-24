@@ -25,11 +25,12 @@ class RiskConfig:
         self.max_turnover = max_turnover
 
 
-def paper_session(prices, strategy, rng, risk=None, warmup=25):
-    """Run one strategy through the paper engine with the full risk-gate stack."""
+def paper_session(prices, strategy, rng, risk=None, warmup=25, broker=None):
+    """Run one strategy through the paper engine with the full risk-gate stack.
+    `broker` lets you swap a partner's execution model (backtest across brokers)."""
     risk = risk or RiskConfig()
     prices = np.asarray(prices, float)
-    broker = PaperBroker(rng=rng)
+    broker = broker if broker is not None else PaperBroker(rng=rng)
     halted = None
     kills = []
     for t in range(warmup, len(prices) - 1):
