@@ -11,7 +11,7 @@ def run():
     assert "timestamp_utc" in r
 
     names = [c["name"] for c in r["checks"]]
-    assert names == sorted(names) and len(names) == 5          # deterministic order, all 5 checks
+    assert names == sorted(names) and len(names) == 9          # deterministic order, all 9 checks
 
     for c in r["checks"]:
         assert c["status"] in ("PASS", "WARN", "FAIL", "ERROR")

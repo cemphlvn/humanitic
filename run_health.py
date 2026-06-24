@@ -46,6 +46,10 @@ _REMEDIATION = {
     "backtest_speed": "walk_forward slow — vectorize the decision loop or cut n_days while iterating.",
     "memory": "peak memory high — shrink the probe codebook/distractors or D.",
     "suite": "no test_*.py found — add tests under tests/.",
+    "detection": "regime-shift detector missed a planted shift — widen the window or lower z.",
+    "registry": "a partner lacks a HUMANITIK license — restore the ethical gate.",
+    "index_recall": "index self-recall low — check encode/cleanup or cut factors per regime.",
+    "security_posture": "a security gate is missing — restore it before any outward action.",
 }
 
 
@@ -72,6 +76,14 @@ def _summary(name, d):
         return "peak %.1f MB" % d["peak_mb"]
     if name == "suite":
         return "%d test_*.py files" % d["test_files"]
+    if name == "detection":
+        return "shift detected=%s, predictability %.2f" % (d.get("detected"), d.get("predictability", 0))
+    if name == "registry":
+        return "%d partners, all HUMANITIK-licensed=%s" % (d.get("partners", 0), d.get("all_licensed"))
+    if name == "index_recall":
+        return "%d entries, self-recall %.2f" % (d.get("entries", 0), d.get("recall", 0))
+    if name == "security_posture":
+        return "%s (%d gates, failed=%s)" % (d.get("posture"), d.get("n_checks", 0), d.get("failed", []))
     return ""
 
 
@@ -105,6 +117,10 @@ def build_report(seed=0, write=True, quick=False):
         _check("capacity_envelope", lambda: monitor.check_capacity_envelope(rng, ks=ks, trials=trials)),
         _check("backtest_speed", monitor.check_backtest_speed),
         _check("suite", monitor.check_suite_hook),
+        _check("detection", lambda: monitor.check_detection(np.random.default_rng(0))),
+        _check("registry", monitor.check_registry),
+        _check("index_recall", monitor.check_index_recall),
+        _check("security_posture", monitor.check_security_posture),
     ]
     peak_mb = tracemalloc.get_traced_memory()[1] / (1024 * 1024)
     tracemalloc.stop()

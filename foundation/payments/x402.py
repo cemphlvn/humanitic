@@ -10,13 +10,16 @@ x402 = HTTP 402 revived as machine-native stablecoin pay-per-call (Coinbase Deve
 
 class PaymentBudget:
     """A per-session x402 spend budget. spend() refuses to exceed it (the payments circuit-breaker)."""
-    def __init__(self, budget, facilitator=None):
+    def __init__(self, budget, facilitator=None, max_single=None):
         self.budget = float(budget)
+        self.max_single = float(max_single) if max_single is not None else float(budget)
         self.spent = 0.0
         self.facilitator = facilitator if facilitator is not None else X402Meter()
 
     def spend(self, amount, resource):
         amount = float(amount)
+        if amount > self.max_single + 1e-12:                      # single-payment cap (anti-drain)
+            raise PermissionError("x402 single-payment cap: %.4f > %.4f" % (amount, self.max_single))
         if self.spent + amount > self.budget + 1e-12:
             raise PermissionError("x402 budget exceeded: %.4f + %.4f > %.4f"
                                   % (self.spent, amount, self.budget))

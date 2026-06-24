@@ -196,6 +196,57 @@ def check_suite_hook():
     }
 
 
+# ── new-regime detection + governance + index health ──────────────────────────
+def check_detection(rng):
+    """Detection self-test: plant a regime shift and confirm the detector flags it."""
+    from foundation.regime import detection
+    n = 400
+    r = np.concatenate([rng.normal(-0.010, 0.005, n), rng.normal(0.010, 0.005, n)])
+    prices = 100.0 * np.exp(np.cumsum(r))
+    det = detection.detect_regime_shift(prices, window=40)
+    detected = any(abs(s - n) < 80 for s in det["shifts"])
+    return {"planted_at": n, "n_shifts": len(det["shifts"]),
+            "predictability": round(det["predictability"], 3), "detected": detected,
+            "status": "PASS" if detected else "FAIL"}
+
+
+def check_registry():
+    """Governance health: every partner carries a HUMANITIK license (the ethical gate holds)."""
+    from foundation.commons import registry
+    parts = registry.default_register().list()
+    licensed = all(p["license"].get("scheme") == "HUMANITIK" and p["license"].get("attribution")
+                   for p in parts)
+    kinds = {}
+    for p in parts:
+        kinds[p["kind"]] = kinds.get(p["kind"], 0) + 1
+    return {"partners": len(parts), "kinds": kinds, "all_licensed": licensed,
+            "status": "PASS" if licensed else "FAIL"}
+
+
+def check_index_recall():
+    """Index health: the knowledge index self-recalls (encode -> store -> retrieve round-trips)."""
+    from foundation.index import store
+    ix = store.Index()
+    try:
+        n = ix.load_commons()
+    except Exception as e:
+        return {"status": "FAIL", "error": str(e)}
+    if n == 0:
+        return {"entries": 0, "recall": 1.0, "status": "PASS"}
+    ok = sum(1 for e in ix.entries if ix.retrieve(e["regime_factors"], 1)[0][0] == e["id"])
+    recall = ok / n
+    return {"entries": n, "recall": round(recall, 3),
+            "status": "PASS" if recall >= 0.9 else ("WARN" if recall >= 0.7 else "FAIL")}
+
+
+def check_security_posture():
+    """Security health: every gate the novel additions need (x402/onchain/live/Article-0/ethics) holds."""
+    from foundation.security.audit import security_posture
+    p = security_posture()
+    return {"posture": p["posture"], "n_checks": len(p["checks"]),
+            "failed": [c["name"] for c in p["checks"] if not c["ok"]], "status": p["status"]}
+
+
 # ── orchestrator ──────────────────────────────────────────────────────────────
 def health():
     """Run every check under one tracemalloc window. Returns metrics + a top-level status."""
