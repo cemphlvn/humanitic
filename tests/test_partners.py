@@ -15,6 +15,13 @@ def run():
         assert abs(lic["foundation_cost"] - 0.05) < 1e-9, p
     assert len(R.list(kind="broker")) >= 2 and len(R.list(kind="inference")) >= 1
     assert len(R.list(kind="data")) >= 1
+    # CDP (Coinbase Developer Platform) is a registered, ethically-licensed onchain partner
+    assert "cdp" in [p["id"] for p in R.list()] and R.get("cdp")["kind"] == "onchain"
+
+    # composable: the COMMON LANGUAGE wires data + broker + inference, all passing the ethical gate
+    comp = registry.pipeline(R, "polygon", "paper", "mlx-lm")
+    assert comp["ethical"] is True
+    assert set(comp["compose"]) == {"data", "broker", "inference"}
 
     # registration is REFUSED without a HUMANITIK license
     try:

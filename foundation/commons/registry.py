@@ -65,6 +65,12 @@ _SUPPORTED = [
      "capabilities": ["local", "openai-compatible", "tool-calling"],
      "adapter": "foundation.operator.inference.LocalServerEngine",
      "license": humanitik_license("Ollama")},
+    {"id": "cdp", "kind": "onchain", "name": "Coinbase Developer Platform", "status": "planned",
+     "capabilities": ["onchain", "wallets", "crypto-trading", "x402-payments"],
+     "adapter": "(runtime)", "license": humanitik_license("Coinbase")},
+    {"id": "polygon", "kind": "data", "name": "Polygon.io", "status": "planned",
+     "capabilities": ["equities", "options", "crypto", "point-in-time"],
+     "adapter": "(runtime)", "license": humanitik_license("Polygon.io")},
 ]
 
 
@@ -73,3 +79,16 @@ def default_register():
     for p in _SUPPORTED:
         R.register(p)
     return R
+
+
+def pipeline(register, data, broker, inference):
+    """Compose a runnable config from registered partners — the COMMON LANGUAGE. Every partner speaks
+    the same schema (id/kind/name/capabilities/adapter/license), so data + broker + inference plug
+    together (composable architecture). All three must pass the ethical gate (HUMANITIK license)."""
+    parts = {"data": register.get(data), "broker": register.get(broker),
+             "inference": register.get(inference)}
+    for p in parts.values():
+        require_humanitik_license(p)                          # passing through the ethical requirements
+    return {"compose": {k: v["id"] for k, v in parts.items()},
+            "capabilities": {k: v["capabilities"] for k, v in parts.items()},
+            "ethical": all(p["license"]["scheme"] == "HUMANITIK" for p in parts.values())}
