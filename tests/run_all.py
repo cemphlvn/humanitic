@@ -7,10 +7,12 @@ import test_constitution
 import test_index
 import test_trigram
 import test_commons
+import test_spine
 
 
 def main():
-    suites = [test_kernel, test_backtest, test_constitution, test_index, test_trigram, test_commons]
+    suites = [test_kernel, test_backtest, test_constitution, test_index, test_trigram,
+              test_commons, test_spine]
     ok = 0
     for s in suites:
         try:
