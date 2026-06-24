@@ -4,6 +4,12 @@
 *.local
 **/.local/
 
+# ── .labs — private learning sandbox (scratch experiments). Validated results graduate to
+# foundation/ + a node; the messy iteration stays local. Not Article 0; just a working lab. ──
+.labs
+.labs/
+**/.labs/
+
 # python
 __pycache__/
 *.py[cod]
