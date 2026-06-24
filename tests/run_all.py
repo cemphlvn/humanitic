@@ -15,13 +15,15 @@ import test_index_props
 import test_health
 import test_news_probe
 import test_trigram_strategy
+import test_jepa
+import test_critic
 
 
 def main():
     suites = [test_kernel, test_backtest, test_constitution, test_index, test_trigram,
               test_commons, test_spine, test_spine_props, test_court_props,
               test_privacy_props, test_index_props, test_health,
-              test_news_probe, test_trigram_strategy]
+              test_news_probe, test_trigram_strategy, test_jepa, test_critic]
     ok = 0
     for s in suites:
         try:
