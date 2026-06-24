@@ -10,8 +10,10 @@ publish(). A constitutional rule that isn't enforced in code is a prayer.
 import os
 import re
 
-# matches `.local` as a path token: ".local/x", "see .local", "a/.local/b"
-_LOCAL_MARKER = re.compile(r"(^|[\s/\"'`])\.local(/|\b)")
+# Article 0.1 covers `.local` AND `*.local`. Flag `.local` as a path token (".local/x",
+# "see .local", "a/.local/b") OR a filename suffix ("positions.local"). Spares
+# ".localish" / "locale" / "/usr/local" (no `.local` at a word boundary there).
+_LOCAL_MARKER = re.compile(r"\.local(/|\b)")
 
 
 def is_publishable(artifact) -> bool:

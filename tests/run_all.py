@@ -8,11 +8,16 @@ import test_index
 import test_trigram
 import test_commons
 import test_spine
+import test_spine_props
+import test_court_props
+import test_privacy_props
+import test_index_props
 
 
 def main():
     suites = [test_kernel, test_backtest, test_constitution, test_index, test_trigram,
-              test_commons, test_spine]
+              test_commons, test_spine, test_spine_props, test_court_props,
+              test_privacy_props, test_index_props]
     ok = 0
     for s in suites:
         try:
