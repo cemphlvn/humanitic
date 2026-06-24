@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Autonomous on macOS via launchd. Edit the path + cadence, then:
+       cp templates/com.humanitik.macro-kernel.plist ~/Library/LaunchAgents/
+       launchctl load ~/Library/LaunchAgents/com.humanitik.macro-kernel.plist
+     Memory-safe at the OS level: HardResourceLimits/ResidentSetSize caps RSS (tune below). -->
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key><string>com.humanitik.macro-kernel</string>
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/bash</string>
+    <string>-lc</string>
+    <string>cd /Users/cem/lib/table/ark &amp;&amp; ./run.sh once</string>
+  </array>
+  <key>StartInterval</key><integer>300</integer>            <!-- autonomous cadence (s); tune -->
+  <key>RunAtLoad</key><false/>
+  <key>StandardOutPath</key><string>/Users/cem/.ark/macro-kernel.out.log</string>
+  <key>StandardErrorPath</key><string>/Users/cem/.ark/macro-kernel.err.log</string>
+  <key>HardResourceLimits</key>
+  <dict><key>ResidentSetSize</key><integer>2147483648</integer></dict>   <!-- 2 GB OS-level RSS cap -->
+</dict>
+</plist>

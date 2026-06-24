@@ -25,3 +25,8 @@ onchain:
   network: base-sepolia        # testnet-first; mainnet needs the human-approved live gate
   x402_budget_usdc: 5.0        # the agent's session spend cap
   x402_max_single_usdc: 0.50   # per-payment cap (anti-drain)
+
+resources:
+  max_ram_mb: 2048             # RAM budget; the runner FAILS SAFE (halts) above it — tunable
+  interval_seconds: 300        # autonomous loop / launchd cadence
+  mode: trigger                # trigger | auto
