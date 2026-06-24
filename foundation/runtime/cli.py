@@ -19,6 +19,10 @@ def main(argv=None):
     jp = sub.add_parser("join", help="pull a real stream + run the causal as-of join")
     jp.add_argument("--target", choices=["hivemapper", "geodnet"], default="geodnet")
     jp.add_argument("--live", action="store_true", help="attempt a live network pull (needs endpoint/creds)")
+    mp = sub.add_parser("mine", help="pull+join+mine into .local; put a capital-growth metric on trial")
+    mp.add_argument("--target", choices=["hivemapper", "geodnet"], default="geodnet")
+    mp.add_argument("--live", action="store_true", help="attempt a live network pull (needs endpoint/creds)")
+    mp.add_argument("--no-local", action="store_true", help="do not write .local")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -33,6 +37,10 @@ def main(argv=None):
         from foundation.runtime import realjoin
         fn = realjoin.live_join if args.live else realjoin.replay_join
         print(json.dumps(fn(args.target)))
+        return 0
+    if args.cmd == "mine":
+        from foundation.runtime import mine as mine_mod
+        print(json.dumps(mine_mod.mine(args.target, live=args.live, write_local=not args.no_local), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,
