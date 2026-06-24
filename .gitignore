@@ -31,3 +31,8 @@ yarn-error.log*
 
 # Test coverage
 coverage/
+
+# Article 0 (macro-kernel node): .local is hard-gitignored ecosystem-wide
+.local
+.local/
+*.local
