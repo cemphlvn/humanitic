@@ -1,0 +1,64 @@
+{
+  "id": "cdp-coinbase",
+  "kind": "reference",
+  "title": "Coinbase Developer Platform (CDP): Agentic Wallets, x402 Pay-Per-Call, Onchain Trade, and Key-Custody for Autonomous Systems",
+  "content": "Coinbase Developer Platform (CDP) is a full-stack onchain infrastructure layer with products spanning wallet custody, agentic toolkits, micropayment protocols, DEX trade execution, fiat onramps, staking, and onchain data — all accessible via a unified REST/SDK surface. CDP Server Wallets v2 give an autonomous system a programmatically created EVM or Solana wallet whose private keys never leave a Trusted Execution Environment (TEE); the system holds only an API key pair plus a wallet secret, issued at registration, which must live in operator-controlled credential storage and never in shared or world-readable paths. AgentKit is the agentic onchain toolkit built on top of CDP wallets: it ships 50+ TypeScript and 30+ Python actions (fund, transfer, trade, stake, DeFi protocol interactions) and integrates with LangChain, OpenAI Agents SDK, AutoGen, Vercel AI SDK, and the Model Context Protocol, making it the canonical adapter layer between an LLM-driven agent and onchain execution. x402 is CDP's open HTTP-payment protocol that revives the HTTP 402 status code as a machine-native pay-per-call primitive: a resource server responds 402 with a payment-requirements header, the client wallet signs a USDC/EURC EIP-3009 or Permit2 payload and retries with an X-PAYMENT header, and the CDP facilitator settles on Base, Polygon, Arbitrum, World, or Solana — zero protocol fee up to 1,000 calls/month, then $0.001/call; as of early 2026 the protocol has processed over 100 million payments. The CDP Trade API enables best-price DEX aggregation across Ethereum, Base, Arbitrum, Optimism, and Polygon mainnet via a two-step quote-then-execute flow tightly coupled to Server Wallet signing, with sub-500ms execution latency; testnet is not supported in the current beta, so ark must gate all Trade API calls behind its testnet-guard before staging to mainnet. Credential hygiene is the non-negotiable invariant: CDP API key ID, API key secret, and wallet secret must be stored exclusively in ark's dot-local vault under Article 0 — they must never appear in shared temp, environment variables reachable by sibling processes, logs, or any artifact that transits the publish guard.",
+  "regime_factors": [
+    "ark_layer:execution",
+    "wallet_custody:tee_server_side",
+    "payment_protocol:x402_http402_stablecoin",
+    "onchain_trade:dex_aggregation_evm",
+    "agentic_toolkit:agentkit_50plus_actions",
+    "credential_scope:api_key_plus_wallet_secret",
+    "network_support:base_polygon_arbitrum_solana",
+    "testnet_posture:trade_api_mainnet_only",
+    "spend_policy:onchain_guardrails_smart_account",
+    "onramp:fiat_to_crypto_kyc_delegated",
+    "staking:eth_dedicated_onchain_billing",
+    "data_api:token_balances_sub1s_p99"
+  ],
+  "sources": [
+    "https://docs.cdp.coinbase.com/x402/welcome",
+    "https://docs.cdp.coinbase.com/server-wallets/v2/introduction/welcome",
+    "https://docs.cdp.coinbase.com/trade-api/welcome",
+    "https://docs.cdp.coinbase.com/agent-kit/core-concepts/agents-actions",
+    "https://docs.cdp.coinbase.com/data/token-balance/welcome",
+    "https://www.coinbase.com/developer-platform/products/agentkit",
+    "https://www.coinbase.com/developer-platform/products/agentic-wallets",
+    "https://www.coinbase.com/developer-platform/discover/launches/x402",
+    "https://www.coinbase.com/developer-platform/discover/launches/agentic-wallets",
+    "https://www.coinbase.com/developer-platform/discover/solutions/onramp",
+    "https://github.com/coinbase/agentkit",
+    "https://github.com/coinbase/x402",
+    "https://coinbase.github.io/agentkit/coinbase-agentkit/python/index.html",
+    "https://docs.cdp.coinbase.com/server-wallets/v2/evm-features/spend-permissions"
+  ],
+  "lesson": "CDP is ark's natural onchain execution partner: AgentKit provides the adapter interface (wallet provider + action providers) that sits cleanly behind ark's execution layer, letting the regime kernel emit a trade signal without coupling to any chain-specific primitive — swap the wallet provider config to flip between testnet and mainnet. The dot-local key-custody rule maps exactly onto CDP's own security model: CDP keeps private keys in a TEE and issues only an API key pair plus a wallet secret to the caller, so ark's operator stores those three tokens in dot-local and nowhere else — they must never transit shared temp, CI logs, or any artifact that enters the publish guard. Testnet-first discipline is enforced by the fact that the CDP Trade API supports mainnet only; ark's staging gate must therefore short-circuit to a paper-fill simulation on Base Sepolia before any mainnet execution is released.",
+  "key_usages": [
+    "register CDP as ark's onchain execution partner behind a CdpEvmWalletProvider adapter; store api_key_id, api_key_secret, and wallet_secret exclusively in the dot-local vault, never in shared temp or environment variables reachable by sibling agents",
+    "bootstrap an agent wallet on Base Sepolia testnet via AgentKit CdpEvmWalletProvider with network_id='base-sepolia', confirm balance with get_balance, and run all integration tests before enabling mainnet",
+    "gate every CDP Trade API call with a testnet-guard that raises an error if network_id is a mainnet chain and the ark escalation flag is below the paper-validated threshold",
+    "wire x402 client logic into ark's data-fetch adapters so any per-call premium API (web data, compute, oracle) is paid autonomously from the agent wallet without human intervention, bounded by a per-session spend cap checked before each request",
+    "use CDP Server Wallet Spend Permissions on a Smart Account to enforce per-period token allowances as a second circuit-breaker layer independent of ark's own RiskGate"
+  ],
+  "key_codes": [
+    {
+      "label": "create CDP server wallet and verify balance on Base Sepolia (illustrative)",
+      "code": "from coinbase_agentkit import AgentKit, AgentKitConfig, CdpEvmWalletProvider, CdpEvmWalletProviderConfig\n\n# Credentials loaded from dot-local vault — never from shared env or temp\nwallet_provider = CdpEvmWalletProvider(CdpEvmWalletProviderConfig(\n    api_key_id=vault.read('cdp/api_key_id'),\n    api_key_secret=vault.read('cdp/api_key_secret'),\n    wallet_secret=vault.read('cdp/wallet_secret'),\n    network_id='base-sepolia'   # testnet-first; switch to 'base-mainnet' only after paper gate\n))\nagent_kit = AgentKit(AgentKitConfig(wallet_provider=wallet_provider))\nbalance = agent_kit.wallet_provider.get_balance()  # confirm wallet is live before any trade"
+    },
+    {
+      "label": "x402 pay-per-call HTTP request with USDC on Base (illustrative)",
+      "code": "import httpx\nfrom x402.client import PaymentClient  # coinbase/x402 Python SDK\n\nclient = PaymentClient(wallet=agent_wallet)  # agent_wallet signs EIP-3009 USDC payloads\n\ndef fetch_paid_resource(url: str) -> dict:\n    resp = client.get(url)           # client auto-handles 402 -> sign -> retry\n    resp.raise_for_status()\n    return resp.json()\n\n# Spend guard: reject if this session has already exceeded budget\ndef guarded_fetch(url: str, session_budget_usdc: float, spent: float) -> dict:\n    if spent >= session_budget_usdc:\n        raise RuntimeError('x402 session budget exhausted')\n    return fetch_paid_resource(url)"
+    },
+    {
+      "label": "AgentKit trade action via LangChain tool (illustrative)",
+      "code": "from coinbase_agentkit_langchain import get_langchain_tools\nfrom langgraph.prebuilt import create_react_agent\nfrom langchain_openai import ChatOpenAI\n\n# AgentKit exposes 'trade' as a LangChain tool: swap fromAsset -> toAsset at market\ntools = get_langchain_tools(agent_kit)\nllm = ChatOpenAI(model='gpt-4o')\nexecutor = create_react_agent(llm=llm, tools=tools)\n\n# Ark signals a regime-driven allocation; agent executes via tool call\nexecutor.invoke({'messages': [('user', 'Swap 10 USDC for ETH on Base using the best available price.')]})"
+    },
+    {
+      "label": "testnet-guard: block Trade API calls on mainnet before escalation flag is set (illustrative)",
+      "code": "MAINNET_CHAIN_IDS = {'base-mainnet', 'ethereum', 'arbitrum-one', 'optimism', 'polygon-mainnet'}\n\ndef assert_trade_allowed(network_id: str, escalation_approved: bool) -> None:\n    \"\"\"Raise before any CDP Trade API call if mainnet execution is not yet approved.\"\"\"\n    if network_id in MAINNET_CHAIN_IDS and not escalation_approved:\n        raise RuntimeError(\n            f'CDP Trade blocked on {network_id}: paper-gate not cleared. '\n            'Set escalation_approved only after written human approval.'\n        )"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}
