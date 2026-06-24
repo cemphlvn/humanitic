@@ -1,0 +1,34 @@
+# ark — hardened container (defense-in-depth). Offline by default; for live, enable the squid egress proxy.
+#   docker compose -f templates/docker-compose.yaml run --rm ark status
+services:
+  ark:
+    build:
+      context: ..
+      dockerfile: templates/Dockerfile
+    read_only: true                       # Layer 1: immutable root filesystem
+    network_mode: none                    # Layer 3: offline. For live -> comment this, use ark-internal + squid
+    cap_drop: [ALL]                       # Layer 1: zero Linux capabilities (numpy-only needs none)
+    security_opt:
+      - no-new-privileges:true            # Layer 1: cheapest, highest-value flag
+    user: "10001:10001"                   # Layer 1: non-root
+    pids_limit: 64                        # Layer 2: no fork bombs
+    mem_limit: 512m                       # Layer 2: hard RAM cap (cgroups) — complements MemoryGuard (soft)
+    cpus: 2.0
+    tmpfs:
+      - /tmp:size=64m,noexec,nosuid,nodev
+    ulimits:
+      nofile: {soft: 256, hard: 512}
+    volumes:
+      - ../.local:/app/.local:rw          # the SINGLE writable mount (Article 0 data)
+    command: ["status"]
+
+  # --- LIVE egress (uncomment + configure for live data feeds) ---
+  # squid:                                # Layer 3: allowlisting forward proxy
+  #   image: ubuntu/squid
+  #   networks: [ark-internal, default]
+  #   volumes: ["./squid.conf:/etc/squid/squid.conf:ro"]   # ACL: ONLY the NTRIP caster + named APIs
+  # then on `ark`: remove network_mode:none, add  networks: [ark-internal]
+  #                and env http_proxy/https_proxy=http://squid:3128
+# networks:
+#   ark-internal:
+#     internal: true                      # containers here cannot reach the internet except via squid
