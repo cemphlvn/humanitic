@@ -24,12 +24,29 @@ import numpy as np
 from foundation.eval import causality, significance
 
 
-def measure(signal, fwd_returns, n_trials=1, alpha=0.05, sr_variance=0.01, lags=3, seed=0):
-    """Run the pre-registered battery ONCE on (signal, fwd_returns) and return one honest verdict bundle."""
+def residualize(y, factor):
+    """OLS residual of y on [1, factor] (Frisch-Waugh): the part of y NOT explained by the factor. Used to
+    strip a common SECTOR driver (e.g. TTN LoRaWAN activity) so the verdict measures edge NET of sector beta."""
+    y = np.asarray(y, float)
+    f = np.asarray(factor, float)
+    n = min(len(y), len(f))
+    y, f = y[:n], f[:n]
+    X = np.column_stack([np.ones(n), f])
+    b = np.linalg.lstsq(X, y, rcond=None)[0]
+    return y - X @ b
+
+
+def measure(signal, fwd_returns, n_trials=1, alpha=0.05, sr_variance=0.01, lags=3, seed=0, control=None):
+    """Run the pre-registered battery ONCE on (signal, fwd_returns) and return one honest verdict bundle.
+    If `control` is given (a sector factor, e.g. TTN activity), BOTH the signal and the return are
+    residualized against it first — so a verdict of MEANINGFUL is edge BEYOND sector beta, not the sector."""
     s = np.asarray(signal, float)
     r = np.asarray(fwd_returns, float)
     n = min(len(s), len(r))                                    # align to the shorter length
     s, r = s[:n], r[:n]
+    if control is not None:                                    # strip the common sector driver from both
+        c = np.asarray(control, float)[:n]
+        s, r = residualize(s, c), residualize(r, c)
 
     court = significance.court(s, r, alpha=alpha, seed=seed)   # the three-test growth court
     dsr = significance.deflated_sharpe(court["sharpe"], n_trials=n_trials, n_obs=court["n"],
@@ -53,7 +70,7 @@ def measure(signal, fwd_returns, n_trials=1, alpha=0.05, sr_variance=0.01, lags=
     meaningful = (court["verdict"] == "MEANINGFUL") and gr["causes"] and (dsr >= 0.95) \
         and court["win"]["beats_breakeven"] and (ctrl["verdict"] == "NOT MEANINGFUL")
 
-    return {"n": court["n"], "ic_lead1": round(ic, 4),
+    return {"n": court["n"], "ic_lead1": round(ic, 4), "sector_controlled": control is not None,
             "granger": {"p_value": gr["p_value"], "causes": gr["causes"]},
             "court_verdict": court["verdict"], "newey_west_t": court["newey_west_t"],
             "permutation_p": court["permutation_p"], "deflated_sharpe": round(dsr, 4),

@@ -7,7 +7,7 @@ a feed is configured, and a live NOT-MEANINGFUL is a full result.
 """
 import numpy as np
 
-from foundation.data.adapters import helium, geodnet
+from foundation.data.adapters import helium, geodnet, ttn
 from foundation.eval import verdict
 
 
@@ -43,11 +43,25 @@ def _series(target, seed=0):
     return sig, fwd
 
 
-def run(target="helium", n_trials=1):
+def _sector(seed=0):
+    """The LoRaWAN SECTOR factor: token-free TTN network activity, deseasonalized — the confound to control
+    for. A live TTN stats endpoint replaces the fixture."""
+    rec = ttn.TTNetwork.demo_fixture(hours=2600, hz=1 / 300.0, seed=seed)
+    _, act = ttn.activity_stream(rec, window_s=3600)
+    return _deseasonalize_z(act)
+
+
+def run(target="helium", n_trials=1, control=None):
     sig, fwd = _series(target)
-    res = verdict.measure(sig, fwd, n_trials=n_trials)
-    return {"target": target, "pre_registered": "PLAN.live-%s.md" % target, "n_trials": n_trials,
-            "result": res,
-            "caveat": "REPLAY (planted) market — validates the measurement apparatus end-to-end; the live "
-                      "%s price feed (creds) delivers the REAL first verdict. NOT MEANINGFUL on real data "
-                      "is a full result." % target.upper()}
+    ctrl = None
+    if control == "ttn":
+        ctrl = _sector()
+        m = min(len(sig), len(fwd), len(ctrl))
+        sig, fwd, ctrl = sig[:m], fwd[:m], ctrl[:m]
+    res = verdict.measure(sig, fwd, n_trials=n_trials, control=ctrl)
+    return {"target": target, "control": control or "none",
+            "pre_registered": "PLAN.live-%s.md" % target, "n_trials": n_trials, "result": res,
+            "caveat": "REPLAY (planted) market — validates the apparatus end-to-end; the live %s price feed "
+                      "(creds) delivers the REAL verdict. --control ttn strips LoRaWAN-sector beta so the "
+                      "verdict is edge BEYOND the sector. NOT MEANINGFUL on real data is a full result."
+                      % target.upper()}

@@ -20,7 +20,8 @@ import ipaddress
 from urllib.parse import urlparse
 
 # default public-egress allowlist — only the configured live data endpoints. Extend via machine config.
-DEFAULT_ALLOW = ("geodnet.com", "hivemapper.com", "api.coingecko.com", "api.llama.fi", "base.org")
+DEFAULT_ALLOW = ("geodnet.com", "hivemapper.com", "thethingsnetwork.org", "helium.io", "helium.com",
+                 "api.coingecko.com", "api.llama.fi", "base.org")
 
 
 def _is_local(host):

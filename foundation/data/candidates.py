@@ -25,6 +25,10 @@ CANDIDATES = [
               "LoRaWAN/LPWAN DePIN — same data-plane family as GEODNET; data-transfer (DC burn) -> HNT. "
               "LONG liquid HNT history = the better-POWERED first live test; orthogonality controls the "
               "LoRaWAN-SECTOR beta vs GEOD (is the edge real, or just the sector moving?)."),
+    Candidate("ttn", "The Things Network", "none (sector factor)", "yes",
+              "open-source / open API (largest LoRaWAN, 140+ countries, since 2015)", "n/a",
+              "NOT a tradeable candidate — the token-FREE LoRaWAN SECTOR factor. Control for sector beta "
+              "in GEOD/HNT: residualize the signal+return against TTN activity (`measure --control ttn`)."),
     Candidate("robonomics", "Robonomics", "XRT", "partial",
               "open ROS2 wrapper; logs on IPFS, hash on-chain", "partial",
               "ideal architecture (ROS2->datalog->IPFS+on-chain hash) but thin, lab-scale volume"),

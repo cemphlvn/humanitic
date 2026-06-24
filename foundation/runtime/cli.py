@@ -38,6 +38,7 @@ def main(argv=None):
     sub.add_parser("contribute", help="demo P2P edge-market round: submit -> court -> orthogonality -> reward (95/5)")
     sp = sub.add_parser("measure", help="run the pre-registered verdict on a target (the first meaningful result)")
     sp.add_argument("--target", choices=["helium", "geodnet"], default="helium")
+    sp.add_argument("--control", choices=["ttn", "none"], default="none", help="strip LoRaWAN-sector beta (TTN)")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -91,7 +92,7 @@ def main(argv=None):
         return 0
     if args.cmd == "measure":
         from foundation.runtime import measure
-        print(json.dumps(measure.run(args.target), indent=2))
+        print(json.dumps(measure.run(args.target, control=(None if args.control == "none" else args.control)), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,
