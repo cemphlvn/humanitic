@@ -1,0 +1,16 @@
+;; ark.sb — macOS sandbox-exec (Seatbelt) profile, OFFLINE jail. Best-effort containment for the dev Mac;
+;; production-strength isolation is the container (templates/Dockerfile). Run:
+;;     sandbox-exec -D REPO="$PWD" -f templates/ark.sb ./run.sh once
+;; This denies all network (offline backtests/replay) and confines writes to the repo (where .local lives).
+(version 1)
+(deny default)
+(allow process-fork)
+(allow process-exec)
+(allow sysctl-read)
+(allow mach-lookup)
+(allow file-read*)                                  ;; read code / python / libs (tighten per deployment)
+(allow file-write* (subpath (param "REPO")))        ;; WRITE only inside the repo (.local/ + scratch here)
+(deny network*)                                     ;; OFFLINE: no outbound network at the OS level
+;; For a LIVE run, drop the (deny network*) line and rely on the egress allowlist
+;; (foundation.security.containment) + a container with an allowlisting proxy for real isolation —
+;; Seatbelt cannot allowlist per-host.

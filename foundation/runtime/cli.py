@@ -24,6 +24,9 @@ def main(argv=None):
     mp.add_argument("--live", action="store_true", help="attempt a live network pull (needs endpoint/creds)")
     mp.add_argument("--no-local", action="store_true", help="do not write .local")
     sub.add_parser("edge", help="unsupervised regime discovery + dynamic trading, judged by court + Granger")
+    cp = sub.add_parser("creds", help="show which live credentials are configured (presence only, never values)")
+    cp.add_argument("--target", choices=["geodnet", "hivemapper", "market"], default=None)
+    sub.add_parser("contain", help="show containment status (interface, egress allowlist, confinement)")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -46,6 +49,14 @@ def main(argv=None):
     if args.cmd == "edge":
         from foundation.regime import unsupervised
         print(json.dumps(unsupervised.edge_report(), indent=2))
+        return 0
+    if args.cmd == "creds":
+        from foundation.security import credentials
+        print(json.dumps(credentials.describe(args.target), indent=2))
+        return 0
+    if args.cmd == "contain":
+        from foundation.security import containment
+        print(json.dumps(containment.status(), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,

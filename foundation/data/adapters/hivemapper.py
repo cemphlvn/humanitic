@@ -14,11 +14,13 @@ Network is used ONLY on an explicit live call; offline it raises with setup inst
 / `replay` feed the SAME pipeline real-schema records for the tested floor. (Article 0: no network in the
 system path; `run_all` never touches the network.)
 """
-import os
 import json
 import math
 
 import numpy as np
+
+from foundation.security.credentials import resolve as _resolve
+from foundation.security import containment
 
 GPS_FIELDS = ("t", "lat", "lon", "alt", "speed", "sats")
 
@@ -28,7 +30,7 @@ class HivemapperODC:
     name = "hivemapper"
 
     def __init__(self, base_url=None, opener=None):
-        self.base_url = base_url if base_url is not None else os.environ.get("ODC_API_URL")
+        self.base_url = base_url if base_url is not None else _resolve("ODC_API_URL")   # vault -> env
         self._opener = opener                                   # injectable for tests; None -> urllib
 
     def describe(self):
@@ -48,6 +50,7 @@ class HivemapperODC:
         q = {k: v for k, v in (("since", since), ("until", until)) if v is not None}
         if q:
             url = url + "?" + urllib.parse.urlencode(q)
+        containment.default_policy().guard(url)                 # egress allowlist (LAN ODC allowed)
         opener = self._opener or urllib.request.urlopen
         with opener(url, timeout=10) as resp:
             rows = json.loads(resp.read().decode())

@@ -13,10 +13,11 @@ Docs learnings (GEODNET):
 Network is used ONLY on an explicit live call; offline it raises with setup instructions. `demo_fixture`
 / `replay` feed the SAME pipeline real-schema RTCM-epoch records for the tested floor. (Article 0.)
 """
-import os
 import math
 
 import numpy as np
+
+from foundation.security.credentials import resolve as _resolve
 
 EPOCH_FIELDS = ("t", "station", "sats", "fix", "corr_latency_ms")
 
@@ -26,8 +27,8 @@ class GeodnetNTRIP:
     name = "geodnet"
 
     def __init__(self, caster=None, mountpoint=None, opener=None):
-        self.caster = caster if caster is not None else os.environ.get("NTRIP_CASTER")
-        self.mountpoint = mountpoint if mountpoint is not None else os.environ.get("NTRIP_MOUNTPOINT")
+        self.caster = caster if caster is not None else _resolve("NTRIP_CASTER")        # vault -> env
+        self.mountpoint = mountpoint if mountpoint is not None else _resolve("NTRIP_MOUNTPOINT")
         self._opener = opener
 
     def describe(self):
