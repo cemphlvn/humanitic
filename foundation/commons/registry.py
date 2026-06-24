@@ -75,6 +75,13 @@ _SUPPORTED = [
     {"id": "polygon", "kind": "data", "name": "Polygon.io", "status": "planned",
      "capabilities": ["equities", "options", "crypto", "point-in-time"],
      "adapter": "(runtime)", "license": humanitik_license("Polygon.io")},
+    {"id": "rlinf", "kind": "training", "name": "RLinf", "status": "planned",
+     "capabilities": ["ppo", "grpo", "sac", "iql", "fsdp", "agentic-rl", "embodied-rl", "remote-nvidia"],
+     "adapter": "foundation.training.rlinf.RLinfTrainer", "license": humanitik_license("RLinf")},
+    {"id": "robotwin", "kind": "simulator", "name": "RoboTwin", "status": "planned",
+     "capabilities": ["bimanual-manipulation", "domain-randomization", "trajectory-data",
+                      "vla-baselines", "remote-nvidia"],
+     "adapter": "(runtime)", "license": humanitik_license("RoboTwin Platform")},
 ]
 
 

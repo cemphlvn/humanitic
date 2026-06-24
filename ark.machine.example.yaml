@@ -12,7 +12,9 @@ secrets:
 inference:
   engine: stub                 # stub | mlx | ollama
   url: http://127.0.0.1:8080/v1
-  model: <local-model-id>      # e.g. an mlx-community 4-bit Qwen3/Llama
+  # recommended Mac-local model: the one Mac-runnable RLinf model (the rest are GPU VLA/robotics).
+  # 4B reasoning; convert to 4-bit MLX (~2.5GB):  mlx_lm.convert --hf-path RLinf/WideSeek-R1-4b -q
+  model: RLinf/WideSeek-R1-4b
 
 execution:
   broker: paper                # paper | alpaca | ibkr | cdp
