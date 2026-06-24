@@ -57,6 +57,7 @@ import test_discovery
 import test_contributor
 import test_power
 import test_helium
+import test_verdict
 
 
 def main():
@@ -71,7 +72,7 @@ def main():
               test_pace_of_place, test_search, test_significance, test_unsupervised, test_containment,
               test_ingest, test_paper, test_winrate, test_edge_book, test_orthogonality, test_allocator,
               test_edge_monitor, test_portfolio_loop, test_discovery, test_contributor, test_power,
-              test_helium]
+              test_helium, test_verdict]
     ok = 0
     for s in suites:
         try:

@@ -36,6 +36,8 @@ def main(argv=None):
     bp.add_argument("--no-local", action="store_true", help="do not write .local")
     bp.add_argument("--paper", action="store_true", help="also trade the book forward on the portfolio paper account")
     sub.add_parser("contribute", help="demo P2P edge-market round: submit -> court -> orthogonality -> reward (95/5)")
+    sp = sub.add_parser("measure", help="run the pre-registered verdict on a target (the first meaningful result)")
+    sp.add_argument("--target", choices=["helium", "geodnet"], default="helium")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -86,6 +88,10 @@ def main(argv=None):
     if args.cmd == "contribute":
         from foundation.runtime import contribute
         print(json.dumps(contribute.run(), indent=2))
+        return 0
+    if args.cmd == "measure":
+        from foundation.runtime import measure
+        print(json.dumps(measure.run(args.target), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,
