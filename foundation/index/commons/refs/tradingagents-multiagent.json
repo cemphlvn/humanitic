@@ -1,0 +1,42 @@
+{
+  "id": "tradingagents-multiagent",
+  "kind": "reference",
+  "title": "TradingAgents: Multi-Agent LLM Financial Trading Framework (TauricResearch)",
+  "content": "TradingAgents is an open-source framework by TauricResearch that mirrors the role structure of a real trading firm using collaborating LLM agents: a Fundamentals Analyst (financial statements, intrinsic value), a Sentiment Analyst (StockTwits, Reddit, social signals), a News Analyst (macro indicators, global news), and a Technical Analyst (MACD, RSI, price-action signals) feed a Researcher team composed of opposing Bullish and Bearish agents who debate in structured rounds to stress-test the combined signal. A Trader Agent synthesises the debate into position-sizing and timing decisions, which are then reviewed by a Risk Manager and Portfolio Manager who approve or veto the proposal before any order is placed. The framework is built on LangGraph for modular orchestration, supports runtime-configurable LLM backends including OpenAI, Anthropic, Google, DeepSeek, Qwen, GLM, MiniMax, xAI, and local endpoints via Ollama or vLLM, and separates the provider configuration from the agent logic so the same role graph runs with different model tiers. No live trading is executed; the framework is designed for research, simulation, and strategy prototyping, consistent with its explicit disclaimer that outputs are not financial advice. The adversarial debate architecture between Bullish and Bearish researchers operationalises a formal refutation loop within the multi-agent pipeline, making dissent a structural component rather than an optional audit step.",
+  "regime_factors": [
+    "architecture:multi_agent",
+    "role_shape:analyst_trader_risk",
+    "debate_structure:adversarial",
+    "orchestration:langgraph",
+    "provider:configurable",
+    "domain:financial_research",
+    "deployment:local_or_api",
+    "ark_layer:operator"
+  ],
+  "sources": [
+    "https://github.com/tauricresearch/tradingagents"
+  ],
+  "lesson": "TradingAgents is a reference design for ark's operator layer: it shows how to decompose the agentic research loop into human-team-shaped roles (fundamental, sentiment, news, technical analysts; adversarial researchers; trader; risk critic) and wire them through a structured debate before a decision is made. The adversarial Bullish/Bearish researcher pair directly instantiates ark's refutation ethos — a refuted signal is a result, not a defeat — at the multi-agent orchestration level.",
+  "key_usages": [
+    "template for ark's operator-layer multi-agent research loop: decompose into specialist analyst roles feeding an adversarial debate before any position decision",
+    "adversarial Bullish/Bearish researcher pair as the structural implementation of ark's refutation ethos — dissent is a required pipeline stage, not an optional audit",
+    "risk-critic veto gate (Risk Manager / Portfolio Manager) as the final operator-layer check before a strategy object is handed to the backtest court",
+    "runtime LLM-backend swapping pattern: same role graph, different model tiers — use GLM/local for speed, larger models for high-stakes debate rounds"
+  ],
+  "key_codes": [
+    {
+      "label": "basic framework invocation — propagate a ticker through the full agent graph",
+      "code": "from tradingagents.graph.trading_graph import TradingAgentsGraph\nfrom tradingagents.default_config import DEFAULT_CONFIG\n\nta = TradingAgentsGraph(debug=True, config=DEFAULT_CONFIG.copy())\n_, decision = ta.propagate(\"NVDA\", \"2026-01-15\")\nprint(decision)"
+    },
+    {
+      "label": "swap LLM backend to Zhipu (GLM) with debate-round budget",
+      "code": "import os\nos.environ[\"ZHIPU_API_KEY\"] = \"<key>\"\n\nconfig = DEFAULT_CONFIG.copy()\nconfig[\"llm_provider\"] = \"zhipu\"\nconfig[\"deep_think_llm\"] = \"glm-4.5\"\nconfig[\"quick_think_llm\"] = \"glm-4.5-air\"\nconfig[\"max_debate_rounds\"] = 2\n\nta = TradingAgentsGraph(debug=False, config=config)\n_, decision = ta.propagate(\"AAPL\", \"2026-01-15\")"
+    },
+    {
+      "label": "enable checkpoint resume for long debate sessions",
+      "code": "config = DEFAULT_CONFIG.copy()\nconfig[\"checkpoint_enabled\"] = True\nta = TradingAgentsGraph(debug=True, config=config)\n_, decision = ta.propagate(\"TSLA\", \"2026-01-15\")"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}

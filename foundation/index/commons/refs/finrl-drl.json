@@ -1,0 +1,41 @@
+{
+  "id": "finrl-drl",
+  "kind": "reference",
+  "title": "FinRL: Financial Reinforcement Learning",
+  "content": "FinRL (github.com/AI4Finance-Foundation/FinRL) is an educational deep reinforcement learning framework for quantitative finance, designed to lower the barrier for researchers and students applying DRL to trading. It provides standardized market environments that simulate stock, cryptocurrency, portfolio-allocation, and high-frequency trading scenarios, with built-in technical indicators (MACD, RSI, Bollinger Bands) and risk signals such as turbulence indices. Supported agents include A2C, DDPG, PPO, TD3, and SAC through Stable Baselines 3, with reward functions designed to reflect risk-adjusted returns. The canonical workflow is a three-phase train-test-trade loop: agents train on historical data, are validated on held-out periods, and then execute on live or paper-trade data, with performance benchmarked against mean-variance optimization and market indices. FinRL v1.0 uses a monolithic, coupled architecture suited to experimentation; its successor FinRL-X (v3.0) decouples the layers into the production-grade modular system and is the recommended path for serious builders. The repository remains actively maintained as an onboarding tool and the conceptual foundation from which FinRL-X's design decisions derive.",
+  "regime_factors": [
+    "ark_layer:execution",
+    "learning_paradigm:deep-reinforcement-learning",
+    "environment_type:market-simulation",
+    "loop:train-test-trade",
+    "agent_library:stable-baselines3",
+    "reward_design:risk-adjusted",
+    "maturity:educational"
+  ],
+  "sources": [
+    "https://github.com/AI4Finance-Foundation/FinRL"
+  ],
+  "lesson": "FinRL grounds ark's execution layer in formal RL-environment semantics: the market environment, reward signal, and train/test/trade loop are the RL-theoretic substrate on which ark's weight-vector contract operates, making the operator loop in ark a practical instantiation of the agent-environment interaction cycle FinRL defines. Ark's EXECUTION layer inherits FinRL's loop structure while graduating to FinRL-X's modular, deployment-aware architecture for production use.",
+  "key_usages": [
+    "train/test/trade loop = ark's operator loop in RL form: ark's state→action→feedback→revision cycle is the FinRL train-test-trade loop expressed as a general agentic pattern",
+    "market environment as RL substrate: ark's backtest/ layer functions as the FinRL environment, providing observations, rewards, and episode resets for strategy agents",
+    "reward design grounding: FinRL's risk-adjusted reward formulations (Sharpe, Sortino, turbulence-penalized) inform how ark's agent-critic scores candidate strategies",
+    "DRL agent inventory: A2C/DDPG/PPO/TD3/SAC via Stable Baselines 3 are the concrete agent choices ark can plug into the execution layer for learned allocation"
+  ],
+  "key_codes": [
+    {
+      "label": "FinRL environment step (verified API pattern)",
+      "code": "env = StockTradingEnv(df=train_data, ...)\nobs, info = env.reset()\nfor _ in range(len(train_data)):\n    action, _ = agent.predict(obs)\n    obs, reward, done, truncated, info = env.step(action)\n    if done:\n        break"
+    },
+    {
+      "label": "train-test-trade loop skeleton (verified API pattern)",
+      "code": "agent = DRLAgent(env=train_env)\nmodel = agent.get_model('ppo')\ntrained = agent.train_model(model, tb_log_name='ppo')\n\ntest_env = StockTradingEnv(df=test_data, ...)\nDRLAgent.DRL_prediction(model=trained, environment=test_env)"
+    },
+    {
+      "label": "ark operator loop mapped to RL form (illustrative)",
+      "code": "# state -> action -> feedback -> revision\nstate = regime_encoder.encode(market_obs)\nw_t = strategy_agent.act(state)       # weight vector\nreward = env.step(w_t)                # execution feedback\nstrategy_agent.update(state, w_t, reward)  # revision"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}

@@ -1,0 +1,44 @@
+{
+  "id": "glm-5-agentic-engineering",
+  "kind": "reference",
+  "title": "GLM-5: From Vibe Coding to Agentic Engineering",
+  "content": "GLM-5 is the successor generation to GLM-4.5 ARC from Zhipu AI, scaling to approximately 744B total parameters with roughly 40B active, trained on 28.5T tokens; the framing shift from 'ARC' to 'agentic engineering' signals intent to sustain coherent goal-directed operation across hundreds of rounds and thousands of tool calls rather than single-session task completion. The architecture introduces DeepSeek Sparse Attention (DSA) and, in GLM-5.2, IndexShare — reusing the same attention index across every four sparse-attention layers to reduce per-token FLOPs by 2.9× at 1M context length — enabling a stable 1M-token context window at production cost. Post-training is powered by SLIME, an asynchronous reinforcement learning infrastructure that improves sample efficiency for long-horizon agentic task training. GLM-5.1 demonstrates sustained multi-round optimisation with improved handling of ambiguous problem specifications, while GLM-5.2 adds speculative decoding, strengthened terminal and SWE benchmarks (Terminal-Bench 2.1: 81.0; SWE-Bench Pro: 62.1), and deployment on Ascend NPUs alongside vLLM, SGLang, and KTransformers in BF16 and FP8 precision. On Vending Bench 2, a year-long operational simulation, GLM-5 approaches Claude Opus 4.5 performance, validating long-horizon operational coherence.",
+  "regime_factors": [
+    "model_family:moe",
+    "activation_budget:40b",
+    "context_length:1m_tokens",
+    "sparse_attention:indexshare",
+    "rl_infrastructure:async_slime",
+    "horizon:multi_hundred_rounds",
+    "tool_calls:thousands",
+    "deployment:vllm_sglang_ktransformers",
+    "precision:fp8_bf16",
+    "ark_layer:operator"
+  ],
+  "sources": [
+    "https://github.com/zai-org/GLM-5"
+  ],
+  "lesson": "GLM-5 instantiates the movement vector that ark's operator layer embodies — from short-horizon code generation toward long-horizon agentic engineering where a single agent sustains goal-directed revision over hundreds of rounds — and its IndexShare sparse attention plus async RL infrastructure demonstrate the engineering requirements for making that coherence practical at scale; ark's operator loop (state → action → feedback → revision) is precisely the behavioural contract GLM-5.1 was post-trained to honour.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "key_usages": [
+    "sustain long-horizon operator loops across hundreds of revision rounds without context collapse",
+    "hold the full backtest evidence court (strategies, signals, audit trail) in a 1M-token context window",
+    "drive multi-thousand tool-call sequences for automated strategy search and repair",
+    "use reasoning_effort=max for deep strategy audits; reasoning_effort=high for faster incremental revisions"
+  ],
+  "key_codes": [
+    {
+      "label": "serve GLM-5 via vLLM (FP8)",
+      "code": "vllm serve zai-org/GLM-5-FP8 \\\n  --tensor-parallel-size 8 \\\n  --tool-call-parser glm47 \\\n  --reasoning-parser glm45 \\\n  --enable-auto-tool-choice \\\n  --served-model-name glm-5"
+    },
+    {
+      "label": "(illustrative) reasoning_effort control from ark operator loop",
+      "code": "resp = client.chat.completions.create(\n    model='glm-5',\n    messages=[{'role': 'user', 'content': state_prompt}],\n    tools=ark_tools,\n    extra_body={\n        'chat_template_kwargs': {\n            'enable_thinking': True,\n            'reasoning_effort': 'max'\n        }\n    }\n)"
+    },
+    {
+      "label": "(illustrative) long-horizon revision loop skeleton",
+      "code": "for round_i in range(max_rounds):\n    resp = client.chat.completions.create(\n        model='glm-5', messages=history, tools=ark_tools\n    )\n    action = resp.choices[0].message\n    history.append(action)\n    if action.tool_calls:\n        result = dispatch_tool(action.tool_calls[0])\n        history.append({'role': 'tool', 'content': result})\n    elif is_terminal(action.content):\n        break"
+    }
+  ]
+}

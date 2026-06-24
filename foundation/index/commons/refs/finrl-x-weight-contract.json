@@ -1,0 +1,43 @@
+{
+  "id": "finrl-x-weight-contract",
+  "kind": "reference",
+  "title": "FinRL-X: An AI-Native Modular Infrastructure for Quantitative Trading",
+  "content": "FinRL-X (arXiv:2603.21330) is an open-source, production-oriented quantitative trading platform built around a single architectural invariant: the target portfolio weight vector w_t is the stable contract between all upstream strategy logic and all downstream execution. Every module in the strategy pipeline — stock selection (S), allocation (A), timing (T), and risk overlay (R) — composes as w_t = R(T(A(S(X_<=t)))), so any module can be swapped without modifying the others or the execution adapter. This weight-centric interface is the key design choice that makes the system simultaneously modular and deployment-safe. The authors identify two critical deployment gaps: the backtest-to-paper gap, where offline simulations assume instant fills, ignore order-book dynamics, and underestimate slippage; and the paper-to-live gap, where real broker APIs introduce fill uncertainty, latency, margin constraints, liquidity effects, and operational failure modes absent from simulation. FinRL-X was validated in paper trading from October 2025 through March 2026, achieving a 1.96 Sharpe ratio outperforming SPY and QQQ benchmarks, and was publicly released v1.0.0 in March 2026 under the Apache 2.0 license.",
+  "regime_factors": [
+    "ark_layer:execution",
+    "interface:weight-vector",
+    "modularity:high",
+    "deployment_gap:backtest-to-live",
+    "agent_type:ai-native",
+    "execution_adapter:alpaca",
+    "risk_overlay:composable",
+    "validation:paper-trading"
+  ],
+  "sources": [
+    "https://arxiv.org/html/2603.21330v1",
+    "https://github.com/AI4Finance-Foundation/FinRL-Trading"
+  ],
+  "lesson": "FinRL-X IS ark's execution layer: the weight-vector contract w_t is the exact interface ark's EXECUTION layer enforces, ensuring every strategy module — from signal generation to risk overlay — terminates in a single target allocation vector that passes unchanged into backtesting and live broker adapters. The deployment-gap audit (backtest-to-paper, paper-to-live) maps directly to ark's Experiment 4 / agent-critic concern: any ark strategy that cannot survive the paper-to-live gap is not production-ready regardless of backtest performance.",
+  "key_usages": [
+    "w_t as the stable contract: every ark strategy module terminates in a target portfolio weight vector that the execution adapter consumes unchanged",
+    "selection→allocation→timing→risk pipeline: ark's operator/ layer follows this exact four-stage composable order, matching FinRL-X's non-abelian pipeline",
+    "deployment-gap audit: ark's agent-critic (Experiment 4) uses FinRL-X's backtest-to-paper and paper-to-live gap taxonomy to flag strategies that inflate backtest metrics via execution assumptions",
+    "module-swap safety: the weight-vector interface lets ark swap signal generators, allocators, or risk overlays without touching the backtest or broker adapter"
+  ],
+  "key_codes": [
+    {
+      "label": "weight-vector contract as composable pipeline",
+      "code": "def w_t(X, S, A, T, R):\n    selected = S(X)       # stock selection\n    allocated = A(selected) # portfolio allocation\n    timed = T(allocated)  # timing adjustment\n    return R(timed)       # risk overlay -> weight vector"
+    },
+    {
+      "label": "module-swap without breaking execution (illustrative)",
+      "code": "pipeline = Pipeline(selection=MomentumSelector(),\n                    allocation=EqualWeightAllocator(),\n                    timing=VolatilityTimer(),\n                    risk=MaxDrawdownOverlay())\nw = pipeline.run(market_data)  # always returns weight vector"
+    },
+    {
+      "label": "deployment-gap check skeleton (illustrative)",
+      "code": "bt_sharpe = backtest(strategy, historical_data)\npt_sharpe = paper_trade(strategy, live_feed)\nif abs(bt_sharpe - pt_sharpe) > TOLERANCE:\n    raise DeploymentGapWarning(\n        f'backtest-to-paper gap: {bt_sharpe:.2f} vs {pt_sharpe:.2f}')"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}
