@@ -32,6 +32,8 @@ def main(argv=None):
     pp.add_argument("--refit", action="store_true", help="re-choose the trading interval via the fit")
     fp = sub.add_parser("fit", help="time-interval-infra-fit: sweep intervals, judged by the Deflated Sharpe")
     fp.add_argument("--bars", type=int, default=8000, help="history length (bars)")
+    bp = sub.add_parser("book", help="build the portfolio-of-edges (discover->court->orthogonality->allocate->monitor)")
+    bp.add_argument("--no-local", action="store_true", help="do not write .local")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -70,6 +72,10 @@ def main(argv=None):
     if args.cmd == "fit":
         from foundation.runtime import paper
         print(json.dumps(paper.run_fit(n=args.bars), indent=2))
+        return 0
+    if args.cmd == "book":
+        from foundation.portfolio import loop
+        print(json.dumps(loop.build_book(write_local=not args.no_local), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,

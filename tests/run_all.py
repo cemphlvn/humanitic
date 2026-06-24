@@ -48,6 +48,11 @@ import test_containment
 import test_ingest
 import test_paper
 import test_winrate
+import test_edge_book
+import test_orthogonality
+import test_allocator
+import test_edge_monitor
+import test_portfolio_loop
 
 
 def main():
@@ -60,7 +65,8 @@ def main():
               test_machine, test_training, test_runtime, test_embodied, test_atoms, test_stream_eval,
               test_align_crypto, test_stats, test_screening, test_candidates, test_real_adapters,
               test_pace_of_place, test_search, test_significance, test_unsupervised, test_containment,
-              test_ingest, test_paper, test_winrate]
+              test_ingest, test_paper, test_winrate, test_edge_book, test_orthogonality, test_allocator,
+              test_edge_monitor, test_portfolio_loop]
     ok = 0
     for s in suites:
         try:
