@@ -25,6 +25,7 @@ import test_personal_os
 import test_secure_temp
 import test_data
 import test_agent_economy
+import test_harness
 
 
 def main():
@@ -33,7 +34,7 @@ def main():
               test_privacy_props, test_index_props, test_health,
               test_news_probe, test_trigram_strategy, test_jepa, test_critic, test_vsa_mlx,
               test_cross_seam, test_autonomous, test_partners, test_personal_os, test_secure_temp,
-              test_data, test_agent_economy]
+              test_data, test_agent_economy, test_harness]
     ok = 0
     for s in suites:
         try:
