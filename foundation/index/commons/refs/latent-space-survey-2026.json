@@ -1,0 +1,45 @@
+{
+  "id": "latent-space-survey-2026",
+  "kind": "reference",
+  "title": "The Latent Space: Foundation, Evolution, Mechanism, Ability, and Outlook — Yu et al. (arXiv 2604.02029, April 2026); supplemented by 'When Embedding Models Meet: Procrustes Bounds and Applications' — Demetci et al. (arXiv 2510.13406, October 2025) and 'Multi-Way Representation Alignment' — Huh et al. (arXiv 2602.06205, February 2026)",
+  "content": "Yu et al. (2026) is the most comprehensive latent-space survey to date, organizing the field along two axes: (1) Mechanism — Architecture, Representation, Computation, Optimization — and (2) Ability — Reasoning, Planning, Modeling, Perception, Memory, Collaboration, Embodiment. Its central thesis is that continuous latent space is now the native computational substrate for large models, overcoming the discretization bottlenecks and semantic loss of token-level generation. A second pillar comes from Demetci et al. (2025), who prove a tight Procrustes error bound — alignment error ≤ (2D)^(1/4)·√ε when two embedding sets preserve pairwise dot products within ε — showing orthogonal alignment is theoretically justified whenever the two spaces share near-isometric structure, and empirically requiring only ~10,000 anchor pairs for reliable cross-model alignment. Huh et al. (2026) extend this to multi-way alignment, revealing the key tradeoff: Generalized Procrustes Analysis (GPA) preserves internal geometry and excels at model-stitching tasks, while Canonical Correlation Analysis maximizes inter-space agreement and excels at retrieval; their GCPA hybrid bridges the gap. The Platonic Representation Hypothesis (Huh et al. 2024, ICML) underpins all three: well-trained large-scale representations converge toward a shared geometric structure, meaning a single linear or even orthogonal projection often suffices to bridge independently trained spaces. The alignment literature from the cross-lingual embedding lineage (Mikolov 2013 → Smith 2017 → Artetxe 2018) confirms that orthogonal Procrustes dominates when spaces are near-isomorphic, while unconstrained ridge regression or piecewise-linear maps are needed when global isomorphism fails (distant domains, low resource, scale mismatch).",
+  "regime_factors": [
+    "ark_layer:regime",
+    "alignment_type:orthogonal-procrustes",
+    "fallback_alignment:ridge-regression",
+    "space_geometry:near-isometric",
+    "anchor_requirement:low-sample",
+    "cross_space:source-to-target",
+    "representation_hypothesis:platonic-convergence",
+    "method_family:linear-map",
+    "robustness_criterion:well-conditioned",
+    "taxonomy_axis:mechanism-ability"
+  ],
+  "sources": [
+    "https://arxiv.org/abs/2604.02029",
+    "https://arxiv.org/abs/2510.13406",
+    "https://arxiv.org/abs/2602.06205",
+    "https://arxiv.org/abs/2405.07987",
+    "https://arxiv.org/pdf/2510.02348"
+  ],
+  "lesson": "Orthogonal Procrustes remains the best-practice choice for ark's SOURCE→TARGET vector translation as long as the news embedding space and the regime embedding space are plausibly near-isometric (same model family, comparable dimensionality, trained on overlapping domains) — conditions confirmed by the Platonic Representation Hypothesis and Demetci et al.'s tight SVD error bound. Its zero-hyperparameter, closed-form nature gives the lowest degrees of freedom of any linear map, maximally protecting against overfit given ark's small anchor set of (news-snippet, regime-label) pairs. The only documented reason to upgrade is global isomorphism failure: if the two spaces show strong anisotropy mismatches or domain-scale mismatch, a ridge-regression linear map (unconstrained but L2-regularized) is the next conservative step, as demonstrated in mini-vec2vec and multi-way alignment literature; nonlinear or OT-based maps should be reserved for empirically confirmed failure of all linear variants.",
+  "key_usages": [
+    "regime probe: Procrustes-align the news embedding space to the regime centroid space; read off the nearest regime centroid as the predicted market dynamic",
+    "anchor calibration: use ~100-10k (news, regime) anchor pairs to fit the SVD rotation matrix W; Demetci et al. show this is sufficient for near-isometric spaces",
+    "isomorphism check: compute pairwise dot-product divergence ‖XᵀX − YᵀY‖_F before committing to orthogonal alignment; if large, escalate to ridge regression",
+    "geometry preservation: orthogonal map keeps within-space distances intact, so regime neighborhood structure is readable after translation",
+    "robustness gate: if orthogonal Procrustes translation error (cosine residual on held-out anchors) exceeds threshold, flag as isomorphism failure and switch to ridge"
+  ],
+  "key_codes": [
+    {
+      "label": "orthogonal Procrustes (SVD) — ark's current method",
+      "code": "import numpy as np\n\ndef fit_procrustes(X_src, X_tgt):\n    \"\"\"Fit orthogonal rotation W s.t. X_src @ W ≈ X_tgt.\n    X_src, X_tgt: (n_anchors, d) anchor pairs.\n    Returns W: (d, d) orthogonal matrix.\"\"\"\n    M = X_src.T @ X_tgt          # (d, d) cross-covariance\n    U, _, Vt = np.linalg.svd(M)\n    W = U @ Vt                   # orthogonal; det=+1 by construction\n    return W\n\n# translate a news embedding to regime space\nW = fit_procrustes(news_anchors, regime_anchors)\nnews_in_regime = news_embedding @ W  # (d,)"
+    },
+    {
+      "label": "ridge-regression linear map — conservative upgrade if isomorphism fails",
+      "code": "import numpy as np\n\ndef fit_ridge(X_src, X_tgt, alpha=1e-3):\n    \"\"\"Fit unconstrained linear map A s.t. X_src @ A ≈ X_tgt.\n    alpha: L2 regularisation (prevents overfit with small anchors).\n    Returns A: (d, d) general linear matrix.\"\"\"\n    d = X_src.shape[1]\n    A = np.linalg.solve(\n        X_src.T @ X_src + alpha * np.eye(d),\n        X_src.T @ X_tgt\n    )\n    return A\n\n# isomorphism check -- if this is large, upgrade from Procrustes\ndef isomorphism_gap(X, Y):\n    return np.linalg.norm(X.T @ X - Y.T @ Y, 'fro')"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}
