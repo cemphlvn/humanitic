@@ -1,0 +1,36 @@
+{
+  "id": "lookahead-overfitting-autopsy",
+  "kind": "failure",
+  "title": "Look-Ahead Bias & Overfitting Autopsy: How a Beautiful Backtest Lies",
+  "content": "A backtest flatters in two compounding ways: look-ahead bias (signals embed information unavailable at decision time, e.g. using end-of-day close to trigger an intraday entry) and overfitting / curve-fitting (parameters are tuned to historical noise rather than durable regime structure, so the model memorises idiosyncratic crisis episodes instead of extracting transferable relationships). The two failure modes are deeply coupled: once any future data leaks into the in-sample window, parameter optimisation anchors to that contaminated signal, producing Sharpe ratios that are mathematically impossible to replicate live. The canonical post-mortem signature is a monotonically rising equity curve in-sample that immediately breaks down on the first out-of-sample bar. The standard surgical fix is walk-forward validation: the historical window is partitioned into rolling IS/OOS pairs, strategy parameters are frozen at the IS boundary and applied unchanged to the OOS slice, then the window advances; only strategies that survive repeated OOS exposures across structurally different regimes earn the right to proceed to paper trading. Purged k-fold cross-validation further closes the leakage gap by excising a buffer zone around each fold boundary so that no training observation is temporally adjacent to a test observation.",
+  "regime_factors": [
+    "vol:high",
+    "liquidity:tight",
+    "rates:rising",
+    "credit:widening",
+    "dollar:strong",
+    "growth:falling",
+    "inflation:high",
+    "risk_appetite:low",
+    "regime_transition:active",
+    "data_quality:degraded",
+    "strategy_fit:overfit",
+    "validation:oos_failed"
+  ],
+  "lesson": "A backtest that has not survived a rolling walk-forward OOS gauntlet across at least two structurally distinct regimes is not evidence of edge; it is evidence of curve-fitting. Freeze parameters at the IS boundary. Never touch OOS data until the strategy is fully specified.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "co_contributors": [],
+  "attribution_count": 0,
+  "links": [],
+  "created": "2026-06-24T00:00:00Z",
+  "schema_v": 1,
+  "sources": [
+    "https://frontierledger.ai/foundations-core-concepts/why-most-backtests-fail-overfitting-look-ahead-bias-and-data-snooping",
+    "https://arxiv.org/html/2512.12924v1",
+    "https://www.sciencedirect.com/science/article/abs/pii/S0950705124011110",
+    "https://logical-invest.com/walk-forward-testing-avoid-curve-fitting-backtesting/",
+    "https://quantstrategy.io/blog/backtesting-algorithmic-futures-strategies-avoiding-curve/",
+    "training-knowledge"
+  ]
+}

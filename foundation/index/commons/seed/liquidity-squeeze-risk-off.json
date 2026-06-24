@@ -1,0 +1,33 @@
+{
+  "id": "liquidity-squeeze-risk-off",
+  "kind": "regime",
+  "title": "Liquidity-Squeeze / Risk-Off: Correlations Going to 1 and What Hedges Actually Hold",
+  "content": "During acute liquidity-squeeze episodes (2008 GFC, March 2020), forced deleveraging drives indiscriminate asset sales across risk classes, causing cross-asset correlations to spike sharply toward 1 as managers sell whatever is liquid to meet margin calls — including gold, which paradoxically falls in the first wave before recovering. The most reliable immediate hedges are long-volatility structures (VIX calls returned approximately 163x in 2008 and 127x in March 2020 at peak) and long USD, as dollar demand surges when global collateral chains seize. Short-dated US Treasuries and JPY/CHF also historically hold or appreciate in pure risk-off / deflation-shock regimes, but the 2022 inflation-driven tightening cycle proved a critical exception: the SPX-AGG correlation flipped to +0.50, the highest on record, meaning the bond hedge failed precisely when equities fell. The practical regime rule is: in a liquidity-squeeze, pay the vol premium continuously and hold the reserve currency; do not rely on gold or nominal duration as first-response hedges until the acute deleveraging phase clears.",
+  "regime_factors": [
+    "liquidity:tight",
+    "credit:widening",
+    "vol:high",
+    "correlation:spiking",
+    "dollar:strong",
+    "rates:falling",
+    "risk_appetite:off",
+    "leverage:unwinding",
+    "gold:sold_first",
+    "bonds:bid_deflation",
+    "equities:falling",
+    "funding:stressed"
+  ],
+  "lesson": "Long-vol (VIX calls) and long-USD are the only hedges with a demonstrated track record of holding through the acute deleveraging phase of a liquidity squeeze; gold and duration only serve as hedges after the first margin-call wave clears, and duration fails entirely in inflation-driven tightening regimes.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://www.princeton.edu/~markus/research/papers/liquidity_credit_crunch.pdf",
+    "https://www.frbsf.org/research-and-insights/publications/economic-letter/2012/05/liquidity-risk-credit-financial-crisis/",
+    "https://sprott.com/insights/gold-holds-gains-as-liquidity-stress-emerges/",
+    "https://upstox.com/learning-center/commodity/why-gold-falls-in-a-crisis-the-margin-call-paradox-explained/article-1526/",
+    "https://www.bloomberg.com/professional/insights/risk/a-correlation-based-framework-for-market-regime-detection-using-bloomberg-mac3/",
+    "https://www.ncbi.nlm.nih.gov/pmc/articles/PMC8153428/",
+    "http://stanford.edu/class/msande448/2021/Final_reports/gr7.pdf",
+    "https://medium.com/@davidjlu/correlation-increases-between-assets-when-liquidity-squeezes-1c396549427c"
+  ]
+}

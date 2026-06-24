@@ -1,0 +1,33 @@
+{
+  "id": "transaction-cost-capacity-autopsy",
+  "kind": "failure",
+  "title": "Transaction Cost & Capacity Autopsy: The Backtest That Dies on Implementation",
+  "content": "A strategy can be statistically genuine — real out-of-sample alpha, clean universe, no look-ahead — and still be economically dead once implementation costs are applied: bid-ask spread, market impact (both temporary price concession during execution and permanent footprint left in the orderbook), financing carry on leveraged positions, and short-borrow fees that can exceed 10-20% annualised for hard-to-borrow micro-cap names. The Almgren-Chriss framework formalises the core trade-off: market impact scales super-linearly with trade size relative to average daily volume (ADV), so a strategy that earns 30 bps per trade at $10M AUM may earn 0 bps net at $200M once impact consumes the alpha — a phenomenon called capacity decay, where realised performance is inversely proportional to assets deployed. The diagnostic fingerprint is distinctive: gross alpha is concentrated in the least-liquid names (smallest ADV, widest spread, highest borrow cost), backtest returns are front-loaded before costs hit, the Sharpe collapses when a realistic half-spread or square-root impact model is applied, and live performance degrades monotonically as AUM grows or as crowding raises market impact and borrow rates simultaneously. High-turnover mean-reversion and small-cap factor strategies are the canonical victims: the very inefficiency they exploit — slow price discovery in thin markets — is also the reason execution costs absorb most or all of the alpha, making capacity, not signal quality, the binding constraint on deployability.",
+  "regime_factors": [
+    "liquidity:tight",
+    "vol:high",
+    "turnover:high",
+    "spread:wide",
+    "impact:elevated",
+    "borrow:scarce",
+    "financing:costly",
+    "aum:scaling",
+    "crowding:rising",
+    "capacity:constrained",
+    "alpha:illiquid-concentrated",
+    "size:micro-cap"
+  ],
+  "lesson": "Gross alpha is not net alpha: a strategy is not validated until it survives a realistic cost model — half-spread on entry and exit, square-root market impact scaled to ADV, financing cost on gross exposure, and borrow-fee drag on the short book — applied at every candidate AUM level; if performance degrades monotonically with size, the strategy has a capacity ceiling, not an edge.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://www.smallake.kr/wp-content/uploads/2016/03/optliq.pdf",
+    "https://questdb.com/glossary/optimal-execution-strategies-almgren-chriss-model/",
+    "https://www.researchgate.net/publication/384458498_The_impact_of_transactions_costs_and_slippage_on_algorithmic_trading_performance",
+    "https://bsic.it/backtesting-series-episode-5-transaction-cost-modelling/",
+    "https://www.quantstart.com/articles/Successful-Backtesting-of-Algorithmic-Trading-Strategies-Part-II/",
+    "https://arxiv.org/html/2605.23905",
+    "https://starqube.com/backtesting-investment-strategies/",
+    "training-knowledge"
+  ]
+}

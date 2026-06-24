@@ -5,10 +5,12 @@ import test_kernel
 import test_backtest
 import test_constitution
 import test_index
+import test_trigram
+import test_commons
 
 
 def main():
-    suites = [test_kernel, test_backtest, test_constitution, test_index]
+    suites = [test_kernel, test_backtest, test_constitution, test_index, test_trigram, test_commons]
     ok = 0
     for s in suites:
         try:

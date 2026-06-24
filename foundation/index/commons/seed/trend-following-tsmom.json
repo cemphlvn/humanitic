@@ -1,0 +1,30 @@
+{
+  "id": "trend-following-tsmom",
+  "kind": "strategy",
+  "title": "Trend-Following / Time-Series Momentum",
+  "content": "Time-series momentum (TSMOM) goes long assets with positive trailing returns and short assets with negative trailing returns over horizons of roughly 1–12 months, exploiting the behavioral tendency of institutional flows to respond slowly to macro regime shifts. The strategy historically earns its highest risk-adjusted returns during sustained directional macro dislocations — inflation shocks, tightening cycles, credit crises, and commodity supercycles — when prices trend persistently enough to keep the signal on the right side for multiple rebalancing periods; the 1970s stagflation, 2008 GFC, and 2021–2023 rate-shock cycle are canonical live periods. Conversely, TSMOM suffers in V-shaped reversals (March 2020), range-bound choppy regimes (2011–2013), and low-volatility mean-reverting environments where signal-to-noise collapses and whipsaw losses compound against round-trip transaction costs. Capacity is constrained by futures liquidity concentration: the ten most liquid commodity markets account for roughly 70% of available liquidity, and forced concentration in fewer markets can impose a Sharpe ratio drag estimated at 17% relative to an unconstrained program. Turnover is the primary cost lever — shorter lookback windows capture trends faster but raise costs materially, while monthly rebalancing with realistic 20 bp round-trip assumptions remains net-profitable in diversified multi-asset implementations.",
+  "regime_factors": [
+    "trend:persistent",
+    "vol:elevated",
+    "inflation:rising",
+    "rates:trending",
+    "liquidity:ample",
+    "growth:divergent",
+    "dollar:trending",
+    "credit:widening",
+    "commodity:trending",
+    "whipsaw:low",
+    "carry:negative",
+    "mean-reversion:low"
+  ],
+  "lesson": "TSMOM earns its premium in macro dislocation regimes where institutional flows lag fundamental repricing; it bleeds in fast-reversal or range-bound regimes where signal noise exceeds the return-to-cost ratio. Size and horizon selection must be anchored to available liquidity, not target AUM.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://quantdecoded.com/en/trend-following-the-case-for-time-series-momentum",
+    "https://quantica-capital.com/en/publication/qi-2025Q1",
+    "https://alphaarchitect.com/rethinking-trend-following-optimal-regime-dependent-allocation/",
+    "https://artursepp.com/2025/06/22/the-science-and-practice-of-trend-following-systems-paper-and-presentation/",
+    "training-knowledge"
+  ]
+}

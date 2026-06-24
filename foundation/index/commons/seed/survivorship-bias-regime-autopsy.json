@@ -1,0 +1,31 @@
+{
+  "id": "survivorship-bias-regime-autopsy",
+  "kind": "failure",
+  "title": "Survivorship Bias & Regime-Shift Autopsy: How a Backtest That Shone Dies Live",
+  "content": "A strategy that backtests brilliantly on the current cross-section of surviving assets carries a compounding lie: every bankruptcy, delisting, and acquisition has been silently excised, so the historical universe is filtered by future outcomes, and the strategy has never actually traded a loser into zero. When a regime shift arrives — most acutely in rate-shock or credit-stress environments where defaults cluster — live performance craters precisely because the tail events the backtest never saw are now the majority of the return distribution. The canonical fix is point-in-time universe construction: at each historical bar the eligible set must contain only assets that were tradeable on that date, including eventual failures, sourced from a survivorship-free database such as CRSP or Compustat with delisting returns applied. Separately, strategies optimised inside a single hospitable regime (e.g., low-vol, low-rate 2010-2021) are doubly exposed: even with a clean universe, in-sample parameter fit will not transfer to the new regime, producing a second wave of live underperformance that looks like alpha decay but is structural model mis-specification.",
+  "regime_factors": [
+    "vol:low",
+    "rates:anchored",
+    "credit:tight",
+    "liquidity:ample",
+    "defaults:suppressed",
+    "growth:stable",
+    "dispersion:low",
+    "correlation:normal",
+    "backtest:survivor-only",
+    "universe:static",
+    "regime:single-period-fit",
+    "tail-risk:hidden"
+  ],
+  "lesson": "Survivorship bias is not just a return-inflation error — it is a regime-invisibility error: the failures that define a stressed regime are exactly the observations that were removed, so the strategy is blind to the environment where it will be most severely tested; point-in-time universe construction and multi-regime walk-forward testing are non-optional before any live deployment.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://am.vontobel.com/en/insights/backtesting-gone-wrong",
+    "https://www.luxalgo.com/blog/survivorship-bias-in-backtesting-explained/",
+    "https://www.quantifiedstrategies.com/survivorship-bias-in-backtesting/",
+    "https://hedgefundalpha.com/education/backtesting-mistakes-kill-quant-strategies-guide/",
+    "https://rpc.cfainstitute.org/blogs/enterprising-investor/2026/why-static-portfolios-fail-when-risk-regimes-change",
+    "training-knowledge"
+  ]
+}

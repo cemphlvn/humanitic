@@ -1,0 +1,32 @@
+{
+  "id": "inflation-rising-rates-regime",
+  "kind": "regime",
+  "title": "Inflationary / Rising-Rates Regime: Macro Drivers, Asset Leadership, and What Fails",
+  "content": "An inflationary rising-rates regime is driven by demand-pull or cost-push forces (fiscal expansion, wage-price spirals, supply-chain shocks, deglobalization) colliding with central-bank tightening, which pushes real yields higher and compresses risk-asset multiples. The dominant feature is positive stock-bond correlation: both asset classes sell off simultaneously, destroying the diversification thesis of classic 60/40 portfolios and producing their worst joint drawdowns in modern history (e.g., 2022, when the 60/40 lost ~16.7% on a calendar-year basis). Assets that lead in this regime are hard-money and real-return instruments: broad commodities historically beat equities in rising-inflation episodes (12 of 17 identified years), energy-linked structures (MLPs, royalties) track commodity strength, short-duration floating-rate credit reprices upward rather than down, and TIPS provide direct CPI linkage though with limited broader-portfolio hedge efficacy. Assets that lag or die include long-duration nominal bonds (price falls inversely with yield), high-multiple growth equities (whose long-dated cash flows are discounted at a higher rate), unprofitable credit dependent on cheap refinancing, and rate-sensitive sectors such as utilities and REITs that trade on yield-spread logic. Value equities, commodity producers, financials with variable-rate loan books, and trend-following CTA strategies tend to be relative outperformers within equities, while cash and short bills preserve optionality at the expense of real return.",
+  "regime_factors": [
+    "inflation:high",
+    "rates:rising",
+    "real-yields:rising",
+    "liquidity:tightening",
+    "credit:widening",
+    "dollar:strong",
+    "growth:slowing",
+    "vol:elevated",
+    "duration-risk:high",
+    "stock-bond-correlation:positive",
+    "commodities:outperforming",
+    "fiscal:expansionary"
+  ],
+  "lesson": "In a rising-rates inflation regime the classic 60/40 bond hedge inverts into a second risk leg; survival requires rotating toward real assets, short duration, and commodity exposure while aggressively cutting long-duration nominal bonds and high-multiple growth equities before the tightening cycle peaks.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://rpc.cfainstitute.org/blogs/enterprising-investor/2026/why-static-portfolios-fail-when-risk-regimes-change",
+    "https://www.msci.com/research-and-insights/blog-post/macro-scenarios-in-focus-structurally-higher-inflation-and-rates",
+    "https://www.cfm.com/wp-content/uploads/2022/12/173-Inflationary-Regimes-and-Asset-Class-Performance-FINAL.pdf",
+    "https://www.cohenandsteers.com/insights/inflation-fighters-the-case-for-real-assets/",
+    "https://caia.org/blog/2023/01/01/inflation-hedging-strategic-asset-allocations-gold-or-something-else",
+    "https://www.parametricportfolio.com/-/media/Files/Insights-and-Research/Expect-the-unexpected/commodities-role-during-inflation.pdf",
+    "https://www.bis.org/publ/bppdf/bispap58g.pdf"
+  ]
+}
