@@ -30,6 +30,7 @@ from foundation.regime.unsupervised import synth_regime_world, dynamic_trade
 from foundation.regime.pace_of_place import pace_features
 from foundation.data.adapters.frodobots import FrodoBots2K
 from foundation.data.adapters.geodnet import GeodnetNTRIP, throughput_stream
+from foundation.data.adapters.helium import HeliumAPI, transfer_stream
 
 
 def _trailing_mean(x, window):
@@ -88,9 +89,24 @@ def _geodnet(seed):
     return (z * mkt)[1:]                                        # drop the wrapped-roll warmup
 
 
+def _helium(seed):
+    """FINDER 4 — the LoRaWAN SISTER of geodnet. Helium network DATA TRANSFER (Data Credits burned per
+    window), standardized, leads a PLANTED HNT market that responds to last window's transfer: same
+    causal shape (usage -> burn -> token) and the same data-plane FAMILY as geodnet, so a SINGLE adapter
+    shape plugs into both. On REAL data this is the test for LoRaWAN-SECTOR beta: if the geodnet and
+    helium edges co-move, the orthogonality filter collapses them to one bet (no double-counted breadth).
+    Offline fixture — a live Helium network-stats endpoint drops into the same slot unchanged."""
+    records = HeliumAPI.demo_fixture(hours=72, seed=seed)
+    _, transfer = transfer_stream(records)
+    z = _standardize(transfer)
+    rng = np.random.default_rng(seed + 300)                     # distinct offset: noise uncorrelated across sources
+    mkt = 0.002 * np.roll(z, 1) + rng.normal(0, 0.01, len(z))   # HNT responds to LAGGED data-transfer
+    return (z * mkt)[1:]
+
+
 # The finder registry: a live feed / P2P contributor registers new sources here; the rest of the
 # portfolio machinery (court -> orthogonality -> allocator) consumes the candidates unchanged.
-SOURCES = {"regime": _regime, "pace": _pace, "geodnet": _geodnet}
+SOURCES = {"regime": _regime, "pace": _pace, "geodnet": _geodnet, "helium": _helium}
 
 
 def candidates(seeds_per_source=4):

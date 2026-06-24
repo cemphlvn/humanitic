@@ -18,11 +18,11 @@ def _pearson(a, b):
 def run():
     cands = D.candidates(2)
 
-    # Shape: 2 seeds x 3 sources = 6 candidates, spanning all three finders.
-    assert len(cands) == 6, len(cands)
-    assert {c["source"] for c in cands} == {"regime", "pace", "geodnet"}
+    # Shape: 2 seeds x 4 sources = 8 candidates, spanning all four finders (incl. the LoRaWAN sister).
+    assert len(cands) == 8, len(cands)
+    assert {c["source"] for c in cands} == {"regime", "pace", "geodnet", "helium"}
     assert sorted(c["id"] for c in cands) == [
-        "geodnet-1", "geodnet-2", "pace-1", "pace-2", "regime-1", "regime-2"]
+        "geodnet-1", "geodnet-2", "helium-1", "helium-2", "pace-1", "pace-2", "regime-1", "regime-2"]
 
     # Each P&L is a real 1D per-bar stream with enough bars for the court.
     for c in cands:
@@ -44,8 +44,8 @@ def run():
     again = D.candidates(2)
     assert all(np.array_equal(by_id[c["id"]]["pnl"], c["pnl"]) for c in again)
 
-    print("test_discovery: OK (6 candidates across regime/pace/geodnet; %d cross-source pairs |r|<0.3; "
-          "deterministic)" % cross_lt)
+    print("test_discovery: OK (8 candidates across regime/pace/geodnet/helium; %d cross-source pairs "
+          "|r|<0.3; deterministic)" % cross_lt)
     return True
 
 

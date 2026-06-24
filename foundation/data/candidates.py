@@ -20,6 +20,11 @@ CANDIDATES = [
     Candidate("geodnet", "GEODNET", "GEOD", "yes",
               "commercial API + free trial + github ntrip", "yes",
               "most operationally ready: RTCM 1s GPS-time epochs; GEOD Coinbase-listed, 80% rev->burn"),
+    Candidate("helium", "Helium (HNT)", "HNT", "yes",
+              "Helium API / oracle (network stats)", "yes",
+              "LoRaWAN/LPWAN DePIN — same data-plane family as GEODNET; data-transfer (DC burn) -> HNT. "
+              "LONG liquid HNT history = the better-POWERED first live test; orthogonality controls the "
+              "LoRaWAN-SECTOR beta vs GEOD (is the edge real, or just the sector moving?)."),
     Candidate("robonomics", "Robonomics", "XRT", "partial",
               "open ROS2 wrapper; logs on IPFS, hash on-chain", "partial",
               "ideal architecture (ROS2->datalog->IPFS+on-chain hash) but thin, lab-scale volume"),

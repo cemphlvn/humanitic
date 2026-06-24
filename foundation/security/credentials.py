@@ -24,6 +24,7 @@ from foundation.security import secrets
 LIVE_KEYS = {
     "geodnet": ["NTRIP_CASTER", "NTRIP_MOUNTPOINT", "NTRIP_USER", "NTRIP_PASS"],
     "hivemapper": ["ODC_API_URL"],
+    "helium": ["HELIUM_API_URL"],
     "market": ["COINGECKO_API_KEY"],
 }
 
