@@ -55,6 +55,7 @@ import test_edge_monitor
 import test_portfolio_loop
 import test_discovery
 import test_contributor
+import test_power
 
 
 def main():
@@ -68,7 +69,7 @@ def main():
               test_align_crypto, test_stats, test_screening, test_candidates, test_real_adapters,
               test_pace_of_place, test_search, test_significance, test_unsupervised, test_containment,
               test_ingest, test_paper, test_winrate, test_edge_book, test_orthogonality, test_allocator,
-              test_edge_monitor, test_portfolio_loop, test_discovery, test_contributor]
+              test_edge_monitor, test_portfolio_loop, test_discovery, test_contributor, test_power]
     ok = 0
     for s in suites:
         try:
