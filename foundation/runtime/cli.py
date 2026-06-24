@@ -25,7 +25,7 @@ def main(argv=None):
     mp.add_argument("--no-local", action="store_true", help="do not write .local")
     sub.add_parser("edge", help="unsupervised regime discovery + dynamic trading, judged by court + Granger")
     cp = sub.add_parser("creds", help="show which live credentials are configured (presence only, never values)")
-    cp.add_argument("--target", choices=["geodnet", "hivemapper", "market"], default=None)
+    cp.add_argument("--target", choices=["geodnet", "hivemapper", "helium", "market"], default=None)
     sub.add_parser("contain", help="show containment status (interface, egress allowlist, confinement)")
     pp = sub.add_parser("paper", help="paper trading (simulated money) — advance the persistent .local account")
     pp.add_argument("--no-local", action="store_true", help="do not write .local")
