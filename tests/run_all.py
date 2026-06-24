@@ -33,6 +33,7 @@ import test_machine
 import test_training
 import test_runtime
 import test_embodied
+import test_atoms
 
 
 def main():
@@ -42,7 +43,7 @@ def main():
               test_news_probe, test_trigram_strategy, test_jepa, test_critic, test_vsa_mlx,
               test_cross_seam, test_autonomous, test_partners, test_personal_os, test_secure_temp,
               test_data, test_agent_economy, test_harness, test_detection, test_security, test_secrets,
-              test_machine, test_training, test_runtime, test_embodied]
+              test_machine, test_training, test_runtime, test_embodied, test_atoms]
     ok = 0
     for s in suites:
         try:
