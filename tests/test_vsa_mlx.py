@@ -1,6 +1,7 @@
 """
-Validate the OPTIONAL MLX VSA backend against the numpy floor. Skips cleanly when MLX is absent
-(so the numpy-only CI stays green); under an MLX-capable interpreter it cross-validates op-by-op.
+Validate the OPTIONAL MLX phase-angle VSA backend against the numpy (complex) floor, by the VSA-law
+SCALARS (the two carriers differ in representation but compute the same algebra). Skips cleanly when
+MLX is absent, so the numpy-only CI stays green.
 """
 import numpy as np
 
@@ -16,41 +17,34 @@ def run():
 
     rng = np.random.default_rng(0)
     D = 4096
+    ta, tb, tc = (rng.uniform(-np.pi, np.pi, D) for _ in range(3))
+    na, nb, nc = (np.exp(1j * t).astype(np.complex64) for t in (ta, tb, tc))      # complex carrier
+    ma, mb, mc = (mx.array(t.astype(np.float32)) for t in (ta, tb, tc))           # angle carrier
 
-    def mk():
-        t = rng.uniform(-np.pi, np.pi, D)
-        n = np.exp(1j * t).astype(np.complex64)
-        return n, mx.array(n)
-
-    na, ma = mk()
-    nb, mb = mk()
-    nc, mc = mk()
-
-    # bind matches numpy elementwise
-    assert np.allclose(np.array(M.bind(ma, mb)), N.bind(na, nb), atol=1e-4)
-    # unbind recovers the filler
+    # the same VSA laws, computed two ways, must agree as SCALARS
+    assert abs(M.similarity(ma, mb) - N.similarity(na, nb)) < 1e-3
     assert abs(M.similarity(M.unbind(M.bind(ma, mb), mb), ma) - 1.0) < 1e-3
-    # similarity matches numpy
-    assert abs(M.similarity(ma, mb) - N.similarity(na, nb)) < 1e-4
-    # bundle matches numpy (up to fp)
-    assert np.allclose(np.array(M.bundle([ma, mb, mc])), N.bundle([na, nb, nc]), atol=1e-3)
+    assert abs(N.similarity(N.unbind(N.bind(na, nb), nb), na) - 1.0) < 1e-3
+    assert abs(M.similarity(M.bundle([ma, mb, mc]), ma)
+               - N.similarity(N.bundle([na, nb, nc]), na)) < 2e-2
 
-    # cleanup picks the SAME concept as numpy
-    book_np = np.stack([np.exp(1j * rng.uniform(-np.pi, np.pi, D)).astype(np.complex64)
-                        for _ in range(100)])
-    noisy_np = book_np[7] * np.exp(1j * rng.normal(0, 0.5, D)).astype(np.complex64)
-    i_np, _ = N.cleanup(noisy_np, book_np, 1)
-    i_mx, _ = M.cleanup(mx.array(noisy_np), mx.array(book_np), 1)
+    # cleanup picks the SAME concept (#7) under both carriers
+    tbook = rng.uniform(-np.pi, np.pi, (100, D))
+    nbook = np.exp(1j * tbook).astype(np.complex64)
+    eta = rng.normal(0, 0.5, D)
+    i_np, _ = N.cleanup(nbook[7] * np.exp(1j * eta).astype(np.complex64), nbook, 1)
+    i_mx, _ = M.cleanup(mx.array((tbook[7] + eta).astype(np.float32)),
+                        mx.array(tbook.astype(np.float32)), 1)
     assert int(i_np[0]) == int(i_mx[0]) == 7
 
-    # the four laws hold on MLX
     laws = M.selftest()
     assert laws["orthogonality |a.b|"] < 0.05, laws
     assert laws["bind->unbind recovers"] > 0.99, laws
     assert laws["bundle keeps a"] > 0.40, laws
 
-    print("test_vsa_mlx: OK (MLX %s on %s — matches the numpy floor)"
-          % (getattr(mx, "__version__", "?"), mx.default_device()))
+    print("test_vsa_mlx: OK (MLX %s on %s — phase-angle carrier matches the numpy floor; "
+          "device-complex-trustworthy=%s)"
+          % (getattr(mx, "__version__", "?"), mx.default_device(), M.gpu_complex_trustworthy()))
     return True
 
 
