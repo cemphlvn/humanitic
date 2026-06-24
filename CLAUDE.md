@@ -18,6 +18,9 @@ Never read, write, stage, publish, or echo `.local`. Every outbound artifact rou
 
 ## Operating rules (every change)
 - **Offline, this Mac, numpy/pandas only.** No torch, no network in the system path, no new heavy deps.
+- **MLX is an optional, validated backend.** `foundation/kernel/vsa_mlx.py` may accelerate the
+  memory-bound VSA ops on Apple Silicon (unified memory) — import-guarded, cross-validated against
+  the numpy floor; CI stays numpy-only and `test_vsa_mlx` skips when MLX is absent.
 - **Not public until notice.** No push, no remotes, no GitHub. Local commits only.
 - **No live trading. No live capital.** The court refuses leaky strategies; escalation
   (synthetic → paper → small live) only on explicit human approval.
