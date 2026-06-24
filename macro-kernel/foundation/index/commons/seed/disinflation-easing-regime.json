@@ -1,0 +1,29 @@
+{
+  "id": "disinflation-easing-regime",
+  "kind": "regime",
+  "title": "Disinflation / Central-Bank Easing Regime: Duration, Growth, and the Classic Rotation",
+  "content": "When inflation retreats toward target and central banks shift to an easing posture, fixed income duration becomes a primary return driver: the belly of the curve (3-7 years) historically captures most of the price appreciation while limiting exposure to fiscal-driven long-end volatility. Equities tend to re-rate higher on falling discount rates, but the leadership tilts toward quality large-cap growth and secular themes rather than deep cyclicals, because easing cycles are usually triggered by below-potential growth rather than boom conditions. Cash returns decay as the policy rate falls, pushing capital out of money-market instruments and into bonds and equities — a rotation that historically lifts a diversified 60/40 portfolio well above cash over the subsequent 12 months. Dollar softness frequently accompanies easing, adding a tailwind for non-dollar assets and international equity markets. The regime breaks down if disinflation stalls (re-acceleration forces a hawkish reversal) or if easing accompanies a hard landing rather than a soft one, in which case credit and equity risk should be reduced in favour of sovereign duration and defensive sectors.",
+  "regime_factors": [
+    "inflation:falling",
+    "rates:cutting",
+    "growth:below-trend",
+    "liquidity:easing",
+    "duration:long-favoured",
+    "credit:stable",
+    "dollar:weakening",
+    "vol:moderate",
+    "curve:steepening",
+    "cash:drag",
+    "equities:growth-led",
+    "international:outperforming"
+  ],
+  "lesson": "In a disinflation-easing regime, extend duration into the 3-7yr belly, rotate out of cash into bonds and quality growth equities, and monitor dollar direction for international allocation signals — but watch for re-acceleration risk that would invalidate the regime.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://am.jpmorgan.com/us/en/asset-management/institutional/insights/market-insights/market-updates/on-the-minds-of-investors/what-are-the-investment-implications-of-the-Fed-rate-cutting-cycle/",
+    "https://www.lpl.com/research/blog/how-do-stocks-perform-during-fed-easing-cycles.html",
+    "https://www.ishares.com/us/insights/fed-rate-cut-and-your-portfolio",
+    "https://cpram.com/fra/en/individual/publications/experts/article/2024-assessment-of-the-monetary-easing-cycle"
+  ]
+}

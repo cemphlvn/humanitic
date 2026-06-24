@@ -1,0 +1,45 @@
+{
+  "id": "glm-45-arc",
+  "kind": "reference",
+  "title": "GLM-4.5 ARC: Agentic, Reasoning, and Coding Foundation Models",
+  "content": "GLM-4.5 is an open-weight Mixture-of-Experts large language model from Zhipu AI (Z.ai), published as arXiv:2508.06471, with 355B total parameters and 32B active parameters per forward pass; a compact variant, GLM-4.5-Air, uses 106B total and 12B active. The model was trained on 23 trillion tokens and post-trained through multi-stage reinforcement learning with expert model iteration, producing a hybrid reasoning architecture that switches between an explicit thinking mode and a direct-response mode. The ARC framing — Agentic, Reasoning, Coding — names three co-designed capability pillars: deep tool integration and agent-framework compatibility, interleaved chain-of-thought reasoning, and software-engineering task performance. On standardised benchmarks GLM-4.5 scores 63.2 across 12 industry benchmarks (ranked third overall, second on agentic tasks), 91.0 on AIME 2024, 64.2 on SWE-bench Verified, and 70.1 on TAU-Bench. Full BF16 inference requires 16 H100 GPUs; FP8 quantisation halves that requirement; models are released under MIT licence on Hugging Face and ModelScope.",
+  "regime_factors": [
+    "model_family:moe",
+    "activation_budget:32b",
+    "training_scale:23t_tokens",
+    "reasoning_mode:hybrid",
+    "capability_pillar:agentic",
+    "coding:native",
+    "tool_use:deep",
+    "licence:open_weight",
+    "ark_layer:operator"
+  ],
+  "sources": [
+    "https://arxiv.org/abs/2508.06471",
+    "https://github.com/zai-org/GLM-4.5"
+  ],
+  "lesson": "GLM-4.5 establishes the ARC capability triad — Agentic, Reasoning, Coding — as the architectural contract for autonomous systems engineering, demonstrating that a 32B-active-parameter MoE can match much larger dense models on tool-use and SWE benchmarks; this maps directly to ark's operator layer, which must select, test, repair, and audit strategies through multi-step agentic loops rather than single-shot inference.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "key_usages": [
+    "drive the agentic strategy-engineering loop (state → action → feedback → revision)",
+    "tool-calling over the evidence court to fetch backtest results and regime signals",
+    "interleaved chain-of-thought reasoning when auditing strategy logic for leakage or overfitting",
+    "coding subtasks: generate, patch, and test operator pipeline components",
+    "switch to non-thinking mode for low-latency regime classification at execution time"
+  ],
+  "key_codes": [
+    {
+      "label": "serve GLM-4.5-Air via vLLM (FP8, tool-call parser enabled)",
+      "code": "vllm serve zai-org/GLM-4.5-Air-FP8 \\\n  --tensor-parallel-size 4 \\\n  --tool-call-parser glm47 \\\n  --reasoning-parser glm45 \\\n  --enable-auto-tool-choice \\\n  --served-model-name glm-4.5-air"
+    },
+    {
+      "label": "serve GLM-4.5-Air via SGLang (FP8, speculative decoding)",
+      "code": "python3 -m sglang.launch_server \\\n  --model-path zai-org/GLM-4.5-Air-FP8 \\\n  --tp-size 4 \\\n  --tool-call-parser glm47 \\\n  --reasoning-parser glm45 \\\n  --speculative-algorithm EAGLE \\\n  --speculative-num-draft-tokens 4 \\\n  --host 0.0.0.0 --port 8000"
+    },
+    {
+      "label": "(illustrative) OpenAI-compatible tool-call from ark operator loop",
+      "code": "from openai import OpenAI\nclient = OpenAI(base_url='http://localhost:8000/v1', api_key='x')\nresp = client.chat.completions.create(\n    model='glm-4.5-air',\n    messages=[{'role': 'user', 'content': state_prompt}],\n    tools=ark_tools,\n    extra_body={'chat_template_kwargs': {'enable_thinking': True}}\n)"
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "id": "carry-rv-convergence",
+  "kind": "strategy",
+  "title": "Carry and Relative-Value Family: Harvesting the Roll, and the Convergence-Trade Blow-Up",
+  "content": "Carry and relative-value (RV) strategies earn a structural premium by being short the same tails that trend-following is long: FX carry collects interest-rate differentials by staying long high-yielders and short low-yielders; bond roll-down harvests the term premium as securities slide down an upward-sloping curve; credit carry captures the spread between risky and risk-free coupons; equity-index futures basis and Treasury cash-futures basis trades exploit mechanical pricing gaps; vol carry (short variance swaps or strangles) monetizes the persistent gap between implied and realized volatility; and on-the-run/off-the-run swap-spread RV bets on the convergence of economically identical instruments. The strategy family earns steadily in regimes of positive carry, compressed spreads, ample funding, low realized volatility, and stable correlations — but all members share the same failure geometry: returns are negatively skewed and leverage-dependent, and the blow-up trigger is invariably a funding or liquidity shock that turns convergence into divergence. Canonical stress episodes are structurally identical: LTCM 1998 saw on-the-run/off-the-run spreads and swap spreads widen violently after Russia's default triggered a flight to liquidity, forcing margin calls that caused further widening in a self-reinforcing spiral at 25:1 gross leverage; August 2007's quant quake reflected crowded long-short equity RV books unwinding in lockstep after one large forced liquidation propagated through a shared factor, with risk models blind to tail correlation because the prior four years had been benign; and March 2020's Treasury basis trade unwind saw cash-futures spreads gap from roughly 20 bps to over 70 bps as repo rates surged and futures margin doubled, prompting hedge funds to sell an estimated $200 billion in cash Treasuries before Federal Reserve intervention stabilized the market. The conditioning variables that signal a hospitable carry regime — tight credit spreads, low VIX, steep funding curve, stable cross-asset correlations, and broad risk appetite — are precisely the variables that should trigger a crowding and fragility audit, because carry capacity is finite and excess positioning guarantees that any funding shock produces an exit far wider than the entry.",
+  "regime_factors": [
+    "carry:positive",
+    "spreads:compressed",
+    "vol:low",
+    "funding:ample",
+    "correlation:stable",
+    "leverage:high",
+    "crowding:elevated",
+    "liquidity:ample",
+    "rates:stable",
+    "credit:tight",
+    "dollar:stable",
+    "skew:negative",
+    "basis:narrow",
+    "repo:accessible",
+    "risk-appetite:high",
+    "margin:low"
+  ],
+  "lesson": "Carry and RV earn a liquidity-risk premium that looks like alpha in benign regimes but is structurally short a funding-shock tail; the blow-up signature is identical across episodes — crowded convergence positions meet a sudden liquidity event, divergence replaces convergence, and leverage amplifies the exit into a self-reinforcing unwind that requires external intervention to arrest.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://www.federalreservehistory.org/essays/ltcm-near-failure",
+    "https://www.nber.org/papers/w14465",
+    "https://www.federalreserve.gov/econres/notes/feds-notes/quantifying-treasury-cash-futures-basis-trades-20240308.html",
+    "https://www.financialresearch.gov/briefs/files/OFRBr_2020_01_Basis-Trades.pdf",
+    "https://www.journals.uchicago.edu/doi/10.1086/593088",
+    "https://markus.scholar.princeton.edu/sites/g/files/toruqf2651/files/carry_trades_currency_crashes.pdf",
+    "https://research.macrosynergy.com/fx-carry-trade-crashes",
+    "https://www.lseg.com/content/dam/ftse-russell/en_us/documents/research/ftse-fixed-income-factor-research-series-carry-concept.pdf",
+    "training-knowledge"
+  ]
+}

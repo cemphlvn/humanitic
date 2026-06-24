@@ -1,0 +1,26 @@
+{
+  "id": "mean-reversion-strategy",
+  "kind": "strategy",
+  "title": "Mean-Reversion Family: Conditions, Failure Modes, and Sizing",
+  "content": "Mean-reversion strategies exploit statistical gravity — the tendency of prices to oscillate around a stable equilibrium — and perform best when volatility is moderate, liquidity is ample, credit spreads are contained, and no secular trend is in force; asset classes with natural anchors (currencies with rate differentials, commodity seasonals, yield-curve spreads) are structurally hospitable. The core failure mode is regime shift: when fundamentals change the equilibrium itself — through a persistent inflationary shock, a credit-cycle inflection, or a sovereign liquidity event — what looks like a 2–3 standard-deviation overextension is actually a new mean forming, and the strategy accumulates losses by repeatedly fading a move that never reverts. Trend-following and mean-reversion are near-orthogonal in return space, so mixing both or deploying a regime filter (ADX, Hurst exponent, rolling ADF p-value) is standard practice for separating hospitable from hostile environments. Sizing discipline is load-bearing: orthodox practice scales into deviations in tranches (adding at 2σ, 3σ) while shrinking notional when realized volatility expands, keeping constant dollar risk per trade in the 0.5–1.0% range, and cutting exposure decisively when the half-life of mean reversion drifts upward — the signal that regime stationarity is breaking down.",
+  "regime_factors": [
+    "vol:moderate",
+    "liquidity:ample",
+    "trend:absent",
+    "credit:stable",
+    "rates:anchored",
+    "growth:stable",
+    "dispersion:low",
+    "correlation:normal"
+  ],
+  "lesson": "Mean reversion is a bet on stationarity; when the regime shifts and the mean itself migrates, the strategy's edge inverts — position sizing and regime filters are the primary defenses, not deeper statistical fitting.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://macro-ops.com/mastering-mean-reversion/",
+    "https://surmount.ai/blogs/mean-reversion-trading-strategy-the-complete-guide",
+    "https://www.quantvero.com/algo-trading/mean-reversion-trading-strategy/",
+    "https://www.quantum-algo.com/blog/guides/mean-reversion-trading-complete-guide/",
+    "training-knowledge"
+  ]
+}

@@ -1,0 +1,52 @@
+{
+  "id": "nemotron-personas",
+  "kind": "reference",
+  "title": "NVIDIA Nemotron-Personas: Multilingual Synthetic Human-Persona Collection",
+  "content": "Nemotron-Personas is a collection of multilingual, region-specific synthetic persona datasets released by NVIDIA under CC-BY-4.0, grounding each persona in real-world demographic and geographic distributions of its target region. The collection spans ten countries and regions — USA, Japan, India, Korea, Brazil, France, Singapore, El Salvador, Vietnam, and Belgium — totaling over 50 million distinct synthetic individuals. Each persona record carries ~30 structured fields covering demographics (age, sex, education, occupation, location), domain narratives (professional, sports, arts, travel, culinary), skills and hobbies as both free-text and structured arrays, cultural background, and career goals. The USA subset alone contains 1 million personas with 567 distinct occupation categories and ages spanning 2–85, demonstrating deliberate occupational, geographic, and intersectional demographic diversity. Personas are produced with NeMo Data Designer, an enterprise compound-AI synthetic-data system that pairs a proprietary Probabilistic Graphical Model (PGM) for structured demographic sampling with an Apache-2.0 openai/gpt-oss-120b model for narrative generation, plus an ever-expanding suite of built-in validators and evaluators; an extended Nemotron-Personas-USA is available inside NeMo Data Designer itself. The USA schema exposes ~24 fields: uuid, persona, professional_persona, sports_persona, arts_persona, travel_persona, culinary_persona, cultural_background, skills_and_expertise (+ _list), career_goals_and_ambitions, hobbies_and_interests (+ _list), sex, age, marital_status, education_level, bachelors_field, occupation, city, state, zipcode, country. The profiles are internally consistent and suitable for training conversational AI, stress-testing models for diversity, and seeding character-based simulation. The CC-BY-4.0 license permits commercial and research reuse with attribution.",
+  "regime_factors": [
+    "ark_layer:operator",
+    "data_type:synthetic_persona",
+    "coverage:multilingual_multinational",
+    "alignment:demographic_distribution",
+    "scale:50m_plus_personas",
+    "license:cc_by_4",
+    "persona_axis:occupational_diversity",
+    "use_case:agent_conditioning",
+    "generator:nemo_data_designer",
+    "synthesis:pgm_plus_llm",
+    "base_model:gpt_oss_120b"
+  ],
+  "sources": [
+    "https://huggingface.co/collections/nvidia/nemotron-personas",
+    "https://huggingface.co/datasets/nvidia/Nemotron-Personas",
+    "https://huggingface.co/datasets/nvidia/Nemotron-Personas-USA"
+  ],
+  "lesson": "Nemotron-Personas gives ark a statistically-grounded, CC-BY-4.0-licensed pool of human diversity that the operator layer can sample to instantiate analyst agents with distinct viewpoints, biases, and behavioral profiles — turning a single thesis into an adversarial chorus. The persona field schema (occupation, cultural background, domain narratives) maps directly onto behavioral market-participant archetypes, enabling HD/VSA regime labeling based on who is likely driving a given market microstructure.",
+  "key_usages": [
+    "Condition fundamental/sentiment/news analyst agents on sampled personas to stress-test a thesis from demographically and behaviorally diverse viewpoints",
+    "Seed adversarial-chorus ensembles in the operator layer: each agent receives a different persona system prompt, producing refutation-ethos diversity",
+    "Map persona occupation and financial-sophistication fields to behavioral market-participant archetypes for HD/VSA regime classification",
+    "Augment synthetic training data for ark's behavioral prediction models with persona-conditioned narrative variations",
+    "Adopt the NeMo Data Designer compound-AI pattern (PGM structure + gpt-oss-120b narrative + validators) as the template for ark's synthetic regime/persona generation — its validators map onto ark's agent-critic as the evaluator layer"
+  ],
+  "key_codes": [
+    {
+      "label": "Load Nemotron-Personas-USA with HuggingFace datasets",
+      "code": "from datasets import load_dataset\n\n# Stream to avoid downloading all 1M rows at once\nds = load_dataset(\n    \"nvidia/Nemotron-Personas-USA\",\n    split=\"train\",\n    streaming=True,\n)\nsample = next(iter(ds))\nprint(sample[\"persona\"])          # narrative summary\nprint(sample[\"occupation\"])       # e.g. 'Financial Analyst'\nprint(sample[\"professional_persona\"])  # domain narrative"
+    },
+    {
+      "label": "Sample a persona and inject into an analyst agent system prompt (illustrative)",
+      "code": "import random\nfrom datasets import load_dataset\n\ndef sample_persona(n: int = 1, seed: int = 42) -> list[dict]:\n    ds = load_dataset(\"nvidia/Nemotron-Personas-USA\", split=\"train\", streaming=True)\n    rng = random.Random(seed)\n    reservoir = []\n    for i, row in enumerate(ds):\n        if i < n:\n            reservoir.append(row)\n        elif rng.random() < n / (i + 1):\n            reservoir[rng.randint(0, n - 1)] = row\n        if i > 50_000:   # early-exit for speed\n            break\n    return reservoir\n\nPERSONA_SYSTEM_PROMPT = \"\"\"\nYou are a market analyst. Your background:\n{persona}\nOccupation: {occupation} | Cultural context: {cultural_background}\nApply your lived perspective when evaluating the thesis below.\n\"\"\"\n\npersona = sample_persona(n=1)[0]\nsystem_msg = PERSONA_SYSTEM_PROMPT.format(**persona)  # (illustrative)"
+    },
+    {
+      "label": "Extract behavioral market-participant archetype from persona fields (illustrative)",
+      "code": "FINANCIAL_OCCUPATIONS = {\n    \"retail\": [\"teacher\", \"nurse\", \"sales associate\"],\n    \"institutional\": [\"portfolio manager\", \"quantitative analyst\", \"hedge fund\"],\n    \"insider\": [\"cfo\", \"vp finance\", \"corporate treasurer\"],\n}\n\ndef infer_participant_type(occupation: str) -> str:\n    occ_lower = occupation.lower()\n    for archetype, keywords in FINANCIAL_OCCUPATIONS.items():\n        if any(k in occ_lower for k in keywords):\n            return archetype\n    return \"retail\"  # default\n\n# Use as a behavioral regime signal in HD/VSA layer  (illustrative)\nregime_signal = infer_participant_type(persona[\"occupation\"])"
+    },
+    {
+      "label": "Load India superset (21M personas, multilingual)",
+      "code": "from datasets import load_dataset\n\n# India dataset covers Hindi (Devanagari + Latin) and Indian English\nds_india = load_dataset(\n    \"nvidia/Nemotron-Personas-India\",\n    split=\"train\",\n    streaming=True,\n)\nrow = next(iter(ds_india))\nprint(row.keys())  # same schema as USA variant"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}

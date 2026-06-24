@@ -1,0 +1,45 @@
+{
+  "id": "glm-v-multimodal",
+  "kind": "reference",
+  "title": "GLM-V: Multimodal Reasoning and GUI Agent Vision-Language Models (GLM-4.1V-Thinking / GLM-4.5V / GLM-4.6V)",
+  "content": "GLM-V is Zhipu AI's family of open-source vision-language models introduced in arXiv:2507.01006, comprising GLM-4.1V-Thinking (9B), GLM-4.5V, and GLM-4.6V (106B foundation, 9B Flash). The core training innovation is Reinforcement Learning with Curriculum Sampling (RLCS), which progressively increases task difficulty during post-training to build robust visual reasoning without reward hacking. GLM-4.1V-Thinking achieves superior results to Qwen2.5-VL-72B on 29 benchmarks despite being a 9B model, while GLM-4.5V reaches state-of-the-art across 42 public vision-language benchmarks among open-source models of comparable size, with performance competitive with closed-source models such as Gemini-2.5-Flash on challenging tasks. Capability pillars span visual grounding (precise element localisation), GUI-based agents (web, desktop, terminal interaction), long-document interpretation, video understanding, STEM problem-solving, and native multimodal function calling in GLM-4.6V. GLM-4.6V supports a 128K token context window, arbitrary image aspect ratios, and 4K resolution, with integration paths via vLLM, SGLang, and Hugging Face transformers. All variants are released as open weights under permissive licences, enabling local or air-gapped deployment on the class of hardware ark targets.",
+  "regime_factors": [
+    "model_family:vision_language",
+    "training_method:rlcs",
+    "parameter_scale:9b_to_106b",
+    "capability_pillar:visual_grounding",
+    "agent_mode:gui",
+    "context_length:128k",
+    "deployment:open_weight",
+    "modality:multimodal",
+    "ark_layer:operator"
+  ],
+  "sources": [
+    "https://arxiv.org/abs/2507.01006",
+    "https://github.com/zai-org/GLM-V"
+  ],
+  "lesson": "GLM-V extends the operator layer's sensory reach from pure text to charts, dashboards, filings, web UIs, and terminal screens — enabling agentic roles (researcher, analyst) to act on visual evidence without a separate OCR or screenshot-parsing service. The RLCS curriculum training pattern is directly applicable to ark's refutation ethos: agents improve by encountering increasingly hard regime transitions, not by memorising fixed tasks.",
+  "key_usages": [
+    "read charts and price dashboards into the regime layer — pass a screenshot to GLM-V, extract structured factor values without a separate OCR step",
+    "parse SEC filings and earnings slides as images, grounding analyst agent output in visual document structure",
+    "drive GUI agents that navigate web terminals or broker interfaces, extending operator-layer tool use to pixel-space actions",
+    "visual grounding of regime-factor annotations — localise the specific table cell or chart region that supports a regime classification",
+    "long-document multimodal ingestion (128K context) for quarterly reports where text and figures are interleaved"
+  ],
+  "key_codes": [
+    {
+      "label": "serve GLM-4.6V via vLLM (OpenAI-compatible endpoint)",
+      "code": "vllm serve zai-org/GLM-4.6V \\\n  --tensor-parallel-size 4 \\\n  --tool-call-parser glm45 \\\n  --reasoning-parser glm45"
+    },
+    {
+      "label": "multimodal chat inference — image + text prompt (illustrative)",
+      "code": "from openai import OpenAI\nclient = OpenAI(base_url=\"http://localhost:8000/v1\", api_key=\"unused\")\nresp = client.chat.completions.create(\n  model=\"GLM-4.6V\",\n  messages=[{\"role\": \"user\", \"content\": [\n    {\"type\": \"image_url\", \"image_url\": {\"url\": \"file:///path/to/chart.png\"}},\n    {\"type\": \"text\",  \"text\": \"Extract regime factors from this equity chart.\"}\n  ]}]\n)\nprint(resp.choices[0].message.content)"
+    },
+    {
+      "label": "disable thinking mode for fast analyst calls (illustrative)",
+      "code": "resp = client.chat.completions.create(\n  model=\"GLM-4.6V\",\n  messages=[...],\n  extra_body={\"chat_template_kwargs\": {\"enable_thinking\": False}}\n)"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}

@@ -1,0 +1,59 @@
+{
+  "id": "local-inference-engines",
+  "kind": "reference",
+  "title": "Local Inference Engines on Apple Silicon: MLX-LM, Ollama, llama.cpp and the InferenceEngine Abstraction",
+  "content": "Three production-ready options serve local LLMs on Apple Silicon in 2026: MLX-LM (Apple's Metal-native Python framework, pip-installable, exposes mlx_lm.generate for in-process calls and mlx_lm.server for an OpenAI-compatible HTTP endpoint on 127.0.0.1:8080), Ollama (a daemon wrapping llama.cpp — or MLX since v0.19 on 32 GB+ Macs — exposing OpenAI-compatible /v1/chat/completions at port 11434, with built-in tool-calling for Qwen3, Llama 3.x, and Mistral families), and llama.cpp / llama-server directly (GGUF quantised models, Metal via -ngl 999, grammar-constrained JSON output via --jinja and grammar files, lowest-level control). MLX leads by 20-87 % on models under 14 B parameters (compute-bound); above 27 B the engines converge on memory bandwidth; Ollama v0.19+ adopted MLX as its Apple Silicon backend so the performance gap between the two largely closed for 32 GB+ machines. For an agentic operator loop, the cleanest architecture defines a narrow InferenceEngine Protocol (chat method returning a typed response), ships a deterministic OfflineStub for CI, and mounts either an MlxLmAdapter (hitting mlx_lm.server) or an OllamaAdapter (hitting Ollama's /v1 endpoint) at runtime — the agent loop never imports the model library directly. Temperature=0 enforces greedy decoding (deterministic token selection) but does not guarantee bit-exact reproduction across runs because of floating-point batching effects; the practical answer is structured JSON output via response_format={type:json_object} or Pydantic schema-constrained tool calls, so the agent loop validates the shape at the system boundary rather than relying on probabilistic repeatability.",
+  "regime_factors": [
+    "ark_layer:operator",
+    "backend:metal_gpu",
+    "inference_mode:local_offline",
+    "api_compat:openai_v1",
+    "tool_calling:json_schema",
+    "model_size:sub_14b_optimal",
+    "determinism:greedy_decode",
+    "abstraction:engine_protocol",
+    "quantization:gguf_mlx",
+    "latency:low_no_network"
+  ],
+  "sources": [
+    "https://github.com/ml-explore/mlx-lm",
+    "https://ollama.com/blog/tool-support",
+    "https://ollama.com/blog/mlx",
+    "https://docs.ollama.com/capabilities/tool-calling",
+    "https://github.com/ggml-org/llama.cpp",
+    "https://blakecrosley.com/blog/agentic-ai-mac-mlx",
+    "https://medium.com/@levchevajoana/a-job-postings-tool-a-guide-to-mlx-lm-server-and-tool-use-with-the-openai-client-edb9a5d75b4c",
+    "https://medium.com/@michael.hannecke/choosing-an-on-device-llm-runtime-on-apple-silicon-a-decision-framework-beyond-benchmarks-2449067b8b67",
+    "https://pub.towardsai.net/apples-mlx-runs-local-llms-3x-faster-than-llama-cpp-until-your-context-hits-40k-715ec441afbb",
+    "https://www.zansara.dev/posts/2026-03-24-temp-0-llm/",
+    "https://callsphere.ai/blog/python-abc-module-abstract-base-classes-agent-interfaces",
+    "https://yage.ai/share/mlx-apple-silicon-en-20260331.html"
+  ],
+  "lesson": "The ark operator loop (state -> action -> feedback -> revision) must be testable without a running model, so the InferenceEngine abstraction is load-bearing: the OfflineStub lets CI run the full loop deterministically, while the MlxLmAdapter or OllamaAdapter hot-swaps in at runtime with zero changes to the loop body. The LLM's role in ark is strictly to propose (choose a strategy variant, diagnose a failure, emit a tool call) while numpy and MLX execute — keeping the model off the numeric hot path preserves the measured performance guarantees of the kernel layer.",
+  "key_usages": [
+    "drive the operator agentic loop (engineer/test/repair/audit strategies) fully offline in CI via OfflineStub",
+    "swap to mlx_lm.server or Ollama /v1 at runtime without modifying any loop logic",
+    "emit structured JSON tool calls for strategy mutation, regime classification, and audit diagnostics",
+    "gate model output at the system boundary with Pydantic schema validation before handing results to numpy/MLX execution"
+  ],
+  "key_codes": [
+    {
+      "label": "InferenceEngine Protocol + OfflineStub (the clean interface)",
+      "code": "from typing import Protocol\nfrom dataclasses import dataclass\n\n@dataclass\nclass ChatResponse:\n    content: str\n    tool_calls: list[dict] | None = None\n\nclass InferenceEngine(Protocol):\n    def chat(self, messages: list[dict], tools: list[dict] | None = None, **kw) -> ChatResponse: ...\n\nclass OfflineStub:\n    \"\"\"Deterministic stub for CI — returns a fixed JSON tool call.\"\"\"\n    def chat(self, messages, tools=None, **kw):\n        return ChatResponse(content='', tool_calls=[{'function': {'name': 'noop', 'arguments': '{}'}}])"
+    },
+    {
+      "label": "mlx_lm.server start + OpenAI-client adapter",
+      "code": "# terminal: mlx_lm.server --model mlx-community/Qwen3-8B-4bit --port 8080\n\nfrom openai import OpenAI\n\nclass MlxLmAdapter:\n    def __init__(self, model='mlx-community/Qwen3-8B-4bit', port=8080):\n        self.client = OpenAI(base_url=f'http://127.0.0.1:{port}/v1', api_key='local')\n        self.model = model\n    def chat(self, messages, tools=None, **kw):\n        resp = self.client.chat.completions.create(\n            model=self.model, messages=messages,\n            tools=tools, temperature=0,\n            response_format={'type': 'json_object'} if not tools else None,\n            **kw)\n        m = resp.choices[0].message\n        return ChatResponse(content=m.content or '', tool_calls=[tc.model_dump() for tc in (m.tool_calls or [])])"
+    },
+    {
+      "label": "Ollama OpenAI-compatible chat call with tool use",
+      "code": "from openai import OpenAI\n\nclass OllamaAdapter:\n    def __init__(self, model='qwen3:8b', port=11434):\n        self.client = OpenAI(base_url=f'http://localhost:{port}/v1', api_key='ollama')\n        self.model = model\n    def chat(self, messages, tools=None, **kw):\n        resp = self.client.chat.completions.create(\n            model=self.model, messages=messages,\n            tools=tools, temperature=0, **kw)\n        m = resp.choices[0].message\n        return ChatResponse(content=m.content or '', tool_calls=[tc.model_dump() for tc in (m.tool_calls or [])])"
+    },
+    {
+      "label": "operator agentic loop skeleton (engine-agnostic)",
+      "code": "def operator_loop(engine: InferenceEngine, state: dict, tools: list[dict], max_rounds=12):\n    history = [{'role': 'user', 'content': build_prompt(state)}]\n    for _ in range(max_rounds):\n        resp = engine.chat(history, tools=tools)\n        history.append({'role': 'assistant', 'content': resp.content})\n        if resp.tool_calls:\n            for tc in resp.tool_calls:\n                result = dispatch_tool(tc)   # numpy/MLX executes here\n                history.append({'role': 'tool', 'content': result})\n        else:\n            return parse_terminal(resp.content)  # structured JSON output\n    raise RuntimeError('operator loop did not converge')"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}

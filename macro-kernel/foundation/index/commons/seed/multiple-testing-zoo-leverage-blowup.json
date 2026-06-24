@@ -1,0 +1,40 @@
+{
+  "id": "multiple-testing-zoo-leverage-blowup",
+  "kind": "failure",
+  "title": "Strategy-Zoo Multiple Testing & Vol-Targeting Leverage Blowup: Two Destruction Mechanisms",
+  "content": "Two distinct failure mechanisms destroy macro strategy books independently of whether the underlying signal has genuine edge. First, the multiple-testing problem: when a researcher or PM evaluates hundreds of strategy variants, parameters, or universes and selects the best performer, the reported Sharpe ratio is inflated by selection bias — Harvey, Liu & Zhu (2016) documented 316+ published factors and argue the t-statistic hurdle must rise from 2.0 to above 3.0; Bailey & Lopez de Prado's Deflated Sharpe Ratio (2014) and Minimum Track Record Length formalize the haircut required to distinguish genuine alpha from the best draw from a noise distribution, with the haircut growing non-linearly in the number of trials tested. False Discovery Rate methods (Barras et al. 2010) confirm most funds or factors that survive naive significance filters are false positives; the remedy is pre-registered hypothesis counts, Bonferroni or BHY correction, and a track record long enough that even a zero-alpha strategy could not plausibly have generated the observed Sharpe. Second, the sizing/leverage pathology: vol-targeting strategies mechanically lever up when realized volatility compresses during calm regimes, concentrating gross exposure precisely when the risk-reward is worst; when volatility spikes — as in February 2018 (Volmageddon) — those same mechanical rules force synchronous de-grossing, selling into the spike and amplifying it endogenously; the XIV/SVXY inverse-VIX ETN implosion (92% loss in one session) is the extreme archetype, but the same loop operates in any short-gamma or carry book that is overleveraged relative to Kelly-optimal sizing, where even a strategy with positive expected value achieves ruin probability approaching 1 under persistent overbetting.",
+  "regime_factors": [
+    "vol:compressed",
+    "tail:spiking",
+    "liquidity:tight",
+    "leverage:high",
+    "credit:widening",
+    "carry:long",
+    "dispersion:low",
+    "rates:rising",
+    "risk_appetite:low",
+    "selection_bias:active",
+    "multiple_testing:uncontrolled",
+    "deleveraging:forced"
+  ],
+  "lesson": "Selection across a zoo of strategies inflates the apparent Sharpe by an amount that grows with trial count and must be deflated before any capital commitment; a strategy that survives this filter can still be destroyed by its own sizing rule if vol-targeting levers it up into calm and then forces mechanical selling into the spike — genuine edge and mechanical ruin are not mutually exclusive.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "co_contributors": [],
+  "attribution_count": 0,
+  "links": [],
+  "created": "2026-06-24T00:00:00Z",
+  "schema_v": 1,
+  "sources": [
+    "https://academic.oup.com/rfs/article/29/1/5/1843824",
+    "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2249314",
+    "https://www.davidhbailey.com/dhbpapers/deflated-sharpe.pdf",
+    "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2460551",
+    "https://papers.ssrn.com/sol3/papers.cfm?abstract_id=2308659",
+    "https://arxiv.org/abs/2006.04269",
+    "https://rpc.cfainstitute.org/research/financial-analysts-journal/2021/volmageddon-failure-short-volatility-products",
+    "https://houndstoothcapital.com/2018/05/06/anatomy_of_a_blowup/",
+    "https://www.cnbc.com/2018/02/05/xiv-exchange-traded-security-linked-to-volatility-plummets-80-percent.html",
+    "training-knowledge"
+  ]
+}

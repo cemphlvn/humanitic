@@ -1,0 +1,58 @@
+{
+  "id": "autonomous-trading-architecture",
+  "kind": "reference",
+  "title": "Autonomous Trading System Architecture: Event Loop, Paper Execution, Risk Gates, and Staged Escalation",
+  "content": "A production-grade autonomous trading core separates concerns into four layers: (1) an event-driven single-threaded kernel that ticks on market data, emits weight vectors, charges costs, and updates state in causal order — the same code path runs in backtest, paper, and live modes, so the deployment gap is a measurable delta rather than a mystery; (2) a paper-execution engine that simulates fills against real-time NBBO with stochastic partial fills (~10% of eligible orders), conservative slippage floors (2-5 bps minimum), and explicit acknowledgment of paper-live divergences (no market impact, no queue position, no borrow fees); (3) a multi-layer risk gate stack — gross/net exposure caps enforced at the weight-contract boundary, per-step and daily loss circuit breakers, a max-drawdown kill that flattens to cash, turnover throttles, and a dead-man's heartbeat that triggers an emergency flatten if the loop misses N consecutive beats; and (4) staged escalation with explicit human gates: synthetic data establishes the evidence floor, paper trading validates deployment consistency (OOS Sharpe retention >= 70%, order rejection rate low, weight tracking error small), and live capital is only released on explicit written human approval with a tiny position ceiling. The deployment gap (FinRL-X taxonomy) has two components: backtest-to-paper distortions driven by fill-model optimism, instant-fill assumptions, and ignored queue dynamics; and paper-to-live distortions driven by latency, margin constraints, liquidity impact, and operational failure modes. NautilusTrader's architecture (Rust-native, single-threaded kernel, RiskEngine pre-trade veto, ports-and-adapters swap between backtest and live) and QuantConnect's LEAN (pluggable fill/slippage/fee models, partial-fill support, brokerage-specific models) represent the production state of the art for deployment-consistent autonomous systems. Fail-safe design demands that the system defaults to flat — every failure mode, network drop, or heartbeat timeout must terminate in a known safe state with all positions closed, never in an unknown open state.",
+  "regime_factors": [
+    "ark_layer:execution",
+    "loop_shape:event_driven",
+    "fill_model:paper_nbbo_stochastic",
+    "risk_gate:kill_switch_drawdown",
+    "escalation:synthetic_paper_live",
+    "deployment_gap:backtest_to_live",
+    "position_cap:gross_net_exposure",
+    "heartbeat:dead_man_switch",
+    "slippage:conservative_floor",
+    "human_gate:live_capital_approval",
+    "circuit_breaker:daily_loss_drawdown",
+    "fail_safe:flatten_on_breach"
+  ],
+  "sources": [
+    "https://arxiv.org/abs/2603.21330",
+    "https://github.com/AI4Finance-Foundation/FinRL-Trading",
+    "https://nautilustrader.io/docs/latest/concepts/architecture/",
+    "https://nautilustrader.io/docs/latest/concepts/live/",
+    "https://docs.alpaca.markets/us/docs/paper-trading",
+    "https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/trade-fills/key-concepts",
+    "https://www.quantconnect.com/docs/v2/writing-algorithms/reality-modeling/slippage/key-concepts",
+    "https://www.luxalgo.com/blog/risk-management-strategies-for-algo-trading/"
+  ],
+  "lesson": "Ark's existing weight-vector contract (w_t, enforced at foundation/kernel/contracts.py) and its CRITIC deployment-gap audit (foundation/operator/critic.py) are already the right architectural invariants — the missing layer is a runtime execution loop that ticks on data, enforces the risk gate stack (gross cap, max-drawdown kill, daily loss limit, heartbeat), and makes paper the mandatory staging environment before any live capital gate is considered. The staged escalation discipline (synthetic floor -> paper validation -> human-approved tiny live) is the operational complement to the court's statistical evidence: evidence court proves edge exists; the paper stage proves the edge survives real execution semantics; the human gate ensures no capital moves without deliberate authorization.",
+  "key_usages": [
+    "event loop tick: on each bar, call strategy.target_weight(), validate against risk gates, charge costs, update equity — same function body in paper and live",
+    "paper fill engine: simulate fills against NBBO with stochastic partial fills and a conservative slippage floor before reporting realized P&L",
+    "max-drawdown kill switch: compare current equity to rolling peak; if drawdown exceeds threshold, flatten all weights to zero and halt new orders",
+    "heartbeat dead-man's switch: a background timer that flattens positions and stops the loop if the main event loop does not reset it within the configured interval",
+    "staged escalation gate: paper-trading must show OOS Sharpe retention >= 0.70 and deployment-gap delta < TOLERANCE before human approval prompt for tiny live allocation"
+  ],
+  "key_codes": [
+    {
+      "label": "event loop tick (paper/live shared core)",
+      "code": "def tick(t, prices, prev_w, equity, peak, risk_cfg):\n    w = strategy.target_weight(prices, t)           # causal: prices[:t+1] only\n    w = np.clip(w, -risk_cfg['max_gross'], risk_cfg['max_gross'])  # gross cap\n    fill = paper_fill(w, prices[t], risk_cfg['slippage_bps'])      # paper engine\n    r = fill * (prices[t+1] / prices[t] - 1.0)\n    c = cost(prev_w, fill, risk_cfg['cost_bps'])\n    equity_new = equity * (1.0 + r - c)\n    peak_new = max(peak, equity_new)\n    dd = (equity_new - peak_new) / peak_new\n    if dd < -risk_cfg['max_dd']:                    # kill switch\n        return 0.0, equity_new, peak_new, 'KILLED'\n    return fill, equity_new, peak_new, 'OK'"
+    },
+    {
+      "label": "max-drawdown kill switch + daily loss circuit breaker",
+      "code": "class RiskGate:\n    def __init__(self, max_dd=0.10, max_daily_loss=0.02):\n        self.peak = 1.0\n        self.day_open = 1.0\n        self.max_dd = max_dd\n        self.max_daily_loss = max_daily_loss\n        self.killed = False\n\n    def check(self, equity):\n        self.peak = max(self.peak, equity)\n        dd = (equity - self.peak) / self.peak\n        daily_loss = (equity - self.day_open) / self.day_open\n        if dd < -self.max_dd or daily_loss < -self.max_daily_loss:\n            self.killed = True\n        return not self.killed  # False -> flatten, halt\n\n    def new_day(self, equity):\n        self.day_open = equity"
+    },
+    {
+      "label": "paper fill engine with stochastic partial fill and slippage floor",
+      "code": "import numpy as np\n\ndef paper_fill(target_w, price, slippage_bps=3.0, partial_prob=0.10, rng=None):\n    rng = rng or np.random.default_rng()\n    # Stochastic partial fill: 10% chance of partial (Alpaca paper model)\n    if rng.random() < partial_prob:\n        fill_frac = rng.uniform(0.3, 0.9)\n    else:\n        fill_frac = 1.0\n    realized_w = target_w * fill_frac\n    # Conservative slippage floor applied to realized fill\n    slip = (slippage_bps / 10_000.0) * abs(realized_w)\n    realized_price = price * (1.0 + slip * np.sign(realized_w))\n    return realized_w, realized_price"
+    },
+    {
+      "label": "dead-man heartbeat (threading-based, flattens on timeout)",
+      "code": "import threading, time\n\nclass Heartbeat:\n    def __init__(self, timeout_s=60, on_flat=None):\n        self.timeout_s = timeout_s\n        self.on_flat = on_flat or (lambda: None)\n        self._last = time.monotonic()\n        self._t = threading.Thread(target=self._watch, daemon=True)\n        self._t.start()\n\n    def beat(self):\n        self._last = time.monotonic()\n\n    def _watch(self):\n        while True:\n            time.sleep(self.timeout_s / 4)\n            if time.monotonic() - self._last > self.timeout_s:\n                self.on_flat()  # flatten positions, halt loop\n                break"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}

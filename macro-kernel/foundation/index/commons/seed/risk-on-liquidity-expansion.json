@@ -1,0 +1,31 @@
+{
+  "id": "risk-on-liquidity-expansion",
+  "kind": "regime",
+  "title": "Risk-On Liquidity Expansion: Carry, Beta, and the Complacency Failure Mode",
+  "content": "In a risk-on liquidity expansion regime, central bank easing or abundant global dollar liquidity compresses credit spreads toward historical lows and suppresses realized volatility, rewarding carry and high-beta positioning as the dominant return sources. As the regime matures, the feedback loop tightens: low vol encourages systematic de-hedging, crowded carry trades amplify beta extension, and tight spreads reduce compensation for tail risk, collectively building a fragility stack that is invisible in contemporaneous metrics. The complacency failure mode triggers when an exogenous shock — policy pivot, credit event, or funding-currency unwind — forces rapid deleveraging; because the unwind is endogenous to position size, the reversal is convex and self-reinforcing rather than gradual. Credit spreads, particularly high-yield, are historically reliable early-warning indicators: a decisive widening beyond regime anchors signals that liquidity is repricing before equity volatility fully registers. Macro strategies should monitor the spread between implied and realized vol, carry-trade positioning crowding, and speculative-grade default rates as leading indicators of regime exhaustion.",
+  "regime_factors": [
+    "liquidity:expanding",
+    "rates:falling",
+    "credit:tight",
+    "vol:low",
+    "carry:rewarded",
+    "beta:extended",
+    "dollar:weakening",
+    "risk-appetite:high",
+    "hedging:depressed",
+    "leverage:rising",
+    "growth:stable",
+    "spreads:compressed"
+  ],
+  "lesson": "Low vol and tight credit are not confirmation of safety — they are the surface expression of accumulated complacency; the regime is most dangerous precisely when it feels most comfortable, because position crowding and de-hedging make the reversal convex and fast.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://markets.financialcontent.com/stocks/article/marketminute-2025-10-27-credit-spreads-hover-near-historic-lows-a-signal-of-market-health-or-looming-complacency",
+    "https://www.capitalflowsresearch.com/p/macro-regime-tracker-global-carry",
+    "https://macrosynergy.com/research/the-risk-reversal-premium/",
+    "https://volatilitybox.com/research/volatility-regimes-explained/",
+    "https://research-center.amundi.com/article/journey-global-liquidity",
+    "https://www.cambridgeassociates.com/insight/2025-outlook-credit-markets/"
+  ]
+}

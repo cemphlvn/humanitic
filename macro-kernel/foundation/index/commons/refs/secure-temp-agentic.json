@@ -1,0 +1,61 @@
+{
+  "id": "secure-temp-agentic",
+  "kind": "reference",
+  "title": "Securing Temporary / Scratch Directories in Agentic Python Stacks",
+  "content": "Insecure temporary file creation is classified under CWE-377 (insecure temp file) and CWE-379 (temp file in directory with insecure permissions); the root attacks are TOCTOU races, symlink hijacking, and predictable path guessing — all three are eliminated by Python's tempfile.mkdtemp() and TemporaryDirectory(), which create directories atomically with mode 0700 (owner-only rwx) and no race window. In agentic stacks the threat surface widens: multiple subagents sharing a world-writable scratch directory enable cross-agent file tampering and, critically, file-based indirect prompt injection — an adversary (or a compromised upstream agent) plants malicious instructions in a tool-output file that a downstream agent later reads and executes, classified as OWASP LLM Top-10 LLM01:2025. CERT FIO21-C codifies the foundational rule: never create temp files in shared world-writable directories; instead, each agent session must own a private, scoped directory unreachable by siblings. Secrets written to temp must be treated as permanently compromised if they ever land in a shared or world-readable path — per NVIDIA's agentic sandboxing guidance, sandbox environments accumulate sensitive artifacts and must be destroyed, not merely cleaned, at session end. The Article-0 rule for ark extends this principle to its strongest form: dot-local private data must never be routed through shared /tmp or any path accessible outside the owning process, and every outbound artifact must pass through the publish guard before leaving the session boundary.",
+  "regime_factors": [
+    "security:temp_file_isolation",
+    "weakness_class:cwe377_insecure_temp",
+    "permission_weakness:cwe379_insecure_dir",
+    "attack_vector:toctou_symlink",
+    "cross_agent_risk:shared_scratch_tampering",
+    "injection_risk:file_based_prompt_injection",
+    "cleanup:guaranteed_teardown",
+    "permissions:0700_owner_only",
+    "python_primitive:tempfile_mkdtemp",
+    "scoping:per_session_per_agent",
+    "ark_layer:privacy"
+  ],
+  "sources": [
+    "https://cwe.mitre.org/data/definitions/377.html",
+    "https://cwe.mitre.org/data/definitions/379.html",
+    "https://docs.python.org/3/library/tempfile.html",
+    "https://security.openstack.org/guidelines/dg_using-temporary-files-securely.html",
+    "https://cmu-sei.github.io/secure-coding-standards/sei-cert-c-coding-standard/recommendations/input-output-fio/fio21-c",
+    "https://owasp.org/www-community/vulnerabilities/Insecure_Temporary_File",
+    "https://genai.owasp.org/llmrisk/llm01-prompt-injection/",
+    "https://cheatsheetseries.owasp.org/cheatsheets/AI_Agent_Security_Cheat_Sheet.html",
+    "https://developer.nvidia.com/blog/practical-security-guidance-for-sandboxing-agentic-workflows-and-managing-execution-risk/",
+    "https://vulert.com/vuln-db/CVE-2024-4030",
+    "https://techcommunity.microsoft.com/blog/marketplace-blog/securing-ai-agents-the-enterprise-security-playbook-for-the-agentic-era/4503627",
+    "https://codeql.github.com/codeql-query-help/python/py-insecure-temporary-file/"
+  ],
+  "lesson": "Ark's session scratchpad already exists; the gap is hardening it: every agent and subagent must receive its own mkdtemp(0700) subdirectory rather than writing into a shared parent, so a compromised or hallucinating subagent cannot plant injection payloads readable by siblings. The Article-0 eternity clause maps directly onto the strongest temp-security rule — dot-local material must never transit through any path (including shared /tmp) that is not owned exclusively by the running process, and teardown must be guaranteed via a context manager even on crash so no sensitive artifact survives the session boundary.",
+  "key_usages": [
+    "instantiate a per-agent secure scratch directory inside ark's session scratchpad with guaranteed 0700 permissions and crash-safe cleanup",
+    "refuse to open any file inside the scratch area that resolves through a symlink, blocking cross-agent symlink-hijack and injection attacks",
+    "ensure dot-local data never routes through shared /tmp — enforce via the publish guard and by always specifying dir= to a session-owned parent",
+    "bound scratch disk usage and destroy the directory tree (not just empty it) at session end to prevent leftover artifact leakage",
+    "treat every file read from the scratch area as untrusted external input before including its content in an agent prompt"
+  ],
+  "key_codes": [
+    {
+      "label": "secure per-agent mkdtemp context manager (0700, crash-safe cleanup)",
+      "code": "import os, tempfile, shutil\nfrom contextlib import contextmanager\n\n@contextmanager\ndef agent_scratchdir(session_root: str, agent_id: str):\n    \"\"\"Atomic 0700 sub-dir scoped to one agent; guaranteed teardown on crash.\"\"\"\n    base = tempfile.mkdtemp(prefix=f\"{agent_id}_\", dir=session_root)\n    os.chmod(base, 0o700)  # mkdtemp already does 0700; explicit for auditability\n    try:\n        yield base\n    finally:\n        shutil.rmtree(base, ignore_errors=False)"
+    },
+    {
+      "label": "symlink-refusing file open inside scratch area (O_NOFOLLOW)",
+      "code": "import os\n\ndef safe_open_scratch(path: str, mode: str = \"r\"):\n    \"\"\"Refuse to open path if it is or resolves through a symlink.\"\"\"\n    if os.path.islink(path):\n        raise PermissionError(f\"Symlink refused in scratch area: {path}\")\n    # O_NOFOLLOW on POSIX: OSError if final component is a symlink\n    flags = os.O_RDONLY | getattr(os, 'O_NOFOLLOW', 0)\n    fd = os.open(path, flags)\n    return os.fdopen(fd, mode)"
+    },
+    {
+      "label": "session-root creation: never pass dir=None (falls back to bare /tmp)",
+      "code": "import os, tempfile\n\ndef make_session_root(base_dir: str) -> str:\n    \"\"\"Create 0700 session scratch root. Agents receive mkdtemp subdirs here.\n    Always pass explicit dir= so the parent is never bare /tmp.\n    \"\"\"\n    os.makedirs(base_dir, mode=0o700, exist_ok=True)\n    return tempfile.mkdtemp(prefix=\"session_\", dir=base_dir)"
+    },
+    {
+      "label": "Article-0 guard: block dot-local paths from entering scratch writes",
+      "code": "import os\n\n_LOCAL = os.path.realpath(os.path.expanduser(\"~/lib/table/ark/dot-local\"))\n\ndef assert_not_local(data_path: str) -> None:\n    \"\"\"Raise hard error if data_path is inside dot-local. Article-0 enforcement.\"\"\"\n    if os.path.realpath(data_path).startswith(_LOCAL):\n        raise RuntimeError(\n            f\"Article-0 violation: dot-local path in scratch write: {data_path}\"\n        )"
+    }
+  ],
+  "provenance": "public",
+  "contributor": "research-agent"
+}

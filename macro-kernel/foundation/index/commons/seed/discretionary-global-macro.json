@@ -1,0 +1,32 @@
+{
+  "id": "discretionary-global-macro",
+  "kind": "strategy",
+  "title": "Discretionary Global Macro: Directional Top-Down Bets and the Convexity Overlay",
+  "content": "Discretionary global macro expresses directional or relative-value theses across rates, FX, commodity, and equity-index markets by anchoring position sizing to a fundamental macro thesis — central-bank reaction-function divergence, growth or inflation surprises versus consensus, balance-of-payments stress, and term-premium repricing — rather than to a mechanical signal; the thesis determines both instrument choice (outright futures, options, swaptions, spot) and the carry budget the manager is willing to consume waiting for the thesis to materialise. A convexity overlay — long-dated payer or receiver swaptions, equity put spreads, deep-OTM currency options — runs in parallel as a regime-transition accelerant: it costs continuous negative carry but delivers asymmetric payoff precisely in the dislocation events (sudden rate re-pricing, sovereign stress, policy U-turns) where the directional book benefits most, so the two legs are co-designed rather than independent. The strategy is the natural actor across all macro regime quadrants — it both initiates the trade that reflects a regime view and rides the full transition — making it complementary to systematic factor premia (trend-following, mean-reversion) that only harvest a regime once it is already in force. The canonical failure mode is not a wrong thesis but correct-thesis-wrong-timing: negative carry on the convexity overlay bleeds P&L until the position is cut for risk-management reasons, whereupon the thesis often resolves — a structural tension between intellectual conviction and the finite capital horizon of any leveraged book. Mitigation practice includes laddered option expiries to smooth the carry drag, scaling entry over multiple tranches as confirmatory signals accumulate, and pre-committing to a maximum carry-loss budget before initiating the trade rather than stopping out reactively.",
+  "regime_factors": [
+    "policy:divergent",
+    "rates:repricing",
+    "vol:rising",
+    "term-premium:expanding",
+    "inflation:surprising",
+    "growth:divergent",
+    "dollar:trending",
+    "credit:widening",
+    "liquidity:tightening",
+    "carry:negative",
+    "dispersion:high",
+    "transition:active"
+  ],
+  "lesson": "Discretionary macro earns its premium at regime inflection points, but the convexity overlay that protects that edge imposes a continuous carry drain — the primary failure mode is correct-thesis-wrong-timing, where a finite carry budget expires before the thesis resolves; pre-committed carry-loss limits and laddered expiries are the structural defenses.",
+  "provenance": "public",
+  "contributor": "research-agent",
+  "sources": [
+    "https://www.grahamcapital.com/blog/global-macro-primer/",
+    "https://www.grahamcapital.com/blog/macro-across-monetary-regimes/",
+    "https://www.jhinvestments.com/viewpoints/alternatives/role-of-macro-strategies-across-monetary-policy-regimes",
+    "https://www.wtwco.com/en-us/insights/2025/09/navigating-complexity-the-role-of-discretionary-macro-strategies-in-client-portfolios",
+    "https://resonanzcapital.com/insights/strategic-tail-risk-hedging-building-antifragility-into-institutional-portfolios",
+    "https://www.bfinance.com/insights/hedge-funds-and-tail-protection-sector-in-brief",
+    "training-knowledge"
+  ]
+}
