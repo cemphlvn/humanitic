@@ -40,6 +40,7 @@ import test_stats
 import test_screening
 import test_candidates
 import test_real_adapters
+import test_pace_of_place
 
 
 def main():
@@ -50,7 +51,8 @@ def main():
               test_cross_seam, test_autonomous, test_partners, test_personal_os, test_secure_temp,
               test_data, test_agent_economy, test_harness, test_detection, test_security, test_secrets,
               test_machine, test_training, test_runtime, test_embodied, test_atoms, test_stream_eval,
-              test_align_crypto, test_stats, test_screening, test_candidates, test_real_adapters]
+              test_align_crypto, test_stats, test_screening, test_candidates, test_real_adapters,
+              test_pace_of_place]
     ok = 0
     for s in suites:
         try:

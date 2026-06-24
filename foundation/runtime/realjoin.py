@@ -12,25 +12,6 @@ from foundation.data import align
 from foundation.data.adapters import hivemapper, geodnet
 
 
-def lead_lag(a, s, max_lag=6):
-    """Best lag L (robot activity LEADS the market by L windows) by correlation. corr(a[:n-L], s[L:])."""
-    a = np.asarray(a, float)
-    s = np.asarray(s, float)
-    n = min(len(a), len(s))
-    a, s = a[:n], s[:n]
-    best = {"lag": 0, "corr": None}
-    for L in range(0, max_lag + 1):
-        if n - L < 3:
-            break
-        x, y = a[:n - L], s[L:n]
-        if x.std() == 0 or y.std() == 0:
-            continue
-        c = float(np.corrcoef(x, y)[0, 1])
-        if best["corr"] is None or c > best["corr"]:
-            best = {"lag": L, "corr": round(c, 3)}
-    return best
-
-
 def _demo_market(t_robot, activity, lag_windows=2, dt_frac=0.8, seed=0):
     """A DEMO token series (HONEY/GEOD) on its OWN irregular clock that co-moves with LAGGED physical
     activity. Offline only — the live market adapter replaces this with the real token series."""
@@ -68,7 +49,7 @@ def _join(t_r, act, t_m, sig, tolerance):
     corr = (round(float(np.corrcoef(a, s)[0, 1]), 3)
             if keep.sum() > 2 and a.std() > 0 and s.std() > 0 else None)
     return {"robot_frames": int(len(t_r)), "market_frames": int(len(t_m)),
-            "aligned": int(keep.sum()), "causal": True, "corr": corr, "lead_lag": lead_lag(a, s)}
+            "aligned": int(keep.sum()), "causal": True, "corr": corr, "lead_lag": align.lead_lag(a, s)}
 
 
 def replay_join(target, tolerance=None, seed=0):

@@ -30,3 +30,22 @@ def assert_causal(t_left, t_right, idx):
         if j >= 0:
             assert t_right[j] <= t_left[i], "lookahead at %d: right %.3f > left %.3f" % (i, t_right[j], t_left[i])
     return True
+
+
+def lead_lag(a, s, max_lag=6):
+    """Best lag L — does series `a` LEAD series `s` by L steps? — by correlation: corr(a[:n-L], s[L:])."""
+    a = np.asarray(a, float)
+    s = np.asarray(s, float)
+    n = min(len(a), len(s))
+    a, s = a[:n], s[:n]
+    best = {"lag": 0, "corr": None}
+    for L in range(0, max_lag + 1):
+        if n - L < 3:
+            break
+        x, y = a[:n - L], s[L:n]
+        if x.std() == 0 or y.std() == 0:
+            continue
+        c = float(np.corrcoef(x, y)[0, 1])
+        if best["corr"] is None or c > best["corr"]:
+            best = {"lag": L, "corr": round(c, 3)}
+    return best

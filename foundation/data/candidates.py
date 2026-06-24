@@ -14,7 +14,9 @@ Candidate = namedtuple("Candidate", "id name token streaming access alignability
 CANDIDATES = [
     Candidate("frodobots", "FrodoBots-2K / BitRobot", "none-yet", "yes",
               "open (HF CC-BY-SA-4.0, ~1TB S3)", "partial",
-              "richest OPEN robot stream (GPS@1Hz, IMU@100Hz, stereo video); token not launched — proxy via FIL/TAO"),
+              "Embodied AI Data Infra (PRE-TOKEN): the asset is the real-world data stream, not the robot. "
+              "Edge = recognizing robot data streams before they're a priced asset class. No clean exposure; "
+              "FIL/SOL/TAO are narrative proxies only. See CLASSIFICATION['frodobots']."),
     Candidate("geodnet", "GEODNET", "GEOD", "yes",
               "commercial API + free trial + github ntrip", "yes",
               "most operationally ready: RTCM 1s GPS-time epochs; GEOD Coinbase-listed, 80% rev->burn"),
@@ -74,6 +76,26 @@ SCREENED = {
     "xmaquina": ({"data_modality": [0, 0, 0], "streaming_timestamps": [0, 0, 0], "access_openness": [0, 0, 0],
                   "verifiability": [0, 0, 0], "market_linkage": [3, 0, 0], "alignment_feasibility": [0, 0, 0, 0],
                   "legal_ethical": [1, 1, 1]}, {"no_provenance"}),
+}
+
+
+# richer classifications for candidates whose value isn't captured by "tradeable now" — the strategic
+# reframing (an asset class recognized before it is priced). Keyed by candidate id.
+CLASSIFICATION = {
+    "frodobots": {
+        "category": "Embodied AI Data Infra / Robot DePIN",
+        "asset_type": "pre-token network + dataset primitive",
+        "research_value": "high",
+        "tradeability": "low/conditional",
+        "strategic_importance": "high if embodied AI becomes the next data bottleneck",
+        "proxy": "no clean liquid exposure; monitor FIL/SOL/TAO as broad ecosystem/narrative proxies only",
+        "watch_triggers": ["token launch", "subnet revenue", "dataset licensing",
+                           "major robotics-lab usage", "benchmark wins"],
+        "common_thread": ("data scarcity in robotics -> gamified teleoperation -> open real-world datasets "
+                          "-> subnet-based verification/rewards -> embodied-AI training infra"),
+        "thesis": ("walking speed + motion dynamics + time-of-day (per area) -> predict that area's local "
+                   "market (foot-traffic-priced commerce). Code: regime/pace_of_place.py"),
+    },
 }
 
 
