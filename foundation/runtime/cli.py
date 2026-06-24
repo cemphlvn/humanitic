@@ -23,6 +23,7 @@ def main(argv=None):
     mp.add_argument("--target", choices=["hivemapper", "geodnet"], default="geodnet")
     mp.add_argument("--live", action="store_true", help="attempt a live network pull (needs endpoint/creds)")
     mp.add_argument("--no-local", action="store_true", help="do not write .local")
+    sub.add_parser("edge", help="unsupervised regime discovery + dynamic trading, judged by court + Granger")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -41,6 +42,10 @@ def main(argv=None):
     if args.cmd == "mine":
         from foundation.runtime import mine as mine_mod
         print(json.dumps(mine_mod.mine(args.target, live=args.live, write_local=not args.no_local), indent=2))
+        return 0
+    if args.cmd == "edge":
+        from foundation.regime import unsupervised
+        print(json.dumps(unsupervised.edge_report(), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,
