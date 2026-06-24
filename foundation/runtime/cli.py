@@ -35,6 +35,7 @@ def main(argv=None):
     bp = sub.add_parser("book", help="build the portfolio-of-edges (discover->court->orthogonality->allocate->monitor)")
     bp.add_argument("--no-local", action="store_true", help="do not write .local")
     bp.add_argument("--paper", action="store_true", help="also trade the book forward on the portfolio paper account")
+    sub.add_parser("contribute", help="demo P2P edge-market round: submit -> court -> orthogonality -> reward (95/5)")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -81,6 +82,10 @@ def main(argv=None):
         else:
             from foundation.portfolio import loop
             print(json.dumps(loop.build_book(write_local=not args.no_local), indent=2))
+        return 0
+    if args.cmd == "contribute":
+        from foundation.runtime import contribute
+        print(json.dumps(contribute.run(), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,

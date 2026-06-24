@@ -16,53 +16,51 @@ import os
 import numpy as np
 
 from foundation.portfolio.edge_book import make_edge, EdgeBook
-from foundation.portfolio import orthogonality, allocator, monitor
-from foundation.regime import unsupervised
+from foundation.portfolio import orthogonality, allocator, monitor, discovery
 from foundation.eval import significance
 
 BOOK_PATH = os.path.join(".local", "edges", "book.json")
 
 
-def candidate(seed, n=1500):
-    """Discovery: one edge candidate from the unsupervised regime trader (a distinct 'source')."""
-    feat, fwd, _ = unsupervised.synth_regime_world(n=n, seed=seed)
-    pos, r, _ = unsupervised.dynamic_trade(feat, fwd, seed=seed)
-    pnl = np.clip(pos, -1.0, 1.0) * r
-    sharpe = float(pnl.mean() / (pnl.std() + 1e-12))
-    return pnl, sharpe
-
-
-def assemble(n_candidates=10, capacity=6, tau=0.5, seed0=1):
-    """Run the factory and return (book, weights, summary) — the assembled book + its weight vector."""
+def assemble(seeds_per_source=4, capacity=6, tau=0.5, cands=None):
+    """Run the factory and return (book, weights, summary). Candidates come from `discovery` — many
+    DIFFERENT finders (regime · pace · geodnet), so cross-source orthogonality is real, not cosmetic.
+    n_trials = the total candidate count (network-wide multiple-testing in the Deflated Sharpe court)."""
+    cands = cands if cands is not None else discovery.candidates(seeds_per_source=seeds_per_source)
     book = EdgeBook(capacity=capacity)
+    n_trials = len(cands)
+    streams = [(c, np.asarray(c["pnl"], float)) for c in cands]
+    sharpes = [float(p.mean() / (p.std() + 1e-12)) for _, p in streams]
+    sr_var = max(float(np.var(sharpes)), 1e-6)                  # empirical Sharpe dispersion across trials (proper DSR)
     log = []
-    for i in range(n_candidates):
-        pnl, sharpe = candidate(seed0 + i)
-        dsr = significance.deflated_sharpe(sharpe, n_trials=n_candidates, n_obs=len(pnl),
-                                           sr_variance=0.01)["deflated_sharpe"]
-        if dsr < 0.95:                                              # HONESTY GATE
-            log.append({"cand": i, "dsr": round(dsr, 3), "action": "fail-court"})
+    for c, pnl in streams:
+        sharpe = float(pnl.mean() / (pnl.std() + 1e-12))
+        dsr = significance.deflated_sharpe(sharpe, n_trials=n_trials, n_obs=len(pnl),
+                                           sr_variance=sr_var)["deflated_sharpe"]
+        if dsr < 0.95:                                              # HONESTY GATE (network-wide n_trials)
+            log.append({"id": c["id"], "source": c["source"], "dsr": round(dsr, 3), "action": "fail-court"})
             continue
-        e = make_edge("edge-%d" % i, "regime/seed-%d" % (seed0 + i), pnl, dsr, {"sharpe": round(sharpe, 4)})
+        e = make_edge(c["id"], c["source"], pnl, dsr, {"sharpe": round(sharpe, 4)})
         dec = orthogonality.admit(book, e, tau=tau)                 # ORTHOGONALITY (capacity-bounded)
-        log.append({"cand": i, "dsr": round(dsr, 3), "action": dec["action"],
-                    "novelty": dec["novelty"], "displaced": dec.get("displaced")})
+        log.append({"id": c["id"], "source": c["source"], "dsr": round(dsr, 3),
+                    "action": dec["action"], "novelty": dec["novelty"], "displaced": dec.get("displaced")})
 
     rev = monitor.review(book)                                      # DECAY / REDUNDANCY sweep
     retired = monitor.apply(book, rev)
-    w = allocator.weights(book, method="risk_parity")               # ALLOCATE -> weight vector
-    summary = {"book_size": len(book), "capacity": capacity, "candidates": n_candidates,
+    w = allocator.weights(book, method="risk_parity")               # ALLOCATE -> weight vector w_t
+    summary = {"book_size": len(book), "capacity": capacity, "candidates": n_trials,
+               "sources_admitted": sorted({book.get(i).source for i in book.ids()}),
                "edges": book.ids(), "weights": [round(float(x), 4) for x in w],
                "portfolio_sharpe": round(allocator.portfolio_sharpe(book, w), 4),
                "diversified_ir": round(allocator.diversified_ir(book), 4),
                "retired": list(retired), "log": log,
-               "caveat": "synthetic regime candidates (planted) — validates the portfolio machinery; "
-                         "live discovery edges replace candidate() unchanged"}
+               "caveat": "synthetic discovery candidates (planted) — validates the machinery; live finders "
+                         "(GEODNET / FrodoBots / market) feed discovery.SOURCES unchanged"}
     return book, w, summary
 
 
-def build_book(n_candidates=10, capacity=6, tau=0.5, seed0=1, write_local=True):
-    book, _, summary = assemble(n_candidates, capacity, tau, seed0)
+def build_book(seeds_per_source=4, capacity=6, tau=0.5, write_local=True):
+    book, _, summary = assemble(seeds_per_source, capacity, tau)
     if write_local:
         book.save(BOOK_PATH)
         summary["book"] = BOOK_PATH

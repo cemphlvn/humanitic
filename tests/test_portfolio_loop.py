@@ -3,10 +3,11 @@ from foundation.portfolio import loop
 
 
 def run():
-    out = loop.build_book(n_candidates=10, capacity=6, write_local=False)
+    out = loop.build_book(seeds_per_source=4, capacity=6, write_local=False)
 
-    # multiple orthogonal edges admitted (breadth), bounded by capacity
+    # multiple orthogonal edges admitted (breadth), bounded by capacity, from real finder sources
     assert 2 <= out["book_size"] <= 6
+    assert len(out["sources_admitted"]) >= 1
     assert len(out["weights"]) == out["book_size"]
     assert abs(sum(abs(x) for x in out["weights"]) - 1.0) < 1e-6        # risk-parity gross-normalized
     assert out["diversified_ir"] > 0 and out["portfolio_sharpe"] > 0
