@@ -23,6 +23,9 @@ def main():
         m = res[split]
         print(f"  {split:10s} n={m['n']:4d}  ret={m['total_return']:+.3f}  "
               f"sharpe={m['sharpe']:+.2f}  maxdd={m['max_dd']:+.3f}")
+    e = res["edge"]
+    print(f"  edge(oos) {e['oos']['held_bits']:.1f} bits  excess {e['oos']['excess_bits']:+.1f}"
+          f"  / cap {e['capacity_bits']:.0f}  retention {e['oos_bit_retention']:.2f}")
 
     print("== leakage guard (refutation) ==")
     clean = leakage_guard.detect_leak(mom, mkt["prices"], np.random.default_rng(3))

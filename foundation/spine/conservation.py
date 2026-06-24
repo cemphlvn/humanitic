@@ -77,3 +77,24 @@ def predictable(coupling):
     """KAM (peras b03): long-horizon prediction is possible only BELOW Greene's K_g (integrable
     torus). Above it lambda>0 and the horizon collapses — a regime shift into un-auditability."""
     return coupling < KAM_THRESHOLD
+
+
+def directional_edge(pred, actual, D=4096):
+    """Edge in BITS from directional calls. Each decision is a binary channel use:
+       held = n . (1 - H2(e)),  e = directional error rate.
+    The drift-null subtracts the majority-direction freebie (excess = held - null); a backtest can
+    NOT honestly hold more than capacity C(D) — the court caps the claim there."""
+    pred = np.sign(np.asarray(pred, float))
+    act = np.sign(np.asarray(actual, float))
+    mask = (pred != 0) & (act != 0)                  # only count real directional bets
+    pred, act = pred[mask], act[mask]
+    n = int(len(pred))
+    if n == 0:
+        return {"n": 0, "accuracy": 0.0, "held_bits": 0.0, "null_bits": 0.0,
+                "excess_bits": 0.0, "bits_per_decision": 0.0}
+    e = float(np.mean(pred != act))
+    held = n * (1.0 - float(binary_entropy(e)))
+    p_up = float(np.mean(act > 0))
+    null = n * (1.0 - float(binary_entropy(min(p_up, 1.0 - p_up))))   # best constant-drift predictor
+    return {"n": n, "accuracy": 1.0 - e, "held_bits": held, "null_bits": null,
+            "excess_bits": held - null, "bits_per_decision": held / n}

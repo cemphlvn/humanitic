@@ -12,6 +12,9 @@ def run():
     mom = baselines.momentum(k=20)
     res = walk_forward.walk_forward(mkt["prices"], mom, np.random.default_rng(1))
     assert res["oos"]["n"] > 0 and np.isfinite(res["oos"]["sharpe"])
+    # edge reported in bits, and never claimed past the capacity ceiling
+    assert "edge" in res and np.isfinite(res["edge"]["oos"]["held_bits"])
+    assert res["edge"]["claimed_oos_bits"] <= res["edge"]["capacity_bits"]
 
     assert leakage_guard.detect_leak(mom, mkt["prices"], np.random.default_rng(4))["leak"] is False
     assert leakage_guard.detect_leak(baselines.leaky_oracle(), mkt["prices"],

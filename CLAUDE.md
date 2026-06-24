@@ -28,6 +28,8 @@ Never read, write, stage, publish, or echo `.local`. Every outbound artifact rou
 - **Legibility contract.** Code reads as explanation: one function = one primitive; the margin
   names the memory choreography, the kernel, and the bottleneck.
 - **Trilingual bootstrap: Turkish first** (the bridge), then English, then Chinese (TR→EN→ZH).
+- **Edge in bits, capped by capacity.** Report a backtest's edge in *bits* against `C(D)=0.386·D`;
+  the court never claims edge past the wall (`capacity_exceeded` flags it). Honesty is the metric.
 - **Everything is tested.** Each increment builds, has an E2E gate, is one clean local commit.
 
 ## The layers (where things live)

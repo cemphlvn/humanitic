@@ -41,6 +41,16 @@ def run():
 
     # the three-domain map names every layer in all three domains
     assert all(len(row) == 4 for row in M.LAYERS)
+
+    # edge in BITS from directional calls; perfect calls hold ~n bits
+    de = C.directional_edge([1, 1, -1, -1, 1], [1, 1, -1, -1, 1], D=4096)
+    assert de["n"] == 5 and abs(de["accuracy"] - 1.0) < 1e-9 and de["held_bits"] > 4.99
+    # capacity refusal: a long accurate run on a small reservoir over-claims -> the court must cap
+    preds = np.ones(800)
+    acts = np.ones(800)
+    acts[:280] = -1.0                                  # 65% correct
+    assert C.directional_edge(preds, acts, D=64)["held_bits"] > C.capacity(64)
+
     print("test_spine: OK")
     return True
 
