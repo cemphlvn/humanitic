@@ -41,6 +41,7 @@ import test_screening
 import test_candidates
 import test_real_adapters
 import test_pace_of_place
+import test_search
 
 
 def main():
@@ -52,7 +53,7 @@ def main():
               test_data, test_agent_economy, test_harness, test_detection, test_security, test_secrets,
               test_machine, test_training, test_runtime, test_embodied, test_atoms, test_stream_eval,
               test_align_crypto, test_stats, test_screening, test_candidates, test_real_adapters,
-              test_pace_of_place]
+              test_pace_of_place, test_search]
     ok = 0
     for s in suites:
         try:
