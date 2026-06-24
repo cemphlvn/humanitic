@@ -26,6 +26,11 @@ capital — is exactly forward testing. Here the **LIVE gate stays shut**; nothi
 `.local/paper/` (private, 0600, gitignored). Each call is a fresh period, so the equity curve extends —
 a continuous forward test, not a one-off backtest.
 
+**The account trades the FIT-CHOSEN interval.** On the first run (or `./run.sh paper --refit`) the account
+runs the time-interval sweep, picks the best timeframe by Deflated Sharpe, and **persists it** (`interval`
+in the ledger). Every subsequent period resamples the strategy to that interval and steps the account at
+it — so the timeframe the fit selected is the timeframe that actually trades forward.
+
 ## Time-interval-infra-fit
 ```bash
 ./run.sh fit       # sweep bar intervals (1,2,4,8,16,32); per-interval Sharpe/return/drawdown + verdict

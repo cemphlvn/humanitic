@@ -38,14 +38,31 @@ def _save(acct):
         pass
 
 
-def run_paper(write_local=True):
+def choose_interval(seed=0):
+    """Run the time-interval-infra-fit and return its best timeframe (fallback to 1 if none is skilled)."""
+    res = run_fit(seed=seed)
+    best = res.get("best_fit")
+    return (best["interval"] if best else 1), res
+
+
+def run_paper(write_local=True, refit=False):
     acct = _load() if (write_local and os.path.exists(ACCOUNT)) else PaperAccount()
-    pos, r = _strategy(seed=acct.n_steps + 1)                # a fresh period each call -> advances forward
-    summ = acct.run(pos, r)
+    chosen = None
+    if acct.interval is None or refit:
+        acct.interval, fit = choose_interval(seed=0)          # pick the timeframe ONCE (or on --refit)
+        chosen = {"interval": acct.interval, "n_trials": fit["n_trials"],
+                  "best_dsr": (fit["best_fit"]["deflated_sharpe"] if fit["best_fit"] else None)}
+
+    pos, r = _strategy(seed=acct.n_steps + 1)                 # a fresh period each call -> advances forward
+    s, rk = interval_fit.resample(pos, r, acct.interval)      # TRADE AT THE FITTED INTERVAL
+    summ = acct.run(np.clip(s, -1.0, 1.0), rk)
+    if chosen:
+        summ["interval_chosen"] = chosen
     if write_local:
         _save(acct)
         summ["account"] = ACCOUNT
-    summ["caveat"] = "synthetic replay strategy (planted) — paper trading validates the LEDGER; a live feed replaces it"
+    summ["caveat"] = "synthetic replay strategy (planted) — paper trading validates the LEDGER + the " \
+                     "interval wiring; a live feed replaces it"
     return summ
 
 

@@ -29,6 +29,7 @@ def main(argv=None):
     sub.add_parser("contain", help="show containment status (interface, egress allowlist, confinement)")
     pp = sub.add_parser("paper", help="paper trading (simulated money) — advance the persistent .local account")
     pp.add_argument("--no-local", action="store_true", help="do not write .local")
+    pp.add_argument("--refit", action="store_true", help="re-choose the trading interval via the fit")
     fp = sub.add_parser("fit", help="time-interval-infra-fit: sweep intervals, judged by the Deflated Sharpe")
     fp.add_argument("--bars", type=int, default=8000, help="history length (bars)")
     args = p.parse_args(argv)
@@ -64,7 +65,7 @@ def main(argv=None):
         return 0
     if args.cmd == "paper":
         from foundation.runtime import paper
-        print(json.dumps(paper.run_paper(write_local=not args.no_local), indent=2))
+        print(json.dumps(paper.run_paper(write_local=not args.no_local, refit=args.refit), indent=2))
         return 0
     if args.cmd == "fit":
         from foundation.runtime import paper
