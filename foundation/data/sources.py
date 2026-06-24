@@ -17,7 +17,10 @@ CATALOG = [
     Source("fred",              "market", "fred.stlouisfed.org",    "public-domain", "parquet", "croissant", "research"),
     Source("open-x-embodiment", "robot",  "robotics-transformer-x", "open",          "rlds",    "croissant", "research"),
     Source("robotwin",          "robot",  "RoboTwin-Platform",      "open",          "rlds",    "croissant", "research"),
-    Source("droid",             "robot",  "droid-dataset",          "open",          "rlds",    "croissant", "research"),
+    Source("droid",             "robot",  "droid-dataset",          "open",          "rlds",    "croissant",  "research"),
+    Source("coingecko",         "crypto", "coingecko.com",          "open",          "ohlc",    "croissant",  "research"),
+    Source("defillama",         "crypto", "defillama.com",          "open",          "parquet", "croissant",  "research"),
+    Source("base-rpc",          "crypto", "base.org",               "open",          "onchain", "openlineage", "research"),
 ]
 
 
