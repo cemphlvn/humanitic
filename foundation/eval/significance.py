@@ -17,6 +17,8 @@ import math
 
 import numpy as np
 
+from foundation.eval import winrate
+
 
 def _norm_cdf(x):
     return 0.5 * (1.0 + math.erf(x / math.sqrt(2.0)))
@@ -131,5 +133,5 @@ def court(signal, fwd_returns, alpha=0.05, seed=0):
     return {"log_growth": round(cg["log_growth"], 5), "sharpe": round(cg["sharpe"], 4),
             "newey_west_t": round(t, 3), "block_bootstrap_p": round(bp, 4),
             "block_bootstrap_ci": [round(c, 4) for c in ci], "permutation_p": round(pp, 4),
-            "n": cg["n"], "alpha": alpha,
+            "n": cg["n"], "alpha": alpha, "win": winrate.hit_rate_significance(cg["pnl"]),
             "verdict": "MEANINGFUL" if meaningful else "NOT MEANINGFUL"}

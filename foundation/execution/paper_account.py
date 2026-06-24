@@ -8,6 +8,8 @@ the SAME account — a continuous forward test, not a one-off backtest.
 """
 import numpy as np
 
+from foundation.eval import winrate
+
 
 class PaperAccount:
     def __init__(self, equity0=100_000.0, interval=None):
@@ -46,7 +48,8 @@ class PaperAccount:
                 "equity0": round(self.equity0, 2), "equity": round(self.equity, 2),
                 "total_return": round(self.equity / self.equity0 - 1.0, 4),
                 "sharpe": round(sharpe, 4), "max_drawdown": round(self.max_drawdown, 4),
-                "n_steps": self.n_steps}
+                "n_steps": self.n_steps,
+                "win": winrate.hit_rate_significance(np.diff(c))}
 
     def to_dict(self):
         return {"equity0": self.equity0, "equity": self.equity, "curve": self.curve,
