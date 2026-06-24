@@ -29,7 +29,8 @@ def main(argv=None):
     sub.add_parser("contain", help="show containment status (interface, egress allowlist, confinement)")
     pp = sub.add_parser("paper", help="paper trading (simulated money) — advance the persistent .local account")
     pp.add_argument("--no-local", action="store_true", help="do not write .local")
-    sub.add_parser("fit", help="time-interval-infra-fit: sweep intervals, judged by the Deflated Sharpe")
+    fp = sub.add_parser("fit", help="time-interval-infra-fit: sweep intervals, judged by the Deflated Sharpe")
+    fp.add_argument("--bars", type=int, default=8000, help="history length (bars)")
     args = p.parse_args(argv)
 
     cfg = MachineConfig.load()
@@ -67,7 +68,7 @@ def main(argv=None):
         return 0
     if args.cmd == "fit":
         from foundation.runtime import paper
-        print(json.dumps(paper.run_fit(), indent=2))
+        print(json.dumps(paper.run_fit(n=args.bars), indent=2))
         return 0
     g = MemoryGuard(cfg.get("resources", "max_ram_mb", default=2048))
     print(json.dumps({"engine": cfg.engine, "broker": cfg.broker, "risk": cfg.risk,

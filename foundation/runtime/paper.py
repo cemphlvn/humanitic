@@ -49,7 +49,13 @@ def run_paper(write_local=True):
     return summ
 
 
-def run_fit(seed=0):
-    feat, fwd, _ = unsupervised.synth_regime_world(n=2000, seed=seed)
-    pos, r, _ = unsupervised.dynamic_trade(feat, fwd, seed=seed)
-    return interval_fit.fit(pos, r, intervals=(1, 2, 4, 8, 16, 32))
+FIT_INTERVALS = (1, 2, 3, 4, 6, 8, 12, 16, 24, 32, 48, 64, 96, 128, 192, 256)
+
+
+def run_fit(seed=0, n=8000, intervals=FIT_INTERVALS, lookback=2000):
+    """Time-interval-infra-fit across MANY intervals over a LONG history. Rolling-lookback regimes keep
+    it O(n) and memory-safe; the Deflated Sharpe's n_trials = #feasible intervals (more intervals = a
+    stronger multiple-testing haircut)."""
+    feat, fwd, _ = unsupervised.synth_regime_world(n=n, seed=seed)
+    pos, r, _ = unsupervised.dynamic_trade(feat, fwd, seed=seed, lookback=lookback)
+    return interval_fit.fit(pos, r, intervals=intervals)

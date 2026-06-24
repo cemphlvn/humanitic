@@ -48,10 +48,11 @@ def synth_regime_world(n=1000, k=3, edges=(0.003, -0.002, 0.0), persist=0.85, no
     return feat, fwd, reg
 
 
-def dynamic_trade(features, fwd, k=3, warmup=150, refit_every=25, seed=0):
+def dynamic_trade(features, fwd, k=3, warmup=150, refit_every=25, seed=0, lookback=None):
     """Walk-forward unsupervised 1-step-ahead trading: discover regimes on the PAST, learn each regime's
     mean NEXT return (regime(X[i]) -> r[i+1]), assign the current state, take the position, earn r[t+1].
-    Causal by construction. Returns (positions, the next returns they earned) + the mined atoms."""
+    Causal by construction. `lookback` bounds the refit window (rolling regimes — keeps long histories
+    O(n) and memory-safe; None = expanding/all-past). Returns (positions, next returns) + the mined atoms."""
     X = np.asarray(features, float)
     r = np.asarray(fwd, float)
     n = len(r)
@@ -61,8 +62,11 @@ def dynamic_trade(features, fwd, k=3, warmup=150, refit_every=25, seed=0):
     last = -10 ** 9
     for t in range(warmup, n - 1):
         if c is None or (t - last) >= refit_every:
-            lab, c = kmeans(X[:t], k, seed=seed)               # discover regimes on the PAST only
-            rmean = np.array([r[1:t][lab[:t - 1] == j].mean() if np.any(lab[:t - 1] == j) else 0.0
+            w0 = max(0, t - lookback) if lookback else 0       # rolling window (bounded) or all-past
+            lab, c = kmeans(X[w0:t], k, seed=seed)             # discover regimes on the PAST only
+            rloc = r[w0 + 1:t]                                 # r[i+1] for i in w0..t-2
+            labp = lab[:len(rloc)]
+            rmean = np.array([rloc[labp == j].mean() if np.any(labp == j) else 0.0
                               for j in range(len(c))])          # atom: regime(X[i]) -> next return r[i+1]
             last = t
         j = int(((X[t] - c) ** 2).sum(1).argmin())
