@@ -1,0 +1,7 @@
+# Article 0 — the eternity clause: the raw prompt and the private library never leave.
+.local/
+node_modules/
+*.log
+
+# The commons/ directory is intentionally NOT ignored — only de-identified,
+# opt-in shares live there, and they are meant to be shared.

@@ -1,0 +1,58 @@
+# Humanitic Macro-Prompt Lab Vector
+# A local-first lens that distills macro-prompts into reusable nano-snippets.
+# This vector evolves as the node develops.
+
+id: humanitic-macro-prompt-lab
+type: instance              # a consumer/lens node (cf. macro-kernel = substrate)
+owner: ecosystem           # forever open; rewarded by contribution degree
+created: 2026-06-27
+version: 0.1.0
+aka: lens
+
+dimensions:
+  epistemic_humility: 0.95       # a rejected snippet is a result, not a defeat
+  recursive_depth: 0.85          # the loop refines the assumptions that gate the loop
+  integration_breadth: 0.80      # linguistics ⟷ HD/VSA (FHRR) ⟷ ontology ⟷ ethics
+  practical_application: 0.90    # one Mac app, one input box, real prompts distilled offline
+  contribution_orientation: 1.0  # opt-in commons; HUMANITIK attribution on every share
+
+curiosity:
+  primary: "Which prompt structures reliably improve human–AI collaboration — and why"
+  secondary:
+    - "What is the smallest linguistic unit that still carries intent, style, and alignment"
+    - "When does a new snippet earn a place in the ontology vs. collapse into a known one"
+    - "How a private library can feed a public commons without ever leaking the private prompt"
+
+role:
+  emerges_from: curiosity
+  current: "The lens: intake -> gate -> distill -> position -> evaluate -> keep/share, looping"
+  activates_when:
+    - a macro-prompt is pasted into the one input place
+    - an assumption pack or research-goal profile is edited
+    - a de-identified snippet is offered to the commons
+
+capabilities:
+  - assumption_gate          # private + public assumptions admit or reject, with a reason
+  - local_distillation       # MLX LLM / local SLM, offline by construction
+  - fhrr_kernel              # MLX custom kernels + FHRR bind/bundle over snippet vectors
+  - ontology_positioning     # snippet -> concept -> intent -> effect -> risk; novel/redundant/contradictory
+  - goal_evaluation          # customizable research-goal profile scores each snippet
+  - private_library          # local, searchable, reusable; user-owned memory
+  - share_composer           # anonymize + abstract; opt-in only; never the raw prompt
+
+invariants:                  # Article 0 — the eternity clause (non-amendable, non-proposable)
+  - the raw pasted prompt is .local and unpublishable
+  - only de-identified, abstracted snippets may leave, and only through the share guard
+  - the removal of the unpublishability clause cannot even be proposed
+
+node_graph:
+  participates_as: lens
+  consumes: [macro-kernel]   # FHRR/ontology lineage; honest-substrate practices
+  open_to: [individual, for-profit, non-profit]
+
+license: Humanitic Open License v1.0
+
+growth_log:
+  - date: 2026-06-27
+    event: initialization
+    insight: "Distillation is gated by assumptions; a rejection is logged as a result, not discarded."
