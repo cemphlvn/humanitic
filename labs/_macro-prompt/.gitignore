@@ -2,6 +2,9 @@
 .local/
 node_modules/
 *.log
+.DS_Store
+.build/
+DerivedData/
 
 # The commons/ directory is intentionally NOT ignored — only de-identified,
 # opt-in shares live there, and they are meant to be shared.

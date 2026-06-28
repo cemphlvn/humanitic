@@ -14,8 +14,10 @@
 | [LOOP.md](./LOOP.md) | The running loop (OBSERVE → … → COMMIT), gates, runner |
 | [PLAN.md](./PLAN.md) | The plan + status — what earns a module (semantic-limit test) |
 | [APP_ARCHITECTURE.md](./APP_ARCHITECTURE.md) | App-side architecture: MVP loop, module boundaries, Mac UI shape, build phases |
+| [ARCHITECTURE_LIMIT_TESTS.md](./ARCHITECTURE_LIMIT_TESTS.md) | Limit tests across code architecture, repo architecture, and designer thinking |
 | [AGENTS.md](./AGENTS.md) | Node guide for agents/contributors (invariants + commands) |
 | [README.md](./README.md) | Quickstart |
+| [app/mac/](./app/mac) | Native SwiftUI macOS shell around the local loop |
 | [src/](./src) | The app — see the layer map below |
 | [commons/](./commons) | Opt-in, de-identified shares (the only thing that leaves) |
 
@@ -25,13 +27,20 @@
 src/
   cli.ts                      one input place: learn · experiment · contribute · library · assumptions · goal
   core/        types · util · patterns · intake · remembrance · loop   (the orchestrator + plain helpers)
-  adapters/inference/         index · heuristic · claude               (ENGINE seam — swappable)
+  adapters/inference/         index · heuristic · mlx · claude         (ENGINE seam — swappable)
   snippets/    index · concept · intent                                (KIND seam — pluggable)
   assumptions/ index                                                   (the gate — explicit, auditable)
   ontology/    vector · graph                                          (kernel: VSA/FHRR floor + positioning)
   evaluator/   index                                                   (research-goal scoring)
   library/     index                                                   (private, local-first store)
   share/       index                                                   (anonymize + guard + commons)
+
+app/mac/
+  Package.swift                Swift Package entry for the native macOS shell
+  Sources/MacroPromptLabApp/
+    AppCoreBridge/             Process bridge to src/cli.ts --json
+    Features/                  Workspace, snippets, ontology, rejections, contribution
+    DesignSystem/              small native visual primitives
 ```
 
 ---
@@ -55,6 +64,8 @@ node src/cli.ts experiment "<...>"        # dry-run
 node src/cli.ts contribute <snippet-id>   # opt-in share to the commons
 ```
 Claude engine (opt-in): `ANTHROPIC_API_KEY=… node src/cli.ts learn "…" --engine claude`
+
+Native shell: `cd app/mac && swift run MacroPromptLab`
 
 ---
 

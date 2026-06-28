@@ -36,6 +36,14 @@ export class Library {
     return this.items.some((s) => s.id === id);
   }
 
+  remove(id: string): boolean {
+    const before = this.items.length;
+    this.items = this.items.filter((s) => s.id !== id);
+    if (this.items.length === before) return false;
+    this.persist();
+    return true;
+  }
+
   // Upsert by id (re-distilling the same gloss updates placement/score).
   save(s: StoredSnippet): void {
     const i = this.items.findIndex((x) => x.id === s.id);

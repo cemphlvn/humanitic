@@ -14,6 +14,7 @@ import { Library } from "./library/index.ts";
 import { Ontology } from "./ontology/graph.ts";
 import { adapterFor } from "./snippets/index.ts";
 import { compose, guard, publish } from "./share/index.ts";
+import { discoverLocalModels, mlxRuntimeStatus } from "./models/local.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "..");
 const DATA_DIR = process.env.MPL_DATA_DIR || join(ROOT, ".local");
@@ -60,7 +61,7 @@ Usage:
   mpl learn "<paste a macro-prompt>"      (or --file prompt.txt, or pipe via stdin)
   mpl experiment "<...>"                   dry-run — distill without saving
   mpl contribute <snippet-id>              opt-in: anonymize + abstract into the commons (--all for every snippet)
-  mpl library | assumptions | goal         inspect the private state
+  mpl library | assumptions | goal | models inspect the private/local state
 
 Commands:
   learn        Run the loop and commit kept snippets to the private library.
@@ -70,9 +71,10 @@ Commands:
   library      List the private library.
   assumptions  List the active gate assumptions (the gate is auditable).
   goal         Show the research-goal profile.
+  models       Scan common local model stores (MLX/Hugging Face, Ollama, LM Studio).
 
 Options:
-  --engine heuristic|claude   Default: heuristic (offline). Claude is opt-in, falls back offline.
+  --engine heuristic|mlx|claude   Default: heuristic. MLX and Claude are opt-in and fall back offline.
   --share                     Mark newly kept snippets as opt-in for later contribution.
   --json                      Machine-readable output.
 
@@ -223,6 +225,28 @@ function showGoal(): void {
   process.stdout.write(`goal: ${g.id}\n  objective: ${g.objective}\n  keepThreshold: ${g.keepThreshold}\n  keywords: ${g.keywords.join(", ")}\n`);
 }
 
+function showModels(args: Args): void {
+  const models = discoverLocalModels();
+  const mlxRuntime = mlxRuntimeStatus();
+  if (args.json) {
+    process.stdout.write(`${JSON.stringify({ mlxRuntime, models }, null, 2)}\n`);
+    return;
+  }
+  process.stdout.write(
+    `MLX runtime: ${mlxRuntime.usable ? "usable" : mlxRuntime.commandFound ? "found but not usable" : "not found"}\n`,
+  );
+  if (mlxRuntime.command) process.stdout.write(`  command: ${mlxRuntime.command}\n`);
+  if (mlxRuntime.error) process.stdout.write(`  note: ${mlxRuntime.error}\n`);
+  if (!models.length) {
+    process.stdout.write("No local models found in Hugging Face, Ollama, or LM Studio default stores.\n");
+    return;
+  }
+  process.stdout.write(`${models.length} local model candidate(s):\n`);
+  for (const m of models) {
+    process.stdout.write(`  [${m.provider}] ${m.name}\n      ${m.path}\n      ${m.note}\n`);
+  }
+}
+
 async function main(): Promise<void> {
   const args = parseArgs(process.argv.slice(2));
   if (args.help) return void process.stdout.write(usage());
@@ -240,6 +264,8 @@ async function main(): Promise<void> {
       return showAssumptions();
     case "goal":
       return showGoal();
+    case "models":
+      return showModels(args);
     case "help":
     default:
       return void process.stdout.write(usage());

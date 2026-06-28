@@ -3,14 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "type": "module",
-  "description": "Local-first lens that distills macro-prompts into reusable nano-snippets (concept + intent), gated by assumptions, positioned in an ontology graph.",
+  "description": "Local-first app that distills text into reusable nano-snippets (concept + intent) and a lab to build your own macro-prompts, with filtering you control.",
   "engines": { "node": ">=23" },
   "bin": { "mpl": "src/cli.ts" },
   "scripts": {
+    "start": "node src/service.ts",
+    "app": "node src/service.ts",
     "mpl": "node src/cli.ts",
-    "learn": "node src/cli.ts learn",
-    "experiment": "node src/cli.ts experiment",
-    "contribute": "node src/cli.ts contribute",
     "demo": "node src/cli.ts demo",
     "typecheck": "tsc --noEmit"
   },

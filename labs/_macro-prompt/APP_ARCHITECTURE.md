@@ -12,7 +12,7 @@ flowchart TD
     B --> C{Assumption gate<br/>public + private + goal}
     C -->|reject| R[Rejection result<br/>named failed assumption]
     C -->|pass| D[Snippet distillation<br/>concept + intent adapters]
-    D --> E[Inference adapter<br/>heuristic now, Claude/Agents SDK, MLX later]
+    D --> E[Inference adapter<br/>heuristic default, MLX local, Claude optional]
     D --> F[Kernel layer<br/>FHRR/VSA vector floor<br/>MLX custom kernels later]
     F --> G[Ontology positioning<br/>novel/similar/contradictory/redundant/valuable]
     G --> H[Research goal evaluator]
@@ -82,8 +82,8 @@ If the answer is no, keep it inside the current module.
 ## Next Build Phases
 
 1. CLI MVP: keep the TypeScript loop runnable and inspectable.
-2. Mac UI shell: one editor, highlight annotations, snippet panes, local library.
-3. MLX adapter: local SLM inference behind the existing `InferenceAdapter` contract.
+2. Mac UI shell: one editor, highlight annotations, snippet panes, local library. Initial SwiftUI shell exists in `app/mac/`.
+3. MLX adapter: local SLM inference behind the existing `InferenceAdapter` contract. Initial `mlx-lm` CLI adapter exists as `src/adapters/inference/mlx.ts`.
 4. Kernel upgrade: replace the readable vector floor with MLX-backed FHRR operations.
 5. Ontology expansion: persist nodes and edges beyond snippet vectors: concept, intent, effect, risk, evidence, contradiction.
 6. App Studio phase: expose assumption packs, goal profiles, and snippet adapters as user-configurable building blocks.

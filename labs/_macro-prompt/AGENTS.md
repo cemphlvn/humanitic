@@ -29,7 +29,7 @@ Add a module only when it has a different reason to change. The app currently ha
 - `core`: intake, types, remembrance, shared utilities.
 - `assumptions`: public/private admission gate and research goal profile.
 - `snippets`: concept and intent snippet adapters.
-- `adapters/inference`: heuristic now, Claude/Agents SDK/MLX later.
+- `adapters/inference`: heuristic default, MLX local through `mlx-lm`, Claude optional.
 - `ontology`: FHRR/VSA vector floor and graph positioning.
 - `evaluator`: research-goal scoring.
 - `library`: private local snippet persistence.
@@ -45,4 +45,4 @@ The Mac app should open directly into the working lab:
 - ontology placement and rejected results,
 - `/learn`, `/experiment`, `/contribute` actions.
 
-Keep the first implementation boring and inspectable. MLX LLM, custom kernels, and richer ontology edges should fit behind the existing adapter contracts.
+Keep the first implementation boring and inspectable. MLX LLM, custom kernels, and richer ontology edges should fit behind the existing adapter contracts. Use `MPL_MLX_MODEL=<model> --engine mlx` when exercising the local MLX path.
