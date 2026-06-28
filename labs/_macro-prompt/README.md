@@ -58,7 +58,7 @@ result is never mistaken for a model result.
 app/web/      ← the app (npm start serves this): index.html + app.js + lib/* + vendor/*
 src/          ← the engine + the local HTTP service (service.ts) the UI talks to
 src/filters/  src/macros/  src/core/review.ts   ← the new modules behind the loop
-app/mac/      ← an earlier native SwiftUI exploration (needs Xcode; not maintained)
+archive/mac/  ← earlier native SwiftUI exploration, archived (needs Xcode; not maintained)
 ```
 
 Net front-end dependency: **Preact + htm only**, vendored under `app/web/vendor/` (offline,
