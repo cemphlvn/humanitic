@@ -26,7 +26,7 @@ const SCHEMA = {
   },
 };
 
-function heuristicScore(snippet: Snippet, placement: Placement, goal: GoalProfile): GoalScore {
+export function heuristicScore(snippet: Snippet, placement: Placement, goal: GoalProfile): GoalScore {
   const base = RELATION_BASE[placement.relation];
   const hay = `${snippet.gloss} ${snippet.move ?? ""} ${snippet.source}`.toLowerCase();
   const hits = goal.keywords.filter((k) => hay.includes(k.toLowerCase())).length;

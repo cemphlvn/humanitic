@@ -43,7 +43,7 @@ export function defaultAssumptions(): Assumption[] {
       test: (t) => {
         const cue =
           /\b(because|so that|in order to|step|compare|contrast|must|should|avoid|if|when|unless|prefer|first|then|ensure|only|identify|distinguish|separate|consider|define|explain|treat|focus|before|after|instead|rather)\b/i;
-        const ok = cue.test(t) || contentWords(t).length >= 7;
+        const ok = cue.test(t) || contentWords(t).length >= 4;
         return ok ? null : "no reasoning signal to distill (filler)";
       },
     },

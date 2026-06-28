@@ -10,7 +10,7 @@ import type { Ontology } from "../ontology/graph.ts";
 import { intake } from "./intake.ts";
 import { gate } from "../assumptions/index.ts";
 import { distillFragment } from "../snippets/index.ts";
-import { evaluate } from "../evaluator/index.ts";
+import { heuristicScore } from "../evaluator/index.ts";
 import { nowISO, shortHash } from "./util.ts";
 
 export interface Candidate {
@@ -86,7 +86,7 @@ export async function extract(opts: ExtractOptions): Promise<ExtractResult> {
     for (const s of snippets) {
       const vector = opts.ontology.vectorFor(s);
       const placement = opts.ontology.position(s, vector);
-      const score = await evaluate(s, placement, opts.goal, opts.inference);
+      const score = heuristicScore(s, placement, opts.goal); // fast, model-free scoring
       candidates.push({
         id: s.id, kind: s.kind, gloss: s.gloss, move: s.move,
         sourceFragmentId: f.id, source: f.text, placement, score, engine: opts.inference.id,

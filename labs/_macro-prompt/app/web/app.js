@@ -69,7 +69,7 @@ function Editor({ text, onText, onRun, busy }) {
           </div>`}
       <div class="run-row">
         <${Button} kind="spot" onClick=${() => onRun(null)} disabled=${busy || !text.trim()}>${busy ? "Running…" : "Run ▷"}<//>
-        ${mode === "mark" && marks.length ? html`<${Button} kind="ghost" onClick=${() => onRun(spans())} disabled=${busy}>Run marked spans<//>` : null}
+        ${mode === "mark" && marks.length ? html`<${Button} kind="ghost" onClick=${() => onRun(spans(), true)} disabled=${busy} title="you marked these — extract them as-is">Run marked spans<//>` : null}
         <span class="kbd-hint">⌘K for commands</span>
       </div>
     </div>`;
@@ -114,7 +114,7 @@ function RejectionExplorer({ rejected, onOverride, onMakeRule }) {
         ${items.map((r) => html`<div class="rej-item">
           <div class="rej-frag">“${r.text.length > 90 ? r.text.slice(0, 90) + "…" : r.text}”</div>
           <div class="rej-acts">
-            <button class="act muted" onClick=${() => onOverride(r.text)}>override &amp; keep</button>
+            <button class="act muted" onClick=${() => onOverride(r.text)}>override & keep</button>
             <button class="act muted" onClick=${() => onMakeRule(r.text)}>make rule</button>
           </div>
         </div>`)}
@@ -205,10 +205,10 @@ function App() {
     window.addEventListener("keydown", h); return () => window.removeEventListener("keydown", h);
   }, []);
 
-  const run = async (spans) => {
+  const run = async (spans, bypass = false) => {
     setBusy(true);
     try {
-      const r = await api.extract(text, spans, engine, false);
+      const r = await api.extract(text, spans, engine, bypass);
       setCands(r.candidates); setApproved({}); setRejected(r.rejected); loadStatus();
       flash(`${r.candidates.length} candidate(s), ${r.rejected.length} set aside`);
     } catch (e) { flash("run failed: " + e.message); } finally { setBusy(false); }
@@ -281,7 +281,9 @@ function App() {
             ? cands.map((c) => html`<${SnippetCard} key=${c.id + c.kind} c=${c} approved=${!!approved[c.id]}
                 onKeep=${() => keep(c.id)} onReject=${() => reject(c.id)} onPatch=${(p) => patch(c.id, p)}
                 onSwitch=${() => switchKind(c.id)} onMap=${openMap} />`)
-            : html`<${EmptyState}>Run the editor to get reviewable concept &amp; intent snippets. Keep the good ones, then Learn.<//>`}
+            : rejected.length
+              ? html`<${EmptyState}>0 candidates — all ${rejected.length} fragment(s) were set aside (see “Set aside”). Loosen Filters, or use “override & keep”.<//>`
+              : html`<${EmptyState}>Run the editor to get reviewable concept & intent snippets. Keep the good ones, then Learn.<//>`}
         </section>
       </main>
 
