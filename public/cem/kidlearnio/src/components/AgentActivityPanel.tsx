@@ -253,6 +253,9 @@ export function AgentActivityPanel({
             >
               <span className="observation-icon">{getAgentIcon(observation.type)}</span>
               <span className="observation-name">{formatAgentName(observation.name)}</span>
+              {getMetadataNum(observation.metadata, 'attempt') > 0 && (
+                <span className="attempt-badge">Attempt {getMetadataNum(observation.metadata, 'attempt')}</span>
+              )}
               <span className="observation-type">{observation.type}</span>
               {observation.durationMs !== undefined && (
                 <span className="observation-duration">{observation.durationMs}ms</span>
@@ -279,7 +282,92 @@ export function AgentActivityPanel({
                     <pre className="io-content">{formatIO(observation.output)}</pre>
                   </div>
                 )}
-                {observation.metadata && Object.keys(observation.metadata).length > 0 && (
+                {/* Schema-specific rendering for Strategist */}
+                {observation.name === 'strategist' && observation.metadata && (
+                  <div className="io-section strategy-contract">
+                    <div className="io-label">
+                      <i className="fas fa-file-contract" /> Strategy Contract
+                    </div>
+                    <div className="contract-fields">
+                      {getMetadataStr(observation.metadata, 'hookPhrase') && (
+                        <div className="contract-field">
+                          <span className="field-label">🎵 Hook:</span>
+                          <span className="field-value hook-value">"{getMetadataStr(observation.metadata, 'hookPhrase')}"</span>
+                        </div>
+                      )}
+                      {getMetadataNum(observation.metadata, 'vocabularyCount') > 0 && (
+                        <div className="contract-field">
+                          <span className="field-label">📚 Vocabulary:</span>
+                          <span className="field-value">{getMetadataNum(observation.metadata, 'vocabularyCount')} anchors</span>
+                        </div>
+                      )}
+                      {getMetadataNum(observation.metadata, 'objectivesCount') > 0 && (
+                        <div className="contract-field">
+                          <span className="field-label">🎯 Objectives:</span>
+                          <span className="field-value">{getMetadataNum(observation.metadata, 'objectivesCount')} learning goals</span>
+                        </div>
+                      )}
+                      {'validationIssues' in observation.metadata && (
+                        <div className="contract-field">
+                          <span className="field-label">✓ Valid:</span>
+                          <span className={`field-value ${getMetadataNum(observation.metadata, 'validationIssues') === 0 ? 'valid' : 'invalid'}`}>
+                            {getMetadataNum(observation.metadata, 'validationIssues') === 0 ? 'Yes' : `${getMetadataNum(observation.metadata, 'validationIssues')} issues`}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Schema-specific rendering for Critic */}
+                {observation.name?.includes('critic') && observation.metadata && (
+                  <div className="io-section critic-verdict">
+                    <div className="io-label">
+                      <i className="fas fa-gavel" /> Critic Verdict
+                    </div>
+                    <div className="verdict-container">
+                      <div className={`verdict-badge ${getMetadataBool(observation.metadata, 'pass') ? 'pass' : 'fail'}`}>
+                        {getMetadataBool(observation.metadata, 'pass') ? '✓ PASS' : '✗ FAIL'}
+                      </div>
+                      {'score' in observation.metadata && (
+                        <div className="verdict-score">
+                          Score: {getMetadataNum(observation.metadata, 'score')}/100
+                        </div>
+                      )}
+                      {getMetadataNum(observation.metadata, 'errorCount') > 0 && (
+                        <div className="verdict-errors">
+                          {getMetadataNum(observation.metadata, 'errorCount')} error{getMetadataNum(observation.metadata, 'errorCount') > 1 ? 's' : ''}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Schema-specific rendering for Lyrics Agent attempts */}
+                {observation.name?.includes('lyrics-agent-attempt') && observation.metadata && (
+                  <div className="io-section lyrics-stats">
+                    <div className="io-label">
+                      <i className="fas fa-music" /> Lyrics Structure
+                    </div>
+                    <div className="lyrics-stats-grid">
+                      {getMetadataNum(observation.metadata, 'sectionCount') > 0 && (
+                        <span className="stat-pill">📑 {getMetadataNum(observation.metadata, 'sectionCount')} sections</span>
+                      )}
+                      {getMetadataNum(observation.metadata, 'duration') > 0 && (
+                        <span className="stat-pill">⏱️ {getMetadataNum(observation.metadata, 'duration')}s</span>
+                      )}
+                      {getMetadataNum(observation.metadata, 'hookCount') > 0 && (
+                        <span className="stat-pill">🔁 {getMetadataNum(observation.metadata, 'hookCount')} hook reps</span>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Generic metadata pills for other observations */}
+                {observation.metadata && Object.keys(observation.metadata).length > 0 &&
+                 !observation.name?.includes('strategist') &&
+                 !observation.name?.includes('critic') &&
+                 !observation.name?.includes('lyrics-agent-attempt') && (
                   <div className="io-section metadata">
                     <div className="io-label">
                       <i className="fas fa-tags" /> Metadata
@@ -514,9 +602,135 @@ export function AgentActivityPanel({
           color: var(--spark-primary-dark);
           border-radius: 10px;
         }
+
+        /* Attempt badge */
+        .attempt-badge {
+          font-size: 0.65rem;
+          padding: 2px 6px;
+          background: var(--wonder-accent);
+          color: white;
+          border-radius: 4px;
+          font-weight: 600;
+        }
+
+        /* Strategy Contract styles */
+        .contract-fields {
+          display: flex;
+          flex-direction: column;
+          gap: var(--space-2);
+          background: linear-gradient(135deg, var(--spark-primary-light), var(--knowledge-surface));
+          padding: var(--space-3);
+          border-radius: 8px;
+          border-left: 3px solid var(--spark-primary);
+        }
+
+        .contract-field {
+          display: flex;
+          align-items: center;
+          gap: var(--space-2);
+          font-size: 0.8rem;
+        }
+
+        .field-label {
+          color: var(--knowledge-medium);
+          min-width: 90px;
+        }
+
+        .field-value {
+          font-weight: 500;
+          color: var(--knowledge-dark);
+        }
+
+        .field-value.hook-value {
+          color: var(--spark-primary-dark);
+          font-style: italic;
+        }
+
+        .field-value.valid {
+          color: var(--growth-secondary-dark);
+        }
+
+        .field-value.invalid {
+          color: #dc3545;
+        }
+
+        /* Critic Verdict styles */
+        .verdict-container {
+          display: flex;
+          align-items: center;
+          gap: var(--space-3);
+          padding: var(--space-2);
+          background: var(--knowledge-surface);
+          border-radius: 8px;
+        }
+
+        .verdict-badge {
+          padding: 4px 12px;
+          border-radius: 6px;
+          font-weight: 700;
+          font-size: 0.8rem;
+          text-transform: uppercase;
+        }
+
+        .verdict-badge.pass {
+          background: linear-gradient(135deg, #28a745, #20c997);
+          color: white;
+        }
+
+        .verdict-badge.fail {
+          background: linear-gradient(135deg, #dc3545, #e83e8c);
+          color: white;
+        }
+
+        .verdict-score {
+          font-family: monospace;
+          font-size: 0.8rem;
+          color: var(--knowledge-medium);
+        }
+
+        .verdict-errors {
+          font-size: 0.75rem;
+          color: #dc3545;
+          font-weight: 500;
+        }
+
+        /* Lyrics Stats styles */
+        .lyrics-stats-grid {
+          display: flex;
+          flex-wrap: wrap;
+          gap: var(--space-2);
+        }
+
+        .stat-pill {
+          font-size: 0.75rem;
+          padding: 4px 10px;
+          background: var(--wonder-light);
+          color: var(--wonder-dark);
+          border-radius: 12px;
+          font-weight: 500;
+        }
       `}</style>
     </div>
   );
+}
+
+// Helper functions for safe metadata access
+function getMetadataStr(metadata: Record<string, unknown> | undefined, key: string): string {
+  if (!metadata || !(key in metadata)) return '';
+  const value = metadata[key];
+  return typeof value === 'string' ? value : String(value ?? '');
+}
+
+function getMetadataNum(metadata: Record<string, unknown> | undefined, key: string): number {
+  if (!metadata || !(key in metadata)) return 0;
+  const value = metadata[key];
+  return typeof value === 'number' ? value : 0;
+}
+
+function getMetadataBool(metadata: Record<string, unknown> | undefined, key: string): boolean | undefined {
+  if (!metadata || !(key in metadata)) return undefined;
+  const value = metadata[key];
+  return typeof value === 'boolean' ? value : undefined;
 }
 
 // Helper functions

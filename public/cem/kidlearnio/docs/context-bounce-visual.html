@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>KidLearnio v2 - Context Bounce</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', -apple-system, sans-serif;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+      min-height: 100vh;
+      padding: 40px;
+      color: #e0e0e0;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 40px;
+      font-size: 2rem;
+      background: linear-gradient(90deg, #6c63ff, #00d9ff);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .subtitle {
+      text-align: center;
+      color: #888;
+      margin-top: -30px;
+      margin-bottom: 40px;
+      font-size: 0.9rem;
+    }
+
+    .pipeline {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    /* Stage containers */
+    .stage {
+      background: rgba(255,255,255,0.05);
+      border-radius: 16px;
+      padding: 24px;
+      border: 1px solid rgba(255,255,255,0.1);
+    }
+    .stage-label {
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: #6c63ff;
+      margin-bottom: 16px;
+    }
+
+    /* Agent boxes */
+    .agent {
+      background: linear-gradient(135deg, #2a2a4a, #1e1e3a);
+      border-radius: 12px;
+      padding: 20px;
+      border: 2px solid #3a3a5a;
+      position: relative;
+    }
+    .agent.strategist {
+      border-color: #ffd700;
+      box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+    }
+    .agent.critic {
+      border-color: #ff6b6b;
+    }
+    .agent.lyrics {
+      border-color: #4ecdc4;
+    }
+    .agent-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .agent-type {
+      font-size: 0.65rem;
+      padding: 2px 8px;
+      background: rgba(108, 99, 255, 0.3);
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+
+    /* Contract visualization */
+    .contract {
+      background: rgba(255, 215, 0, 0.1);
+      border: 1px dashed #ffd700;
+      border-radius: 8px;
+      padding: 16px;
+      margin-top: 12px;
+    }
+    .contract-title {
+      font-size: 0.75rem;
+      color: #ffd700;
+      margin-bottom: 10px;
+      font-weight: 600;
+    }
+    .contract-fields {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 8px;
+    }
+    .field {
+      font-size: 0.8rem;
+      padding: 6px 10px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .field-key { color: #888; }
+    .field-value { color: #4ecdc4; font-family: monospace; }
+
+    /* Parallel container */
+    .parallel-container {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+    }
+    .parallel-agent {
+      background: linear-gradient(135deg, #2a3a4a, #1e2e3a);
+      border-radius: 10px;
+      padding: 16px;
+      border: 1px solid #3a4a5a;
+      text-align: center;
+    }
+    .parallel-agent-name {
+      font-weight: 600;
+      font-size: 0.9rem;
+      margin-bottom: 8px;
+    }
+    .parallel-output {
+      font-size: 0.75rem;
+      color: #888;
+      background: rgba(0,0,0,0.3);
+      padding: 8px;
+      border-radius: 6px;
+      margin-top: 8px;
+    }
+
+    /* Arrows and flow */
+    .flow-arrow {
+      display: flex;
+      justify-content: center;
+      padding: 10px 0;
+    }
+    .arrow {
+      width: 40px;
+      height: 40px;
+      position: relative;
+    }
+    .arrow::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 0;
+      width: 2px;
+      height: 30px;
+      background: linear-gradient(to bottom, #6c63ff, #00d9ff);
+      transform: translateX(-50%);
+    }
+    .arrow::after {
+      content: '';
+      position: absolute;
+      left: 50%;
+      bottom: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 10px solid #00d9ff;
+      transform: translateX(-50%);
+    }
+
+    /* Data flow labels */
+    .data-flow {
+      position: absolute;
+      right: -120px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(108, 99, 255, 0.2);
+      border: 1px solid #6c63ff;
+      border-radius: 6px;
+      padding: 8px 12px;
+      font-size: 0.7rem;
+      white-space: nowrap;
+    }
+
+    /* Retry loop */
+    .retry-loop {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+    }
+    .retry-arrow {
+      flex: 0 0 60px;
+      height: 80px;
+      position: relative;
+    }
+    .retry-arrow::before {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 0;
+      width: 60px;
+      height: 2px;
+      background: #ff6b6b;
+    }
+    .retry-arrow::after {
+      content: 'retry with feedback';
+      position: absolute;
+      right: 0;
+      top: 10px;
+      font-size: 0.65rem;
+      color: #ff6b6b;
+    }
+    .retry-label {
+      position: absolute;
+      left: -10px;
+      top: 30px;
+      font-size: 0.65rem;
+      color: #ff6b6b;
+      writing-mode: vertical-rl;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 30px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+    }
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 4px;
+    }
+    .legend-color.strategy { background: #ffd700; }
+    .legend-color.parallel { background: #6c63ff; }
+    .legend-color.lyrics { background: #4ecdc4; }
+    .legend-color.critic { background: #ff6b6b; }
+
+    /* Context bounce visualization */
+    .bounce-visual {
+      margin-top: 50px;
+      padding: 30px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 16px;
+    }
+    .bounce-title {
+      text-align: center;
+      margin-bottom: 30px;
+      font-size: 1.2rem;
+      color: #00d9ff;
+    }
+    .bounce-diagram {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px 0;
+    }
+    .bounce-node {
+      flex: 0 0 auto;
+      background: linear-gradient(135deg, #2a2a4a, #1e1e3a);
+      border-radius: 50%;
+      width: 100px;
+      height: 100px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid #3a3a5a;
+      position: relative;
+    }
+    .bounce-node.active {
+      border-color: #00d9ff;
+      box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+    }
+    .bounce-node-icon { font-size: 1.5rem; margin-bottom: 4px; }
+    .bounce-node-label { font-size: 0.7rem; text-align: center; }
+    .bounce-connector {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, #6c63ff, #00d9ff);
+      position: relative;
+      min-width: 40px;
+    }
+    .bounce-connector::after {
+      content: '';
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+      border-left: 8px solid #00d9ff;
+      border-top: 5px solid transparent;
+      border-bottom: 5px solid transparent;
+    }
+    .bounce-data {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.6rem;
+      background: rgba(108, 99, 255, 0.3);
+      padding: 2px 8px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* Key insight box */
+    .insight-box {
+      margin-top: 40px;
+      background: linear-gradient(135deg, rgba(108, 99, 255, 0.2), rgba(0, 217, 255, 0.1));
+      border: 1px solid #6c63ff;
+      border-radius: 12px;
+      padding: 24px;
+    }
+    .insight-title {
+      font-size: 1rem;
+      margin-bottom: 16px;
+      color: #6c63ff;
+    }
+    .insight-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .insight-list li {
+      font-size: 0.85rem;
+      padding-left: 24px;
+      position: relative;
+    }
+    .insight-list li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: #00d9ff;
+    }
+  </style>
+</head>
+<body>
+  <h1>Context Bounce — V2 Pipeline</h1>
+  <p class="subtitle">How data flows between agents with structured contracts</p>
+
+  <div class="pipeline">
+    <!-- Stage 1: Strategist -->
+    <div class="stage">
+      <div class="stage-label">Stage 1 — Contract Creation</div>
+      <div class="agent strategist">
+        <div class="agent-name">
+          <span>🎯 Strategist</span>
+          <span class="agent-type">Planner</span>
+        </div>
+        <p style="font-size: 0.85rem; color: #aaa; margin-bottom: 12px;">
+          Creates the <strong>single source of truth</strong> that ALL downstream agents must respect.
+        </p>
+        <div class="contract">
+          <div class="contract-title">📜 GenerationStrategy Contract</div>
+          <div class="contract-fields">
+            <div class="field">
+              <span class="field-key">hookPhrase:</span>
+              <span class="field-value">"We rise again"</span>
+            </div>
+            <div class="field">
+              <span class="field-key">vocabularyAnchors:</span>
+              <span class="field-value">["photosynthesis", "chlorophyll", "sunlight"]</span>
+            </div>
+            <div class="field">
+              <span class="field-key">learningObjectives:</span>
+              <span class="field-value">["Understand how plants make food"]</span>
+            </div>
+            <div class="field">
+              <span class="field-key">maxDurationSeconds:</span>
+              <span class="field-value">75</span>
+            </div>
+            <div class="field">
+              <span class="field-key">emotionalArc:</span>
+              <span class="field-value">"curiosity_to_mastery"</span>
+            </div>
+            <div class="field">
+              <span class="field-key">targetHookRepetitions:</span>
+              <span class="field-value">4</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow"><div class="arrow"></div></div>
+
+    <!-- Stage 2: Parallel -->
+    <div class="stage">
+      <div class="stage-label">Stage 2 — Parallel Enrichment (all bound by strategy)</div>
+      <div class="parallel-container">
+        <div class="parallel-agent">
+          <div class="parallel-agent-name">📚 Context Gatherer</div>
+          <div class="parallel-output">
+            Uses <code>vocabularyAnchors</code><br>
+            Returns: EnrichedContext
+          </div>
+        </div>
+        <div class="parallel-agent">
+          <div class="parallel-agent-name">🧠 Logic Sticks</div>
+          <div class="parallel-output">
+            Deterministic rules<br>
+            Returns: StickResults
+          </div>
+        </div>
+        <div class="parallel-agent">
+          <div class="parallel-agent-name">✨ Curiosity Coord</div>
+          <div class="parallel-output">
+            Uses <code>learningObjectives</code><br>
+            Returns: CuriosityOutput
+          </div>
+        </div>
+        <div class="parallel-agent">
+          <div class="parallel-agent-name">🎵 Flow Expert</div>
+          <div class="parallel-output">
+            Uses <code>maxDuration</code><br>
+            Returns: FlowGuidance
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flow-arrow"><div class="arrow"></div></div>
+
+    <!-- Stage 3: Lyrics + Critic Loop -->
+    <div class="stage">
+      <div class="stage-label">Stage 3 — Generation + Reflection Loop</div>
+      <div class="retry-loop">
+        <div class="agent lyrics" style="flex: 2;">
+          <div class="agent-name">
+            <span>🎤 Lyrics Agent</span>
+            <span class="agent-type">Generator</span>
+          </div>
+          <p style="font-size: 0.85rem; color: #aaa;">
+            Receives ALL context from Stage 2 + Strategy contract.<br>
+            Must use exact <code>hookPhrase</code> from strategy.<br>
+            Must cover all <code>learningObjectives</code>.
+          </p>
+          <div class="contract" style="border-color: #4ecdc4; background: rgba(78, 205, 196, 0.1);">
+            <div class="contract-title" style="color: #4ecdc4;">📄 StructuredLyrics Output</div>
+            <div class="contract-fields">
+              <div class="field">
+                <span class="field-key">sections:</span>
+                <span class="field-value">[hook, verse, chorus, verse, outro]</span>
+              </div>
+              <div class="field">
+                <span class="field-key">hookRepetitionCount:</span>
+                <span class="field-value">4</span>
+              </div>
+              <div class="field">
+                <span class="field-key">estimatedDurationSeconds:</span>
+                <span class="field-value">72</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center;">
+          <div style="font-size: 1.5rem;">→</div>
+          <div style="font-size: 0.7rem; color: #888;">validate</div>
+        </div>
+
+        <div class="agent critic" style="flex: 1;">
+          <div class="agent-name">
+            <span>⚖️ Critic</span>
+            <span class="agent-type">Evaluator</span>
+          </div>
+          <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 10px;">
+            Checks lyrics against strategy contract:
+          </p>
+          <ul style="font-size: 0.75rem; color: #ff6b6b; padding-left: 16px;">
+            <li>Hook in first 15 seconds?</li>
+            <li>All vocabulary anchors used?</li>
+            <li>Learning objectives covered?</li>
+            <li>Duration within limit?</li>
+          </ul>
+          <div style="margin-top: 12px; padding: 8px; background: rgba(255,107,107,0.2); border-radius: 6px; font-size: 0.8rem;">
+            <strong>Verdict:</strong> PASS/FAIL + Score + Feedback
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 16px; padding: 12px; background: rgba(255,107,107,0.1); border-radius: 8px; border-left: 3px solid #ff6b6b;">
+        <strong style="color: #ff6b6b;">↩ Retry Loop:</strong>
+        <span style="font-size: 0.85rem; color: #aaa;">
+          If Critic returns FAIL, lyrics agent retries with <code>feedbackForRetry</code> in prompt (max 3 attempts)
+        </span>
+      </div>
+    </div>
+
+    <div class="flow-arrow"><div class="arrow"></div></div>
+
+    <!-- Stage 4: Style -->
+    <div class="stage">
+      <div class="stage-label">Stage 4 — Final Output</div>
+      <div class="agent" style="border-color: #9b59b6;">
+        <div class="agent-name">
+          <span>🎨 Style Agent</span>
+          <span class="agent-type">Generator</span>
+        </div>
+        <p style="font-size: 0.85rem; color: #aaa;">
+          Uses strategy's <code>emotionalArc</code> and <code>technique</code> to generate Suno style prompt.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Context Bounce Diagram -->
+  <div class="bounce-visual">
+    <div class="bounce-title">🏓 The "Context Bounce" Pattern</div>
+    <div class="bounce-diagram">
+      <div class="bounce-node active">
+        <div class="bounce-node-icon">📥</div>
+        <div class="bounce-node-label">User Input</div>
+      </div>
+      <div class="bounce-connector">
+        <div class="bounce-data">topic, age, technique</div>
+      </div>
+      <div class="bounce-node active" style="border-color: #ffd700;">
+        <div class="bounce-node-icon">🎯</div>
+        <div class="bounce-node-label">Strategist</div>
+      </div>
+      <div class="bounce-connector">
+        <div class="bounce-data">GenerationStrategy</div>
+      </div>
+      <div class="bounce-node">
+        <div class="bounce-node-icon">⚡</div>
+        <div class="bounce-node-label">Parallel<br>Agents</div>
+      </div>
+      <div class="bounce-connector">
+        <div class="bounce-data">Enriched + Sticks + Flow</div>
+      </div>
+      <div class="bounce-node" style="border-color: #4ecdc4;">
+        <div class="bounce-node-icon">🎤</div>
+        <div class="bounce-node-label">Lyrics</div>
+      </div>
+      <div class="bounce-connector">
+        <div class="bounce-data">StructuredLyrics</div>
+      </div>
+      <div class="bounce-node" style="border-color: #ff6b6b;">
+        <div class="bounce-node-icon">⚖️</div>
+        <div class="bounce-node-label">Critic</div>
+      </div>
+      <div class="bounce-connector">
+        <div class="bounce-data">CriticVerdict</div>
+      </div>
+      <div class="bounce-node">
+        <div class="bounce-node-icon">📤</div>
+        <div class="bounce-node-label">Output</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Key Insights -->
+  <div class="insight-box">
+    <div class="insight-title">🔑 Key Architectural Insights</div>
+    <ul class="insight-list">
+      <li><strong>Contract-First:</strong> Strategist defines hookPhrase, vocabulary, objectives BEFORE any generation happens</li>
+      <li><strong>Bound Outputs:</strong> Each agent's output schema references <code>strategyId</code> — enforcing traceability</li>
+      <li><strong>Parallel Safe:</strong> Context, Sticks, Curiosity, Flow have NO dependencies on each other — only on Strategy</li>
+      <li><strong>Reflection Pattern:</strong> Critic doesn't generate — it validates against the original contract</li>
+      <li><strong>Retry with Context:</strong> Failed attempts pass <code>feedbackForRetry</code> to next attempt — not blind retry</li>
+      <li><strong>No Silent Fallbacks:</strong> If validation fails after 3 attempts, pipeline FAILS explicitly</li>
+    </ul>
+  </div>
+
+  <div class="legend">
+    <div class="legend-item">
+      <div class="legend-color strategy"></div>
+      <span>Strategy Contract</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color parallel"></div>
+      <span>Parallel Execution</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color lyrics"></div>
+      <span>Lyrics Generation</span>
+    </div>
+    <div class="legend-item">
+      <div class="legend-color critic"></div>
+      <span>Critic Validation</span>
+    </div>
+  </div>
+</body>
+</html>

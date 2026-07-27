@@ -1,0 +1,127 @@
+[  777264ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3000/_next/static/chunks/a5dda_next_dist_fd2d7206._.js:2297
+[  778247ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/:0
+[  778858ms] ReferenceError: Cannot access 'SupportedLanguageSchema' before initialization
+    at Module.SupportedLanguageSchema (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_12540cfd._.js:218:9)
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_12540cfd._.js:55:182)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:238:20)
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_12540cfd._.js:226:184)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:238:20)
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_12540cfd._.js:384:197)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:238:20)
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_12540cfd._.js:1789:195)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.commonJsRequire [as r] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:259:12)
+    at requireModule (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:85:84)
+    at initializeModuleChunk (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1089:25)
+    at resolveModuleChunk (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1013:43)
+    at http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1735:24
+[  781871ms] [WARNING] The resource http://localhost:3000/_next/static/media/5d52bd6c4cb3f315-s.p.610fd2a3.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[  781872ms] [WARNING] The resource http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__033ee67d._.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[  781872ms] [WARNING] The resource http://localhost:3000/_next/static/media/83afe278b6a6bb3c-s.p.3a6ba036.woff2 was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1297710ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3000/_next/static/chunks/a5dda_next_dist_fd2d7206._.js:2297
+[ 1297711ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/a5dda_next_dist_fd2d7206._.js:2297
+[ 1307836ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3000/_next/static/chunks/a5dda_next_dist_fd2d7206._.js:2297
+[ 1308880ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/:0
+[ 1309479ms] ReferenceError: SupportedLanguageSchema is not defined
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_8968ec99._.js:295:15)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:238:20)
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_8968ec99._.js:416:197)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:238:20)
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_8968ec99._.js:1821:195)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.commonJsRequire [as r] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:259:12)
+    at requireModule (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:85:84)
+    at initializeModuleChunk (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1089:25)
+    at resolveModuleChunk (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1013:43)
+    at http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1735:24
+[ 1312490ms] [WARNING] The resource http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__033ee67d._.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1319042ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3000/_next/static/chunks/a5dda_next_dist_fd2d7206._.js:2297
+[ 1319042ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/a5dda_next_dist_fd2d7206._.js:2297
+[ 1319886ms] [ERROR] Failed to load resource: the server responded with a status of 500 (Internal Server Error) @ http://localhost:3000/:0
+[ 1320592ms] ReferenceError: AgeRangeSchema is not defined
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_8968ec99._.js:324:15)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:238:20)
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_8968ec99._.js:404:197)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.esmImport [as i] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:238:20)
+    at module evaluation (http://localhost:3000/_next/static/chunks/public_cem_kidlearnio_8968ec99._.js:1809:195)
+    at http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:879:13
+    at runModuleExecutionHooks (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:904:13)
+    at instantiateModule (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:877:9)
+    at getOrInstantiateModuleFromParent (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:830:12)
+    at DevContext.commonJsRequire [as r] (http://localhost:3000/_next/static/chunks/turbopack-public_cem_kidlearnio_27197565._.js:259:12)
+    at requireModule (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:85:84)
+    at initializeModuleChunk (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1089:25)
+    at resolveModuleChunk (http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1013:43)
+    at http://localhost:3000/_next/static/chunks/a5dda_next_dist_compiled_react-server-dom-turbopack_5791e7a8._.js:1735:24
+[ 1323398ms] [WARNING] The resource http://localhost:3000/_next/static/chunks/%5Broot-of-the-server%5D__033ee67d._.css was preloaded using link preload but not used within a few seconds from the window's load event. Please make sure it has an appropriate `as` value and it is preloaded intentionally. @ http://localhost:3000/:0
+[ 1452299ms] [WARNING] [Fast Refresh] performing full reload
+
+Fast Refresh will perform a full reload when you edit a file that's imported by modules outside of the React rendering tree.
+You might have a file which exports a React component but also exports a value that is imported by a non-React component file.
+Consider migrating the non-React component export to a separate file and importing it into both files.
+
+It is also possible the parent component of the component you edited is a class component, which disables Fast Refresh.
+Fast Refresh requires at least one parent function component in your React tree. @ http://localhost:3000/_next/static/chunks/a5dda_next_dist_fd2d7206._.js:2297
+[ 1452300ms] [WARNING] [Fast Refresh] performing full reload because your application had an unrecoverable error @ http://localhost:3000/_next/static/chunks/a5dda_next_dist_fd2d7206._.js:2297

@@ -1,1 +1,1 @@
-../../plugin/.claude/skills/cockpit.md
+/Users/cem/humanitic/plugin/.claude/commands/cockpit.md

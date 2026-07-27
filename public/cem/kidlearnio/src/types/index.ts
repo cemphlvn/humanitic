@@ -1,11 +1,26 @@
 import { z } from 'zod';
 
+// Import base types for internal use
+import {
+  SupportedLanguageSchema,
+  type SupportedLanguage,
+  AgeRangeSchema,
+  TechniqueSchema,
+} from './base';
+
+// Re-export base types for external consumers
+export {
+  SupportedLanguageSchema,
+  type SupportedLanguage,
+  AgeRangeSchema,
+  type AgeRange,
+  TechniqueSchema,
+  type Technique,
+} from './base';
+
 // ============================================================================
 // LANGUAGE SCHEMAS — Brains Before Mouths
 // ============================================================================
-
-export const SupportedLanguageSchema = z.enum(['en', 'tr', 'zh']);
-export type SupportedLanguage = z.infer<typeof SupportedLanguageSchema>;
 
 export const LANGUAGE_NAMES: Record<SupportedLanguage, string> = {
   en: 'English',
@@ -51,15 +66,6 @@ export interface LanguageBrain {
 // INPUT SCHEMAS
 // ============================================================================
 
-export const AgeRangeSchema = z.tuple([
-  z.number().min(5).max(18),
-  z.number().min(5).max(18),
-]).refine(([min, max]) => min <= max, {
-  message: 'Minimum age must be less than or equal to maximum age',
-});
-
-export const TechniqueSchema = z.enum(['memorization', 'connection']);
-
 export const OutputTypeSchema = z.enum(['lyrics', 'style', 'both']);
 
 export const GenerationInputSchema = z.object({
@@ -72,8 +78,6 @@ export const GenerationInputSchema = z.object({
 });
 
 export type GenerationInput = z.infer<typeof GenerationInputSchema>;
-export type AgeRange = z.infer<typeof AgeRangeSchema>;
-export type Technique = z.infer<typeof TechniqueSchema>;
 export type OutputType = z.infer<typeof OutputTypeSchema>;
 
 // ============================================================================
@@ -240,3 +244,9 @@ export type DeepPartial<T> = {
 export type AsyncResult<T, E = Error> =
   | { success: true; data: T }
   | { success: false; error: E };
+
+// ============================================================================
+// STRUCTURED PIPELINE TYPES (v2 Architecture)
+// ============================================================================
+
+export * from './strategy';

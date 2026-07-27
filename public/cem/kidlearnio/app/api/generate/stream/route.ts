@@ -1,5 +1,5 @@
 import { GenerationInputSchema } from '@/types';
-import { runPipeline } from '@/pipelines/generation-pipeline';
+import { runPipelineV2 } from '@/pipelines/generation-pipeline-v2';
 import type { TraceEvent } from '@/lib/tracing';
 
 export const runtime = 'nodejs';
@@ -49,8 +49,8 @@ export async function POST(request: Request) {
       controller.enqueue(encoder.encode(`data: ${JSON.stringify(thinkingEvent)}\n\n`));
 
       try {
-        // Run pipeline with event streaming
-        const result = await runPipeline(
+        // Run v2 pipeline with event streaming
+        const result = await runPipelineV2(
           input,
           undefined, // No progress callback needed - using trace events
           (event: TraceEvent) => {

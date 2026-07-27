@@ -88,12 +88,21 @@ export default function HomePage() {
           </MDBCol>
 
           <MDBCol lg="7">
-            {output && output.success ? (
-              <OutputDisplay
-                lyrics={output.lyrics}
-                style={output.style}
-                metadata={output.metadata}
-              />
+            {output && (output.success || output.lyrics) ? (
+              <>
+                {!output.success && output.lyrics && (
+                  <div className="alert alert-warning mb-3" role="alert">
+                    <i className="fas fa-exclamation-triangle me-2" />
+                    Generation completed with warnings. Lyrics shown below may need review.
+                    {output.error && <small className="d-block mt-1 text-muted">{output.error}</small>}
+                  </div>
+                )}
+                <OutputDisplay
+                  lyrics={output.lyrics}
+                  style={output.style}
+                  metadata={output.metadata}
+                />
+              </>
             ) : (
               <div className="generator-card text-center py-5">
                 <i
