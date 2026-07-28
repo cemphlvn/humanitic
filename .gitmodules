@@ -1,3 +1,6 @@
 [submodule "plugin"]
 	path = plugin
 	url = https://github.com/cemphlvn/meta-agentic-loop.git
+[submodule "public/cem/mind.c"]
+	path = public/cem/mind.c
+	url = https://github.com/cemphlvn/MIND.git
